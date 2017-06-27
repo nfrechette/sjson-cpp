@@ -9,8 +9,8 @@ Everything is 100% C++ header based for easy and trivial integration.
 
 ## Authors
 
-[Nicholas Frechette](https://github.com/nfrechette)
-[Cody Jones](https://github.com/CodyDWJones)
+*  [Nicholas Frechette](https://github.com/nfrechette)
+*  [Cody Jones](https://github.com/CodyDWJones)
 
 ## MIT License
 
