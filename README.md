@@ -7,6 +7,14 @@ By design, the reader/parser does no memory allocations.
 
 Everything is 100% C++ header based for easy and trivial integration.
 
+## Unsupported Uses
+
+This parser is intended to accept only pure SJSON, and it will fail if given a JSON file, unlike the Autodesk Stingray parser. 
+
+The following are not yet supported:
+- null literals
+- unescaping characters within strings, since only string views (windowed pointers into the input) are returned.
+
 ## Authors
 
 *  [Nicholas Frechette](https://github.com/nfrechette)
@@ -14,4 +22,4 @@ Everything is 100% C++ header based for easy and trivial integration.
 
 ## MIT License
 
-Copyright (c) 2017 Nicholas Frechette & contributors
+Copyright (c) 2017 Nicholas Frechette, Cody Jones, and sjson-cpp contributors
