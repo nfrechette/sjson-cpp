@@ -14,6 +14,7 @@ This parser is intended to accept only pure SJSON, and it will fail if given a J
 The following are not yet supported:
 - null literals
 - unescaping characters within strings, since only string views (windowed pointers into the input) are returned.
+- utf8 or unicode SJSON
 
 ## Authors
 
