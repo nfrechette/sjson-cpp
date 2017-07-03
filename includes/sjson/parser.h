@@ -82,6 +82,14 @@ namespace sjson
 		bool read(const char* key, StringView& value) { return read_key(key) && read_equal_sign() && read_string(value); }
 		bool read(const char* key, bool& value) { return read_key(key) && read_equal_sign() && read_bool(value); }
 		bool read(const char* key, double& value) { return read_key(key) && read_equal_sign() && read_double(value); }
+		bool read(const char* key, int8_t& value) { return read_key(key) && read_equal_sign() && read_integer(value); }
+		bool read(const char* key, uint8_t& value) { return read_key(key) && read_equal_sign() && read_integer(value); }
+		bool read(const char* key, int16_t& value) { return read_key(key) && read_equal_sign() && read_integer(value); }
+		bool read(const char* key, uint16_t& value) { return read_key(key) && read_equal_sign() && read_integer(value); }
+		bool read(const char* key, int32_t& value) { return read_key(key) && read_equal_sign() && read_integer(value); }
+		bool read(const char* key, uint32_t& value) { return read_key(key) && read_equal_sign() && read_integer(value); }
+		bool read(const char* key, int64_t& value) { return read_key(key) && read_equal_sign() && read_integer(value); }
+		bool read(const char* key, uint64_t& value) { return read_key(key) && read_equal_sign() && read_integer(value); }
 
 		bool read(const char* key, double* values, uint32_t num_elements)
 		{
@@ -497,6 +505,85 @@ namespace sjson
 
 			char* last_used_symbol = nullptr;
 			value = std::strtod(slice, &last_used_symbol);
+
+			if (last_used_symbol != slice + length)
+			{
+				set_error(ParserError::NumberCouldNotBeConverted);
+				return false;
+			}
+
+			return true;
+		}
+
+		template<typename IntegralType>
+		bool read_integer(IntegralType& value)
+		{
+			if (!skip_comments_and_whitespace_fail_if_eof())
+				return false;
+
+			size_t start_offset = m_state.offset;
+			size_t end_offset;
+
+			if (m_state.symbol == '-')
+				advance();
+
+			if (m_state.symbol == '0')
+			{
+				advance();
+			}
+			else if (std::isdigit(m_state.symbol))
+			{
+				while (std::isdigit(m_state.symbol))
+					advance();
+			}
+			else
+			{
+				set_error(ParserError::NumberExpected);
+				return false;
+			}
+
+			if (m_state.symbol == '.')
+			{
+				set_error(ParserError::NumberExpected);
+				return false;
+			}
+
+			end_offset = m_state.offset - 1;
+			size_t length = end_offset - start_offset + 1;
+
+			char slice[MAX_NUMBER_LENGTH + 1];
+			if (length >= MAX_NUMBER_LENGTH)
+			{
+				set_error(ParserError::NumberIsTooLong);
+				return false;
+			}
+
+			std::memcpy(slice, m_input + start_offset, length);
+			slice[length] = '\0';
+
+			char* last_used_symbol = nullptr;
+			if (std::is_unsigned<IntegralType>::value)
+			{
+				uint64_t raw_value = std::strtoull(slice, &last_used_symbol, 10);
+				value = static_cast<IntegralType>(raw_value);
+
+				if (value != raw_value)
+				{
+					set_error(ParserError::NumberCouldNotBeConverted);
+					return false;
+				}
+			}
+			else
+			{
+				int64_t raw_value = std::strtoll(slice, &last_used_symbol, 10);
+				value = static_cast<IntegralType>(raw_value);
+
+				if (value != raw_value)
+				{
+					set_error(ParserError::NumberCouldNotBeConverted);
+					return false;
+				}
+			}
 
 			if (last_used_symbol != slice + length)
 			{
