@@ -1,20 +1,28 @@
 # SJSON CPP
 
-`sjson-cpp` is a C++ library to read and write [SJSON](http://help.autodesk.com/view/Stingray/ENU/?guid=__stingray_help_managing_content_sjson_html) files.
+`sjson-cpp` is a C++ library to read and write [Simplified JSON](http://help.autodesk.com/view/Stingray/ENU/?guid=__stingray_help_managing_content_sjson_html) files.
 It aims to be minimal, fast, and get out of the way of the programmer.
 
 By design, the reader/parser does no memory allocations. This is in contrast to the [nflibs C parser](https://github.com/niklasfrykholm/nflibs).
 
 Everything is 100% C++ header based for easy and trivial integration.
 
-## Unsupported Uses
+This parser is intended to accept only pure SJSON, and it will fail if given a JSON file, unlike the [Autodesk JS Stingray parser](https://github.com/Autodesk/sjson).
 
-This parser is intended to accept only pure SJSON, and it will fail if given a JSON file, unlike the [Autodesk JS Stingray parser](https://github.com/Autodesk/sjson). 
+## The SJSON format
 
-The following are not yet supported:
-- null literals
-- unescaping characters within strings, since only string views (windowed pointers into the input) are returned.
-- utf8 or unicode SJSON
+TODO: Add a reference sjson file showing the format as a form of loose specification
+
+## Unicode support
+
+UTF-8 supported is as follow:
+
+*  String values return a raw `StringView` into the SJSON buffer. It is the responsability of the caller to interpret it as ANSI or UTF-8.
+*  String values properly support escaped unicode sequences in that they are returned raw in the `StringView`.
+*  Keys do not support UTF-8, they must be ANSI.
+*  The BOM is properly skipped if present
+
+Unicode formats other than UTF-8 aren't supported.
 
 ## Authors
 

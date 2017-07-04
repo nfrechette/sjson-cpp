@@ -43,6 +43,7 @@ namespace sjson
 			, m_input_length(input_length)
 			, m_state(input, input_length)
 		{
+			skip_bom();
 		}
 
 		bool object_begins() { return read_opening_brace(); }
@@ -79,6 +80,19 @@ namespace sjson
 			return true;
 		}
 
+		// TODO: To support 'null' value entries (e.g. foo = null), these functions should take as an argument an Option
+		// e.g. bool read(const char* key, Option<bool>& value)
+		// The return value tells us whether or not we successfully parsed our key/value pair
+		// The option returned tells us whether we parsed an actual value or a null literal
+		// The caller is responsible for interpreting the meaning of this
+		// TODO: These should all be renamed to try_read since on failure they restore the state prior to the parsing attempt
+		// TODO: Return the actual parsing error instead of a bool, maybe introduce an ErrorType that coerces to bool, true == success?
+		// TODO: Rename this for a cleaner API, try_read_string, try_read_bool, try_read_double, try_read_integer, etc
+
+		// The StringView returned is a raw view of the SJSON buffer. Anything escaped within is thus returned as-is.
+		// Only the start/end quote is stripped from the returned string.
+		// e.g.: some_key = "this is an \"escaped\" string within another string"
+		//  StringView start ^                                             end ^
 		bool read(const char* key, StringView& value) { return read_key(key) && read_equal_sign() && read_string(value); }
 		bool read(const char* key, bool& value) { return read_key(key) && read_equal_sign() && read_bool(value); }
 		bool read(const char* key, double& value) { return read_key(key) && read_equal_sign() && read_double(value); }
@@ -195,7 +209,7 @@ namespace sjson
 		void reset_state() { m_state = ParserState(m_input, m_input_length); }
 
 	private:
-		static size_t constexpr MAX_NUMBER_LENGTH = 64;
+		static constexpr size_t MAX_NUMBER_LENGTH = 64;
 
 		const char* m_input;
 		const size_t m_input_length;
@@ -223,6 +237,10 @@ namespace sjson
 			return false;
 		}
 
+		// This function assumes that the first '/' character has already been consumed
+		// e.g.:      //        or   /*
+		// symbol:     ^              ^
+		// TODO: Fix this
 		bool read_comment()
 		{
 			if (eof())
@@ -304,6 +322,9 @@ namespace sjson
 			return true;
 		}
 
+		// The StringView value returned is a raw view of the SJSON buffer. Nothing is unescaped:
+		// escaped quotation marks will remain, escaped unicode sequences will remain, etc.
+		// It is the responsibility of the caller to handle this in a meaningful way.
 		bool read_string(StringView& value)
 		{
 			if (!skip_comments_and_whitespace_fail_if_eof())
@@ -340,15 +361,34 @@ namespace sjson
 					// Strings are returned as slices of the input, so escape sequences cannot be un-escaped.
 					// Assume the escape sequence is valid and skip over it.
 					advance();
-				}
 
-				advance();
+					if (m_state.symbol == 'u')
+					{
+						advance();
+
+						// This is an escaped unicode character, skip the 4 bytes that follow
+						advance();
+						advance();
+						advance();
+						advance();
+					}
+					else
+					{
+						advance();
+					}
+				}
+				else
+				{
+					advance();
+				}
 			}
 
 			value = StringView(m_input + start_offset, end_offset - start_offset + 1);
 			return true;
 		}
 
+		// Unquoted keys do not support escaped unicode literals or any form of escaping
+		// e.g. foo_\u0066_bar = "this is an invalid key"
 		bool read_unquoted_key(StringView& value)
 		{
 			if (eof())
@@ -364,8 +404,8 @@ namespace sjson
 			{
 				if (eof())
 				{
-					end_offset = m_state.offset - 1;
-					break;
+					set_error(ParserError::InputTruncated);
+					return false;
 				}
 
 				if (m_state.symbol == '"')
@@ -489,7 +529,7 @@ namespace sjson
 				while (std::isdigit(m_state.symbol))
 					advance();
 			}
-			
+
 			end_offset = m_state.offset - 1;
 			size_t length = end_offset - start_offset + 1;
 
@@ -523,6 +563,7 @@ namespace sjson
 
 			size_t start_offset = m_state.offset;
 			size_t end_offset;
+			int base = 10;
 
 			if (m_state.symbol == '-')
 				advance();
@@ -530,6 +571,22 @@ namespace sjson
 			if (m_state.symbol == '0')
 			{
 				advance();
+
+				if (m_state.symbol == 'x' || m_state.symbol == 'X')
+				{
+					advance();
+					base = 16;
+
+					while (is_hex_digit(m_state.symbol))
+						advance();
+				}
+				else
+				{
+					base = 8;
+
+					while (std::isdigit(m_state.symbol))
+						advance();
+				}
 			}
 			else if (std::isdigit(m_state.symbol))
 			{
@@ -564,7 +621,7 @@ namespace sjson
 			char* last_used_symbol = nullptr;
 			if (std::is_unsigned<IntegralType>::value)
 			{
-				uint64_t raw_value = std::strtoull(slice, &last_used_symbol, 10);
+				uint64_t raw_value = std::strtoull(slice, &last_used_symbol, base);
 				value = static_cast<IntegralType>(raw_value);
 
 				if (value != raw_value)
@@ -575,7 +632,7 @@ namespace sjson
 			}
 			else
 			{
-				int64_t raw_value = std::strtoll(slice, &last_used_symbol, 10);
+				int64_t raw_value = std::strtoll(slice, &last_used_symbol, base);
 				value = static_cast<IntegralType>(raw_value);
 
 				if (value != raw_value)
@@ -594,6 +651,17 @@ namespace sjson
 			return true;
 		}
 
+		static constexpr bool is_hex_digit(char value)
+		{
+			return std::isdigit(value)
+				|| value == 'a' || value == 'A'
+				|| value == 'b' || value == 'B'
+				|| value == 'c' || value == 'C'
+				|| value == 'd' || value == 'D'
+				|| value == 'e' || value == 'E'
+				|| value == 'f' || value == 'F';
+		}
+
 		bool skip_comments_and_whitespace_fail_if_eof()
 		{
 			if (!skip_comments_and_whitespace())
@@ -606,6 +674,29 @@ namespace sjson
 			}
 
 			return true;
+		}
+
+		void skip_bom()
+		{
+			ParserState initial_state = save_state();
+			bool skipped_bom = false;
+
+			if (m_state.symbol == 0xEF)
+			{
+				advance();
+				if (m_state.symbol == 0xBB)
+				{
+					advance();
+					if (m_state.symbol == 0xBF)
+					{
+						advance();
+						skipped_bom = true;
+					}
+				}
+			}
+
+			if (!skipped_bom)
+				restore_state(initial_state);
 		}
 
 		bool advance()
