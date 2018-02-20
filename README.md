@@ -15,7 +15,7 @@ TODO: Add a reference sjson file showing the format as a form of loose specifica
 
 ## Unicode support
 
-UTF-8 supported is as follow:
+UTF-8 support is as follow:
 
 *  String values return a raw `StringView` into the SJSON buffer. It is the responsability of the caller to interpret it as ANSI or UTF-8.
 *  String values properly support escaped unicode sequences in that they are returned raw in the `StringView`.
