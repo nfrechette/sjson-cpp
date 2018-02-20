@@ -17,6 +17,8 @@ This parser is intended to accept only pure SJSON, and it will fail if given a J
 
 ## The SJSON format
 
+The data format is described [here](http://help.autodesk.com/view/Stingray/ENU/?guid=__stingray_help_managing_content_sjson_html) in the Stingray documentation.
+
 TODO: Add a reference sjson file showing the format as a form of loose specification
 
 ## Unicode support
