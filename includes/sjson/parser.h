@@ -47,6 +47,25 @@ namespace sjson
 			skip_bom();
 		}
 
+		// Prevent copying to reduce to avoid potential mistakes
+		Parser(const Parser& other) = delete;
+		Parser& operator=(const Parser& other) = delete;
+
+		Parser(Parser&& other)
+			: m_input(other.m_input)
+			, m_input_length(other.m_input_length)
+			, m_state(other.m_state)
+		{}
+
+		Parser& operator=(Parser&& other)
+		{
+			m_input = other.m_input;
+			m_input_length = other.m_input_length;
+			m_state = other.m_state;
+
+			return *this;
+		}
+
 		bool object_begins() { return read_opening_brace(); }
 		bool object_begins(const char* having_name) { return read_key(having_name) && read_equal_sign() && object_begins(); }
 		bool object_ends() { return read_closing_brace(); }
@@ -277,7 +296,7 @@ namespace sjson
 		static constexpr size_t k_max_number_length = 64;
 
 		const char* m_input;
-		const size_t m_input_length;
+		size_t m_input_length;
 		ParserState m_state;
 
 		bool read_equal_sign()		{ return read_symbol('=', ParserError::EqualSignExpected); }
