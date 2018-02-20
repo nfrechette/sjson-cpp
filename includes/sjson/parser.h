@@ -135,34 +135,6 @@ namespace sjson
 			return read_key(key) && read_equal_sign() && read_opening_bracket() && read(values, num_elements) && read_closing_bracket();
 		}
 
-		bool read(double* values, uint32_t num_elements)
-		{
-			if (num_elements == 0)
-				return true;
-
-			for (uint32_t i = 0; i < num_elements; ++i)
-			{
-				if (!read_double(values[i]) || (i < (num_elements - 1) && !read_comma()))
-					return false;
-			}
-
-			return true;
-		}
-
-		bool read(StringView* values, uint32_t num_elements)
-		{
-			if (num_elements == 0)
-				return true;
-
-			for (uint32_t i = 0; i < num_elements; ++i)
-			{
-				if (!read_string(values[i]) || (i < (num_elements - 1) && !read_comma()))
-					return false;
-			}
-
-			return true;
-		}
-
 		bool try_read(const char* key, StringView& value, const char* default_value)
 		{
 			ParserState s = save_state();
@@ -730,6 +702,34 @@ namespace sjson
 			{
 				set_error(ParserError::NumberCouldNotBeConverted);
 				return false;
+			}
+
+			return true;
+		}
+
+		bool read(double* values, uint32_t num_elements)
+		{
+			if (num_elements == 0)
+				return true;
+
+			for (uint32_t i = 0; i < num_elements; ++i)
+			{
+				if (!read_double(values[i]) || (i < (num_elements - 1) && !read_comma()))
+					return false;
+			}
+
+			return true;
+		}
+
+		bool read(StringView* values, uint32_t num_elements)
+		{
+			if (num_elements == 0)
+				return true;
+
+			for (uint32_t i = 0; i < num_elements; ++i)
+			{
+				if (!read_string(values[i]) || (i < (num_elements - 1) && !read_comma()))
+					return false;
 			}
 
 			return true;
