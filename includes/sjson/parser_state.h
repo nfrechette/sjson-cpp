@@ -27,7 +27,7 @@
 #include "parser_error.h"
 
 #include <cstdlib>
-#include <stdint.h>
+#include <cstdint>
 
 namespace sjson
 {

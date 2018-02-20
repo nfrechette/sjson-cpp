@@ -31,7 +31,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
-#include <stdint.h>
+#include <cstdint>
 
 namespace sjson
 {
@@ -67,7 +67,7 @@ namespace sjson
 			return true;
 		}
 
-		bool try_array_ends() 
+		bool try_array_ends()
 		{
 			ParserState s = save_state();
 
@@ -141,7 +141,7 @@ namespace sjson
 		bool try_read(const char* key, double* values, uint32_t num_elements)
 		{
 			ParserState s = save_state();
-			
+
 			if (!read(key, values, num_elements))
 			{
 				restore_state(s);
@@ -472,7 +472,7 @@ namespace sjson
 					return true;
 				}
 			}
-			
+
 			restore_state(start_of_literal);
 			set_error(ParserError::TrueOrFalseExpected);
 			return false;
