@@ -29,6 +29,7 @@
 #include "string_view.h"
 
 #include <cctype>
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <cstdint>
@@ -110,6 +111,11 @@ namespace sjson
 			return read_key(key) && read_equal_sign() && read_opening_bracket() && read(values, num_elements) && read_closing_bracket();
 		}
 
+		bool read(const char* key, StringView* values, uint32_t num_elements)
+		{
+			return read_key(key) && read_equal_sign() && read_opening_bracket() && read(values, num_elements) && read_closing_bracket();
+		}
+
 		bool read(double* values, uint32_t num_elements)
 		{
 			if (num_elements == 0)
@@ -117,28 +123,70 @@ namespace sjson
 
 			for (uint32_t i = 0; i < num_elements; ++i)
 			{
-				if (!read_double(values[i]) || i < num_elements - 1 && !read_comma())
+				if (!read_double(values[i]) || (i < (num_elements - 1) && !read_comma()))
 					return false;
 			}
 
 			return true;
 		}
 
-		bool try_read(const char* key, StringView& value)
+		bool read(StringView* values, uint32_t num_elements)
+		{
+			if (num_elements == 0)
+				return true;
+
+			for (uint32_t i = 0; i < num_elements; ++i)
+			{
+				if (!read_string(values[i]) || (i < (num_elements - 1) && !read_comma()))
+					return false;
+			}
+
+			return true;
+		}
+
+		bool try_read(const char* key, StringView& value, const char* default_value)
 		{
 			ParserState s = save_state();
 
 			if (!read(key, value))
 			{
 				restore_state(s);
-				value = nullptr;
+				value = default_value;
 				return false;
 			}
 
 			return true;
 		}
 
-		bool try_read(const char* key, double* values, uint32_t num_elements)
+		bool try_read(const char* key, bool& value, bool default_value)
+		{
+			ParserState s = save_state();
+
+			if (!read(key, value))
+			{
+				restore_state(s);
+				value = default_value;
+				return false;
+			}
+
+			return true;
+		}
+
+		bool try_read(const char* key, double& value, double default_value)
+		{
+			ParserState s = save_state();
+
+			if (!read(key, value))
+			{
+				restore_state(s);
+				value = default_value;
+				return false;
+			}
+
+			return true;
+		}
+
+		bool try_read(const char* key, double* values, uint32_t num_elements, double default_value)
 		{
 			ParserState s = save_state();
 
@@ -147,7 +195,24 @@ namespace sjson
 				restore_state(s);
 
 				for (uint32_t i = 0; i < num_elements; ++i)
-					values[i] = 0.0;
+					values[i] = default_value;
+
+				return false;
+			}
+
+			return true;
+		}
+
+		bool try_read(const char* key, StringView* values, uint32_t num_elements, const char* default_value)
+		{
+			ParserState s = save_state();
+
+			if (!read(key, values, num_elements))
+			{
+				restore_state(s);
+
+				for (uint32_t i = 0; i < num_elements; ++i)
+					values[i] = default_value;
 
 				return false;
 			}
@@ -209,7 +274,7 @@ namespace sjson
 		void reset_state() { m_state = ParserState(m_input, m_input_length); }
 
 	private:
-		static constexpr size_t MAX_NUMBER_LENGTH = 64;
+		static constexpr size_t k_max_number_length = 64;
 
 		const char* m_input;
 		const size_t m_input_length;
@@ -533,8 +598,8 @@ namespace sjson
 			end_offset = m_state.offset - 1;
 			size_t length = end_offset - start_offset + 1;
 
-			char slice[MAX_NUMBER_LENGTH + 1];
-			if (length >= MAX_NUMBER_LENGTH)
+			char slice[k_max_number_length + 1];
+			if (length >= k_max_number_length)
 			{
 				set_error(ParserError::NumberIsTooLong);
 				return false;
@@ -608,8 +673,8 @@ namespace sjson
 			end_offset = m_state.offset - 1;
 			size_t length = end_offset - start_offset + 1;
 
-			char slice[MAX_NUMBER_LENGTH + 1];
-			if (length >= MAX_NUMBER_LENGTH)
+			char slice[k_max_number_length + 1];
+			if (length >= k_max_number_length)
 			{
 				set_error(ParserError::NumberIsTooLong);
 				return false;
@@ -624,7 +689,7 @@ namespace sjson
 				uint64_t raw_value = std::strtoull(slice, &last_used_symbol, base);
 				value = static_cast<IntegralType>(raw_value);
 
-				if (value != raw_value)
+				if (static_cast<uint64_t>(value) != raw_value)
 				{
 					set_error(ParserError::NumberCouldNotBeConverted);
 					return false;
@@ -635,7 +700,7 @@ namespace sjson
 				int64_t raw_value = std::strtoll(slice, &last_used_symbol, base);
 				value = static_cast<IntegralType>(raw_value);
 
-				if (value != raw_value)
+				if (static_cast<int64_t>(value) != raw_value)
 				{
 					set_error(ParserError::NumberCouldNotBeConverted);
 					return false;
