@@ -31,7 +31,7 @@
 #include <cstdint>
 #include <cinttypes>
 
-namespace acl
+namespace sjson
 {
 	// TODO: Cleanup the locking stuff, wrap it in #ifdef to strip when asserts are disabled
 
@@ -76,12 +76,12 @@ namespace acl
 		void push_value(bool value);
 		void push_value(double value);
 		void push_value(float value) { push_value(double(value)); }
-		void push_value(int8_t value) { push_signed_integer(value); }
-		void push_value(uint8_t value) { push_unsigned_integer(value); }
-		void push_value(int16_t value) { push_signed_integer(value); }
-		void push_value(uint16_t value) { push_unsigned_integer(value); }
-		void push_value(int32_t value) { push_signed_integer(value); }
-		void push_value(uint32_t value) { push_unsigned_integer(value); }
+		void push_value(int8_t value) { push_signed_integer(static_cast<int64_t>(value)); }
+		void push_value(uint8_t value) { push_unsigned_integer(static_cast<uint64_t>(value)); }
+		void push_value(int16_t value) { push_signed_integer(static_cast<int64_t>(value)); }
+		void push_value(uint16_t value) { push_unsigned_integer(static_cast<uint64_t>(value)); }
+		void push_value(int32_t value) { push_signed_integer(static_cast<int64_t>(value)); }
+		void push_value(uint32_t value) { push_unsigned_integer(static_cast<uint64_t>(value)); }
 		void push_value(int64_t value) { push_signed_integer(value); }
 		void push_value(uint64_t value) { push_unsigned_integer(value); }
 
@@ -249,8 +249,8 @@ namespace acl
 		m_stream_writer.write(" = ");
 
 		char buffer[256];
-		size_t length = snprintf(buffer, sizeof(buffer), "%.10f%s", value, k_line_terminator);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %.10f]", key, value);
+		size_t length = snprintf(buffer, sizeof(buffer), "%.17g%s", value, k_line_terminator);
+		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %.17g]", key, value);
 		m_stream_writer.write(buffer, length);
 	}
 
@@ -421,8 +421,8 @@ namespace acl
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot assign a value when locked");
 
 		char buffer[256];
-		size_t length = snprintf(buffer, sizeof(buffer), "%.10f%s", value, k_line_terminator);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %.10f", value);
+		size_t length = snprintf(buffer, sizeof(buffer), "%.17g%s", value, k_line_terminator);
+		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %.17g", value);
 		m_object_writer->m_stream_writer.write(buffer, length);
 		m_is_empty = false;
 	}
@@ -557,8 +557,8 @@ namespace acl
 			write_indentation();
 
 		char buffer[256];
-		size_t length = snprintf(buffer, sizeof(buffer), "%.10f", value);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %.10f", value);
+		size_t length = snprintf(buffer, sizeof(buffer), "%.17g", value);
+		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %.17g", value);
 		m_stream_writer.write(buffer, length);
 		m_is_empty = false;
 		m_is_newline = false;
