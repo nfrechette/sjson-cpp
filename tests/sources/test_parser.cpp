@@ -296,7 +296,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 		Parser parser = parser_from_c_str("key = 1234567890123456");
 		uint64_t value;
 		REQUIRE(parser.read("key", value));
-		REQUIRE(value == 1234567890123456ll);
+		REQUIRE(value == 1234567890123456ull);
 		REQUIRE(parser.eof());
 		REQUIRE(parser.is_valid());
 	}
