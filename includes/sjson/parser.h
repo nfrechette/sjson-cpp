@@ -244,6 +244,8 @@ namespace sjson
 
 					if (!read_comment())
 						return false;
+
+					continue;
 				}
 
 				return true;
