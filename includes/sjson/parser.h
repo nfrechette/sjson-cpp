@@ -211,6 +211,34 @@ namespace sjson
 			return true;
 		}
 
+		bool read(double* values, uint32_t num_elements)
+		{
+			if (num_elements == 0)
+				return true;
+
+			for (uint32_t i = 0; i < num_elements; ++i)
+			{
+				if (!read_double(values[i]) || (i < (num_elements - 1) && !read_comma()))
+					return false;
+			}
+
+			return true;
+		}
+
+		bool read(StringView* values, uint32_t num_elements)
+		{
+			if (num_elements == 0)
+				return true;
+
+			for (uint32_t i = 0; i < num_elements; ++i)
+			{
+				if (!read_string(values[i]) || (i < (num_elements - 1) && !read_comma()))
+					return false;
+			}
+
+			return true;
+		}
+
 		bool remainder_is_comments_and_whitespace()
 		{
 			if (!skip_comments_and_whitespace())
@@ -710,35 +738,7 @@ namespace sjson
 			return true;
 		}
 
-		bool read(double* values, uint32_t num_elements)
-		{
-			if (num_elements == 0)
-				return true;
-
-			for (uint32_t i = 0; i < num_elements; ++i)
-			{
-				if (!read_double(values[i]) || (i < (num_elements - 1) && !read_comma()))
-					return false;
-			}
-
-			return true;
-		}
-
-		bool read(StringView* values, uint32_t num_elements)
-		{
-			if (num_elements == 0)
-				return true;
-
-			for (uint32_t i = 0; i < num_elements; ++i)
-			{
-				if (!read_string(values[i]) || (i < (num_elements - 1) && !read_comma()))
-					return false;
-			}
-
-			return true;
-		}
-
-		static constexpr bool is_hex_digit(char value)
+		static bool is_hex_digit(char value)
 		{
 			return std::isdigit(value)
 				|| value == 'a' || value == 'A'
