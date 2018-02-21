@@ -85,7 +85,7 @@ namespace sjson
 		void push_value(int64_t value) { push_signed_integer(value); }
 		void push_value(uint64_t value) { push_unsigned_integer(value); }
 
-		void push_object(std::function<void(ObjectWriter& object)> writer_fun);
+		void push_object(std::function<void(ObjectWriter& object_writer)> writer_fun);
 		void push_array(std::function<void(ArrayWriter& array_writer)> writer_fun);
 
 		void push_newline();
