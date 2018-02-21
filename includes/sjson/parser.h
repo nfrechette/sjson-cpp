@@ -261,6 +261,7 @@ namespace sjson
 		bool eof() { return m_state.offset >= m_input_length; }
 
 		ParserError get_error() { return m_state.error; }
+		bool is_valid() const { return m_state.error.error == ParserError::None; }
 
 		ParserState save_state() const { return m_state; }
 		void restore_state(const ParserState& s) { m_state = s; }
