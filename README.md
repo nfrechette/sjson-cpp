@@ -9,7 +9,7 @@
 `sjson-cpp` is a C++ library to read and write [Simplified JSON](http://help.autodesk.com/view/Stingray/ENU/?guid=__stingray_help_managing_content_sjson_html) files.
 It aims to be minimal, fast, and get out of the way of the programmer.
 
-By design, the reader/parser does no memory allocations. This is in contrast to the [nflibs C parser](https://github.com/niklasfrykholm/nflibs).
+By design, the library does no memory allocations. This is in contrast to the [nflibs C parser](https://github.com/niklasfrykholm/nflibs).
 
 Everything is 100% C++ header based for easy and trivial integration.
 
@@ -31,6 +31,11 @@ UTF-8 support is as follow:
 *  The BOM is properly skipped if present
 
 Unicode formats other than UTF-8 aren't supported.
+
+## External dependencies
+
+There are none! You don't need anything else to get started: everything is self contained.
+See [here](./external) for details on the ones we do include.
 
 ## Authors
 
