@@ -70,7 +70,7 @@ namespace sjson
 		std::FILE* m_file;
 	};
 
-#if defined(_MSC_VER)
+#if !defined(_MSC_VER)
 	namespace impl
 	{
 		template <class Sig, class = void>
