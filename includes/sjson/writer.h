@@ -70,11 +70,12 @@ namespace sjson
 		std::FILE* m_file;
 	};
 
+#if defined(_MSC_VER)
 	namespace impl
 	{
 		template <class Sig, class = void>
 		struct invoke {};
-		
+
 		template <class F, class... Args>
 		struct invoke<F(Args...), decltype(void(std::declval<F>()(std::declval<Args>()...)))>
 		{
@@ -95,6 +96,7 @@ namespace sjson
 			return invoke_test<Sig, T>::value;
 		}
 	}
+#endif
 
 	class ArrayWriter
 	{
@@ -121,6 +123,11 @@ namespace sjson
 		//
 		// To resolve this, we use template logic to deduce a real type if we pass a function
 		// and if we pass bool, the type will not exist and the function is stripped.
+		// Note that VisualStudio properly supports it but GCC/clang do not but VS does not support the template logic
+#if defined(_MSC_VER)
+		inline void push(std::function<void(ObjectWriter& object_writer)> writer_fun);
+		inline void push(std::function<void(ArrayWriter& object_writer)> writer_fun);
+#else
 		template<typename F>
 		inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
 		push(F writer_fun);
@@ -128,6 +135,7 @@ namespace sjson
 		template<typename F>
 		inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
 		push(F writer_fun);
+#endif
 
 		// TODO: Introduce a newline type
 		void push_newline();
@@ -176,6 +184,11 @@ namespace sjson
 		//
 		// To resolve this, we use template logic to deduce a real type if we pass a function
 		// and if we pass bool, the type will not exist and the function is stripped.
+		// Note that VisualStudio properly supports it but GCC/clang do not but VS does not support the template logic
+#if defined(_MSC_VER)
+		inline void insert(const char* key, std::function<void(ObjectWriter& object_writer)> writer_fun);
+		inline void insert(const char* key, std::function<void(ArrayWriter& object_writer)> writer_fun);
+#else
 		template<typename F>
 		inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
 		insert(const char* key, F writer_fun);
@@ -183,6 +196,7 @@ namespace sjson
 		template<typename F>
 		inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
 		insert(const char* key, F writer_fun);
+#endif
 
 		void insert_newline();
 
@@ -215,6 +229,11 @@ namespace sjson
 			//
 			// To resolve this, we use template logic to deduce a real type if we pass a function
 			// and if we pass bool, the type will not exist and the function is stripped.
+			// Note that VisualStudio properly supports it but GCC/clang do not but VS does not support the template logic
+#if defined(_MSC_VER)
+			inline void operator=(std::function<void(ObjectWriter& object_writer)> writer_fun);
+			inline void operator=(std::function<void(ArrayWriter& object_writer)> writer_fun);
+#else
 			template<typename F>
 			inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
 			operator=(F writer_fun);
@@ -222,6 +241,7 @@ namespace sjson
 			template<typename F>
 			inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
 			operator=(F writer_fun);
+#endif
 
 		private:
 			inline ValueRef(ObjectWriter& object_writer, const char* key);
@@ -356,9 +376,13 @@ namespace sjson
 		m_stream_writer.write(buffer, length);
 	}
 
+#if defined(_MSC_VER)
+	inline void ObjectWriter::insert(const char* key, std::function<void(ObjectWriter& object_writer)> writer_fun)
+#else
 	template<typename F>
 	inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
 	ObjectWriter::insert(const char* key, F writer_fun)
+#endif
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON object in locked object");
 		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON object in object when it has a live ValueRef");
@@ -380,9 +404,13 @@ namespace sjson
 		m_stream_writer.write(k_line_terminator);
 	}
 
+#if defined(_MSC_VER)
+	inline void ObjectWriter::insert(const char* key, std::function<void(ArrayWriter& array_writer)> writer_fun)
+#else
 	template<typename F>
 	inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
 	ObjectWriter::insert(const char* key, F writer_fun)
+#endif
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON array in locked object");
 		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON array in object when it has a live ValueRef");
@@ -501,9 +529,13 @@ namespace sjson
 		m_is_empty = false;
 	}
 
+#if defined(_MSC_VER)
+	inline void ObjectWriter::ValueRef::operator=(std::function<void(ObjectWriter& object_writer)> writer_fun)
+#else
 	template<typename F>
 	inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
 	ObjectWriter::ValueRef::operator=(F writer_fun)
+#endif
 	{
 		SJSON_CPP_ENSURE(m_is_empty, "Cannot write multiple values within a ValueRef");
 		SJSON_CPP_ENSURE(m_object_writer != nullptr, "ValueRef not initialized");
@@ -523,9 +555,13 @@ namespace sjson
 		m_is_empty = false;
 	}
 
+#if defined(_MSC_VER)
+	inline void ObjectWriter::ValueRef::operator=(std::function<void(ArrayWriter& array_writer)> writer_fun)
+#else
 	template<typename F>
 	inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
 	ObjectWriter::ValueRef::operator=(F writer_fun)
+#endif
 	{
 		SJSON_CPP_ENSURE(m_is_empty, "Cannot write multiple values within a ValueRef");
 		SJSON_CPP_ENSURE(m_object_writer != nullptr, "ValueRef not initialized");
@@ -678,9 +714,13 @@ namespace sjson
 		m_is_newline = false;
 	}
 
+#if defined(_MSC_VER)
+	inline void ArrayWriter::push(std::function<void(ObjectWriter& object_writer)> writer_fun)
+#else
 	template<typename F>
 	inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
 	ArrayWriter::push(F writer_fun)
+#endif
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON object in locked array");
 
@@ -709,9 +749,13 @@ namespace sjson
 		m_is_newline = true;
 	}
 
+#if defined(_MSC_VER)
+	inline void ArrayWriter::push(std::function<void(ArrayWriter& array_writer)> writer_fun)
+#else
 	template<typename F>
 	inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
 	ArrayWriter::push(F writer_fun)
+#endif
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON array in locked array");
 
