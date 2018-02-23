@@ -4,7 +4,7 @@ project(sjson-cpp_unit_tests)
 set(CMAKE_CXX_STANDARD 11)
 
 include_directories("${PROJECT_SOURCE_DIR}/../includes")
-include_directories("${PROJECT_SOURCE_DIR}/external/catch-1.9.6")
+include_directories("${PROJECT_SOURCE_DIR}/../external/catch-1.9.6")
 
 # Grab all of our source files
 file(GLOB_RECURSE SJSON_CPP_UNIT_TEST_SOURCE_FILES LIST_DIRECTORIES false
@@ -25,8 +25,8 @@ add_test(NAME UNIT COMMAND sjson-cpp_unit_tests)
 
 if(MSVC)
 	# Replace some default compiler switches and add new ones
-	STRING(REPLACE "/GR" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})		# Disable RTTI
-	STRING(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})	# Bump warnings to W4
+	STRING(REPLACE "/GR" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})				# Disable RTTI
+	STRING(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})			# Bump warnings to W4
 	target_compile_options(sjson-cpp_unit_tests PRIVATE /Zi)				# Add debug info
 	target_compile_options(sjson-cpp_unit_tests PRIVATE /Oi)				# Generate intrinsic functions
 
