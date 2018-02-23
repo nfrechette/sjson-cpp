@@ -38,6 +38,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdint>
+#include <algorithm>
 
 namespace sjson
 {
@@ -144,76 +145,105 @@ namespace sjson
 		{
 			ParserState s = save_state();
 
-			if (!read(key, value))
+			if (read_key(key) && read_equal_sign())
 			{
-				restore_state(s);
-				value = default_value;
-				return false;
+				if (try_read_null())
+				{
+					value = default_value;
+					return false;
+				}
+
+				if (read_string(value))
+					return true;
 			}
 
-			return true;
+			restore_state(s);
+			value = default_value;
+			return false;
 		}
 
 		bool try_read(const char* key, bool& value, bool default_value)
 		{
 			ParserState s = save_state();
 
-			if (!read(key, value))
+			if (read_key(key) && read_equal_sign())
 			{
-				restore_state(s);
-				value = default_value;
-				return false;
+				if (try_read_null())
+				{
+					value = default_value;
+					return false;
+				}
+
+				if (read_bool(value))
+					return true;
 			}
 
-			return true;
+			restore_state(s);
+			value = default_value;
+			return false;
 		}
 
 		bool try_read(const char* key, double& value, double default_value)
 		{
 			ParserState s = save_state();
 
-			if (!read(key, value))
+			if (read_key(key) && read_equal_sign())
 			{
-				restore_state(s);
-				value = default_value;
-				return false;
+				if (try_read_null())
+				{
+					value = default_value;
+					return false;
+				}
+
+				if (read_double(value))
+					return true;
 			}
 
-			return true;
+			restore_state(s);
+			value = default_value;
+			return false;
 		}
 
 		bool try_read(const char* key, double* values, uint32_t num_elements, double default_value)
 		{
 			ParserState s = save_state();
 
-			if (!read(key, values, num_elements))
+			if (read_key(key) && read_equal_sign())
 			{
-				restore_state(s);
+				if (try_read_null())
+				{
+					std::fill(values, values + num_elements, default_value);
+					return false;
+				}
 
-				for (uint32_t i = 0; i < num_elements; ++i)
-					values[i] = default_value;
-
-				return false;
+				if (read_opening_bracket() && read(values, num_elements) && read_closing_bracket())
+					return true;
 			}
 
-			return true;
+			restore_state(s);
+			std::fill(values, values + num_elements, default_value);
+			return false;
 		}
 
 		bool try_read(const char* key, StringView* values, uint32_t num_elements, const char* default_value)
 		{
 			ParserState s = save_state();
 
-			if (!read(key, values, num_elements))
+			if (read_key(key) && read_equal_sign())
 			{
-				restore_state(s);
+				if (try_read_null())
+				{
+					std::fill(values, values + num_elements, default_value);
+					return false;
+				}
 
-				for (uint32_t i = 0; i < num_elements; ++i)
-					values[i] = default_value;
-
-				return false;
+				if (read_opening_bracket() && read(values, num_elements) && read_closing_bracket())
+					return true;
 			}
 
-			return true;
+			restore_state(s);
+			std::fill(values, values + num_elements, default_value);
+			return false;
 		}
 
 		bool read(double* values, uint32_t num_elements)
@@ -223,7 +253,10 @@ namespace sjson
 
 			for (uint32_t i = 0; i < num_elements; ++i)
 			{
-				if (!read_double(values[i]) || (i < (num_elements - 1) && !read_comma()))
+				if (!read_double(values[i]))
+					return false;
+
+				if (i < (num_elements - 1) && !read_comma())
 					return false;
 			}
 
@@ -237,7 +270,10 @@ namespace sjson
 
 			for (uint32_t i = 0; i < num_elements; ++i)
 			{
-				if (!read_string(values[i]) || (i < (num_elements - 1) && !read_comma()))
+				if (!read_string(values[i]))
+					return false;
+
+				if (i < (num_elements - 1) && !read_comma())
 					return false;
 			}
 
@@ -752,6 +788,31 @@ namespace sjson
 				|| value == 'd' || value == 'D'
 				|| value == 'e' || value == 'E'
 				|| value == 'f' || value == 'F';
+		}
+
+		// Attempts to read a 'null' literal.
+		// Returns true on success and the state is advanced otherwise
+		// the state remains unchanged and the function returns false.
+		bool try_read_null()
+		{
+			ParserState old_state = save_state();
+
+			skip_comments_and_whitespace();
+
+			if (m_state.symbol == 'n')
+			{
+				advance();
+
+				if (m_state.symbol == 'u' && advance() &&
+					m_state.symbol == 'l' && advance() &&
+					m_state.symbol == 'l' && advance())
+				{
+					return true;
+				}
+			}
+
+			restore_state(old_state);
+			return false;
 		}
 
 		bool skip_comments_and_whitespace_fail_if_eof()

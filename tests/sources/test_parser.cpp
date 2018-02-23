@@ -96,6 +96,24 @@ TEST_CASE("Parser Misc", "[parser]")
 		REQUIRE(parser.eof());
 		REQUIRE(parser.is_valid());
 	}
+
+	{
+		Parser parser = parser_from_c_str("key /* bar */ = true");
+		bool value = false;
+		REQUIRE(parser.read("key", value));
+		REQUIRE(value == true);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("/* bar */ key = true");
+		bool value = false;
+		REQUIRE(parser.read("key", value));
+		REQUIRE(value == true);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
 }
 
 TEST_CASE("Parser Bool Reading", "[parser]")
@@ -399,4 +417,19 @@ TEST_CASE("Parser Array Reading", "[parser]")
 		REQUIRE(parser.is_valid());
 	}
 #endif
+}
+
+TEST_CASE("Parser Null Reading", "[parser]")
+{
+	{
+		Parser parser = parser_from_c_str("key = null");
+		bool value_bool = false;
+		REQUIRE_FALSE(parser.try_read("key", value_bool, true));
+		REQUIRE(value_bool == true);
+		double value_dbl = 0.0;
+		REQUIRE_FALSE(parser.try_read("key", value_dbl, 1.0));
+		REQUIRE(value_dbl == 1.0);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
 }
