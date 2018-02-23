@@ -30,6 +30,7 @@
 #include <cstdio>
 #include <cstdint>
 #include <cinttypes>
+#include <cstring>
 
 namespace sjson
 {
@@ -69,25 +70,66 @@ namespace sjson
 		std::FILE* m_file;
 	};
 
+	namespace impl
+	{
+		template <class Sig, class = void>
+		struct invoke {};
+		
+		template <class F, class... Args>
+		struct invoke<F(Args...), decltype(void(std::declval<F>()(std::declval<Args>()...)))>
+		{
+			using type = decltype(std::declval<F>()(std::declval<Args>()...));
+		};
+
+		template <typename Sig, typename T, typename = void>
+		struct invoke_test : std::false_type {};
+
+		template <typename... Args, typename T>
+		struct invoke_test<void(Args...), T,
+						   decltype(void(typename invoke<T(Args...)>::type()))> : std::true_type
+		{};
+
+		template <typename Sig, typename T>
+		constexpr bool invokable()
+		{
+			return invoke_test<Sig, T>::value;
+		}
+	}
+
 	class ArrayWriter
 	{
 	public:
-		void push_value(const char* value);
-		void push_value(bool value);
-		void push_value(double value);
-		void push_value(float value) { push_value(double(value)); }
-		void push_value(int8_t value) { push_signed_integer(static_cast<int64_t>(value)); }
-		void push_value(uint8_t value) { push_unsigned_integer(static_cast<uint64_t>(value)); }
-		void push_value(int16_t value) { push_signed_integer(static_cast<int64_t>(value)); }
-		void push_value(uint16_t value) { push_unsigned_integer(static_cast<uint64_t>(value)); }
-		void push_value(int32_t value) { push_signed_integer(static_cast<int64_t>(value)); }
-		void push_value(uint32_t value) { push_unsigned_integer(static_cast<uint64_t>(value)); }
-		void push_value(int64_t value) { push_signed_integer(value); }
-		void push_value(uint64_t value) { push_unsigned_integer(value); }
+		void push(const char* value);
+		void push(bool value);
+		void push(double value);
+		void push(float value) { push(double(value)); }
+		void push(int8_t value) { push_signed_integer(int64_t(value)); }
+		void push(uint8_t value) { push_unsigned_integer(uint64_t(value)); }
+		void push(int16_t value) { push_signed_integer(int64_t(value)); }
+		void push(uint16_t value) { push_unsigned_integer(uint64_t(value)); }
+		void push(int32_t value) { push_signed_integer(int64_t(value)); }
+		void push(uint32_t value) { push_unsigned_integer(uint64_t(value)); }
+		void push(int64_t value) { push_signed_integer(value); }
+		void push(uint64_t value) { push_unsigned_integer(value); }
 
-		void push_object(std::function<void(ObjectWriter& object_writer)> writer_fun);
-		void push_array(std::function<void(ArrayWriter& array_writer)> writer_fun);
+		// Note: This is funky because of C++ lambda coercion rules
+		// A lambda that does not capture anything is equivalent to a static function
+		// and calling a function with it as an argument is equivalent to passing a function pointer.
+		// Of course, a pointer can safely and automatically coerces to 'bool' and as such
+		// a clean signature like this does not work: void insert(const char*, std::function<void(ObjectWriter&)) foo)
+		// The compiler finds it ambiguous and fails to compile.
+		//
+		// To resolve this, we use template logic to deduce a real type if we pass a function
+		// and if we pass bool, the type will not exist and the function is stripped.
+		template<typename F>
+		inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
+		push(F writer_fun);
 
+		template<typename F>
+		inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
+		push(F writer_fun);
+
+		// TODO: Introduce a newline type
 		void push_newline();
 
 	private:
@@ -112,21 +154,35 @@ namespace sjson
 	class ObjectWriter
 	{
 	public:
-		void insert_value(const char* key, const char* value);
-		void insert_value(const char* key, bool value);
-		void insert_value(const char* key, double value);
-		void insert_value(const char* key, float value) { insert_value(key, double(value)); }
-		void insert_value(const char* key, int8_t value) { insert_signed_integer(key, value); }
-		void insert_value(const char* key, uint8_t value) { insert_unsigned_integer(key, value); }
-		void insert_value(const char* key, int16_t value) { insert_signed_integer(key, value); }
-		void insert_value(const char* key, uint16_t value) { insert_unsigned_integer(key, value); }
-		void insert_value(const char* key, int32_t value) { insert_signed_integer(key, value); }
-		void insert_value(const char* key, uint32_t value) { insert_unsigned_integer(key, value); }
-		void insert_value(const char* key, int64_t value) { insert_signed_integer(key, value); }
-		void insert_value(const char* key, uint64_t value) { insert_unsigned_integer(key, value); }
+		void insert(const char* key, const char* value);
+		void insert(const char* key, bool value);
+		void insert(const char* key, double value);
+		void insert(const char* key, float value) { insert(key, double(value)); }
+		void insert(const char* key, int8_t value) { insert_signed_integer(key, int64_t(value)); }
+		void insert(const char* key, uint8_t value) { insert_unsigned_integer(key, uint64_t(value)); }
+		void insert(const char* key, int16_t value) { insert_signed_integer(key, int64_t(value)); }
+		void insert(const char* key, uint16_t value) { insert_unsigned_integer(key, uint64_t(value)); }
+		void insert(const char* key, int32_t value) { insert_signed_integer(key, int64_t(value)); }
+		void insert(const char* key, uint32_t value) { insert_unsigned_integer(key, uint64_t(value)); }
+		void insert(const char* key, int64_t value) { insert_signed_integer(key, int64_t(value)); }
+		void insert(const char* key, uint64_t value) { insert_unsigned_integer(key, uint64_t(value)); }
 
-		void insert_object(const char* key, std::function<void(ObjectWriter& object_writer)> writer_fun);
-		void insert_array(const char* key, std::function<void(ArrayWriter& array_writer)> writer_fun);
+		// Note: This is funky because of C++ lambda coercion rules
+		// A lambda that does not capture anything is equivalent to a static function
+		// and calling a function with it as an argument is equivalent to passing a function pointer.
+		// Of course, a pointer can safely and automatically coerces to 'bool' and as such
+		// a clean signature like this does not work: void insert(const char*, std::function<void(ObjectWriter&)) foo)
+		// The compiler finds it ambiguous and fails to compile.
+		//
+		// To resolve this, we use template logic to deduce a real type if we pass a function
+		// and if we pass bool, the type will not exist and the function is stripped.
+		template<typename F>
+		inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
+		insert(const char* key, F writer_fun);
+
+		template<typename F>
+		inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
+		insert(const char* key, F writer_fun);
 
 		void insert_newline();
 
@@ -141,17 +197,31 @@ namespace sjson
 			void operator=(bool value);
 			void operator=(double value);
 			void operator=(float value) { *this = double(value); }
-			void operator=(int8_t value) { assign_signed_integer(value); }
-			void operator=(uint8_t value) { assign_unsigned_integer(value); }
-			void operator=(int16_t value) { assign_signed_integer(value); }
-			void operator=(uint16_t value) { assign_unsigned_integer(value); }
-			void operator=(int32_t value) { assign_signed_integer(value); }
-			void operator=(uint32_t value) { assign_unsigned_integer(value); }
-			void operator=(int64_t value) { assign_signed_integer(value); }
-			void operator=(uint64_t value) { assign_unsigned_integer(value); }
+			void operator=(int8_t value) { assign_signed_integer(int64_t(value)); }
+			void operator=(uint8_t value) { assign_unsigned_integer(uint64_t(value)); }
+			void operator=(int16_t value) { assign_signed_integer(int64_t(value)); }
+			void operator=(uint16_t value) { assign_unsigned_integer(uint64_t(value)); }
+			void operator=(int32_t value) { assign_signed_integer(int64_t(value)); }
+			void operator=(uint32_t value) { assign_unsigned_integer(uint64_t(value)); }
+			void operator=(int64_t value) { assign_signed_integer(int64_t(value)); }
+			void operator=(uint64_t value) { assign_unsigned_integer(uint64_t(value)); }
 
-			void operator=(std::function<void(ObjectWriter& object_writer)> writer_fun);
-			void operator=(std::function<void(ArrayWriter& array_writer)> writer_fun);
+			// Note: This is funky because of C++ lambda coercion rules
+			// A lambda that does not capture anything is equivalent to a static function
+			// and calling a function with it as an argument is equivalent to passing a function pointer.
+			// Of course, a pointer can safely and automatically coerces to 'bool' and as such
+			// a clean signature like this does not work: void operator=(std::function<void(ObjectWriter&)) foo)
+			// The compiler finds it ambiguous and fails to compile.
+			//
+			// To resolve this, we use template logic to deduce a real type if we pass a function
+			// and if we pass bool, the type will not exist and the function is stripped.
+			template<typename F>
+			inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
+			operator=(F writer_fun);
+
+			template<typename F>
+			inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
+			operator=(F writer_fun);
 
 		private:
 			ValueRef(ObjectWriter& object_writer, const char* key);
@@ -208,7 +278,7 @@ namespace sjson
 		, m_has_live_value_ref(false)
 	{}
 
-	inline void ObjectWriter::insert_value(const char* key, const char* value)
+	inline void ObjectWriter::insert(const char* key, const char* value)
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON value in locked object");
 		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
@@ -222,7 +292,7 @@ namespace sjson
 		m_stream_writer.write(k_line_terminator);
 	}
 
-	inline void ObjectWriter::insert_value(const char* key, bool value)
+	inline void ObjectWriter::insert(const char* key, bool value)
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON value in locked object");
 		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
@@ -238,7 +308,7 @@ namespace sjson
 		m_stream_writer.write(buffer, length);
 	}
 
-	inline void ObjectWriter::insert_value(const char* key, double value)
+	inline void ObjectWriter::insert(const char* key, double value)
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON value in locked object");
 		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
@@ -286,7 +356,9 @@ namespace sjson
 		m_stream_writer.write(buffer, length);
 	}
 
-	inline void ObjectWriter::insert_object(const char* key, std::function<void(ObjectWriter& object_writer)> writer_fun)
+	template<typename F>
+	inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
+	ObjectWriter::insert(const char* key, F writer_fun)
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON object in locked object");
 		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON object in object when it has a live ValueRef");
@@ -308,7 +380,9 @@ namespace sjson
 		m_stream_writer.write(k_line_terminator);
 	}
 
-	inline void ObjectWriter::insert_array(const char* key, std::function<void(ArrayWriter& array_writer)> writer_fun)
+	template<typename F>
+	inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
+	ObjectWriter::insert(const char* key, F writer_fun)
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON array in locked object");
 		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON array in object when it has a live ValueRef");
@@ -427,7 +501,9 @@ namespace sjson
 		m_is_empty = false;
 	}
 
-	inline void ObjectWriter::ValueRef::operator=(std::function<void(ObjectWriter& object_writer)> writer_fun)
+	template<typename F>
+	inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
+	ObjectWriter::ValueRef::operator=(F writer_fun)
 	{
 		SJSON_CPP_ENSURE(m_is_empty, "Cannot write multiple values within a ValueRef");
 		SJSON_CPP_ENSURE(m_object_writer != nullptr, "ValueRef not initialized");
@@ -447,7 +523,9 @@ namespace sjson
 		m_is_empty = false;
 	}
 
-	inline void ObjectWriter::ValueRef::operator=(std::function<void(ArrayWriter& array_writer)> writer_fun)
+	template<typename F>
+	inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
+	ObjectWriter::ValueRef::operator=(F writer_fun)
 	{
 		SJSON_CPP_ENSURE(m_is_empty, "Cannot write multiple values within a ValueRef");
 		SJSON_CPP_ENSURE(m_object_writer != nullptr, "ValueRef not initialized");
@@ -511,7 +589,7 @@ namespace sjson
 		, m_is_newline(false)
 	{}
 
-	inline void ArrayWriter::push_value(const char* value)
+	inline void ArrayWriter::push(const char* value)
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON value in locked array");
 
@@ -528,7 +606,7 @@ namespace sjson
 		m_is_newline = false;
 	}
 
-	inline void ArrayWriter::push_value(bool value)
+	inline void ArrayWriter::push(bool value)
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON value in locked array");
 
@@ -546,7 +624,7 @@ namespace sjson
 		m_is_newline = false;
 	}
 
-	inline void ArrayWriter::push_value(double value)
+	inline void ArrayWriter::push(double value)
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON value in locked array");
 
@@ -600,7 +678,9 @@ namespace sjson
 		m_is_newline = false;
 	}
 
-	inline void ArrayWriter::push_object(std::function<void(ObjectWriter& object_writer)> writer_fun)
+	template<typename F>
+	inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
+	ArrayWriter::push(F writer_fun)
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON object in locked array");
 
@@ -629,7 +709,9 @@ namespace sjson
 		m_is_newline = true;
 	}
 
-	inline void ArrayWriter::push_array(std::function<void(ArrayWriter& array_writer)> writer_fun)
+	template<typename F>
+	inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
+	ArrayWriter::push(F writer_fun)
 	{
 		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON array in locked array");
 
