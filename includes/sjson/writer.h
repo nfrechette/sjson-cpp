@@ -51,7 +51,7 @@ namespace sjson
 
 		virtual void write(const void* buffer, size_t buffer_size) = 0;
 
-		void write(const char* str) { write(str, std::strlen(str)); }
+		inline void write(const char* str) { write(str, std::strlen(str)); }
 	};
 
 	class FileStreamWriter final : public StreamWriter
@@ -99,18 +99,18 @@ namespace sjson
 	class ArrayWriter
 	{
 	public:
-		void push(const char* value);
-		void push(bool value);
-		void push(double value);
-		void push(float value) { push(double(value)); }
-		void push(int8_t value) { push_signed_integer(int64_t(value)); }
-		void push(uint8_t value) { push_unsigned_integer(uint64_t(value)); }
-		void push(int16_t value) { push_signed_integer(int64_t(value)); }
-		void push(uint16_t value) { push_unsigned_integer(uint64_t(value)); }
-		void push(int32_t value) { push_signed_integer(int64_t(value)); }
-		void push(uint32_t value) { push_unsigned_integer(uint64_t(value)); }
-		void push(int64_t value) { push_signed_integer(value); }
-		void push(uint64_t value) { push_unsigned_integer(value); }
+		inline void push(const char* value);
+		inline void push(bool value);
+		inline void push(double value);
+		inline void push(float value) { push(double(value)); }
+		inline void push(int8_t value) { push_signed_integer(int64_t(value)); }
+		inline void push(uint8_t value) { push_unsigned_integer(uint64_t(value)); }
+		inline void push(int16_t value) { push_signed_integer(int64_t(value)); }
+		inline void push(uint16_t value) { push_unsigned_integer(uint64_t(value)); }
+		inline void push(int32_t value) { push_signed_integer(int64_t(value)); }
+		inline void push(uint32_t value) { push_unsigned_integer(uint64_t(value)); }
+		inline void push(int64_t value) { push_signed_integer(value); }
+		inline void push(uint64_t value) { push_unsigned_integer(value); }
 
 		// Note: This is funky because of C++ lambda coercion rules
 		// A lambda that does not capture anything is equivalent to a static function
@@ -133,14 +133,14 @@ namespace sjson
 		void push_newline();
 
 	private:
-		ArrayWriter(StreamWriter& stream_writer, uint32_t indent_level);
+		inline ArrayWriter(StreamWriter& stream_writer, uint32_t indent_level);
 
 		ArrayWriter(const ArrayWriter&) = delete;
 		ArrayWriter& operator=(const ArrayWriter&) = delete;
 
-		void push_signed_integer(int64_t value);
-		void push_unsigned_integer(uint64_t value);
-		void write_indentation();
+		inline void push_signed_integer(int64_t value);
+		inline void push_unsigned_integer(uint64_t value);
+		inline void write_indentation();
 
 		StreamWriter& m_stream_writer;
 		uint32_t m_indent_level;
@@ -154,18 +154,18 @@ namespace sjson
 	class ObjectWriter
 	{
 	public:
-		void insert(const char* key, const char* value);
-		void insert(const char* key, bool value);
-		void insert(const char* key, double value);
-		void insert(const char* key, float value) { insert(key, double(value)); }
-		void insert(const char* key, int8_t value) { insert_signed_integer(key, int64_t(value)); }
-		void insert(const char* key, uint8_t value) { insert_unsigned_integer(key, uint64_t(value)); }
-		void insert(const char* key, int16_t value) { insert_signed_integer(key, int64_t(value)); }
-		void insert(const char* key, uint16_t value) { insert_unsigned_integer(key, uint64_t(value)); }
-		void insert(const char* key, int32_t value) { insert_signed_integer(key, int64_t(value)); }
-		void insert(const char* key, uint32_t value) { insert_unsigned_integer(key, uint64_t(value)); }
-		void insert(const char* key, int64_t value) { insert_signed_integer(key, int64_t(value)); }
-		void insert(const char* key, uint64_t value) { insert_unsigned_integer(key, uint64_t(value)); }
+		inline void insert(const char* key, const char* value);
+		inline void insert(const char* key, bool value);
+		inline void insert(const char* key, double value);
+		inline void insert(const char* key, float value) { insert(key, double(value)); }
+		inline void insert(const char* key, int8_t value) { insert_signed_integer(key, int64_t(value)); }
+		inline void insert(const char* key, uint8_t value) { insert_unsigned_integer(key, uint64_t(value)); }
+		inline void insert(const char* key, int16_t value) { insert_signed_integer(key, int64_t(value)); }
+		inline void insert(const char* key, uint16_t value) { insert_unsigned_integer(key, uint64_t(value)); }
+		inline void insert(const char* key, int32_t value) { insert_signed_integer(key, int64_t(value)); }
+		inline void insert(const char* key, uint32_t value) { insert_unsigned_integer(key, uint64_t(value)); }
+		inline void insert(const char* key, int64_t value) { insert_signed_integer(key, int64_t(value)); }
+		inline void insert(const char* key, uint64_t value) { insert_unsigned_integer(key, uint64_t(value)); }
 
 		// Note: This is funky because of C++ lambda coercion rules
 		// A lambda that does not capture anything is equivalent to a static function
@@ -190,21 +190,21 @@ namespace sjson
 		class ValueRef
 		{
 		public:
-			ValueRef(ValueRef&& other);
-			~ValueRef();
+			inline ValueRef(ValueRef&& other);
+			inline ~ValueRef();
 
-			void operator=(const char* value);
-			void operator=(bool value);
-			void operator=(double value);
-			void operator=(float value) { *this = double(value); }
-			void operator=(int8_t value) { assign_signed_integer(int64_t(value)); }
-			void operator=(uint8_t value) { assign_unsigned_integer(uint64_t(value)); }
-			void operator=(int16_t value) { assign_signed_integer(int64_t(value)); }
-			void operator=(uint16_t value) { assign_unsigned_integer(uint64_t(value)); }
-			void operator=(int32_t value) { assign_signed_integer(int64_t(value)); }
-			void operator=(uint32_t value) { assign_unsigned_integer(uint64_t(value)); }
-			void operator=(int64_t value) { assign_signed_integer(int64_t(value)); }
-			void operator=(uint64_t value) { assign_unsigned_integer(uint64_t(value)); }
+			inline void operator=(const char* value);
+			inline void operator=(bool value);
+			inline void operator=(double value);
+			inline void operator=(float value) { *this = double(value); }
+			inline void operator=(int8_t value) { assign_signed_integer(int64_t(value)); }
+			inline void operator=(uint8_t value) { assign_unsigned_integer(uint64_t(value)); }
+			inline void operator=(int16_t value) { assign_signed_integer(int64_t(value)); }
+			inline void operator=(uint16_t value) { assign_unsigned_integer(uint64_t(value)); }
+			inline void operator=(int32_t value) { assign_signed_integer(int64_t(value)); }
+			inline void operator=(uint32_t value) { assign_unsigned_integer(uint64_t(value)); }
+			inline void operator=(int64_t value) { assign_signed_integer(int64_t(value)); }
+			inline void operator=(uint64_t value) { assign_unsigned_integer(uint64_t(value)); }
 
 			// Note: This is funky because of C++ lambda coercion rules
 			// A lambda that does not capture anything is equivalent to a static function
@@ -224,13 +224,13 @@ namespace sjson
 			operator=(F writer_fun);
 
 		private:
-			ValueRef(ObjectWriter& object_writer, const char* key);
+			inline ValueRef(ObjectWriter& object_writer, const char* key);
 
 			ValueRef(const ValueRef&) = delete;
 			ValueRef& operator=(const ValueRef&) = delete;
 
-			void assign_signed_integer(int64_t value);
-			void assign_unsigned_integer(uint64_t value);
+			inline void assign_signed_integer(int64_t value);
+			inline void assign_unsigned_integer(uint64_t value);
 
 			ObjectWriter* m_object_writer;
 			bool m_is_empty;
@@ -239,17 +239,17 @@ namespace sjson
 			friend ObjectWriter;
 		};
 
-		ValueRef operator[](const char* key) { return ValueRef(*this, key); }
+		inline ValueRef operator[](const char* key) { return ValueRef(*this, key); }
 
 	protected:
-		ObjectWriter(StreamWriter& stream_writer, uint32_t indent_level);
+		inline ObjectWriter(StreamWriter& stream_writer, uint32_t indent_level);
 
 		ObjectWriter(const ObjectWriter&) = delete;
 		ObjectWriter& operator=(const ObjectWriter&) = delete;
 
-		void insert_signed_integer(const char* key, int64_t value);
-		void insert_unsigned_integer(const char* key, uint64_t value);
-		void write_indentation();
+		inline void insert_signed_integer(const char* key, int64_t value);
+		inline void insert_unsigned_integer(const char* key, uint64_t value);
+		inline void write_indentation();
 
 		StreamWriter& m_stream_writer;
 		uint32_t m_indent_level;
@@ -262,7 +262,7 @@ namespace sjson
 	class Writer : public ObjectWriter
 	{
 	public:
-		Writer(StreamWriter& stream_writer);
+		inline Writer(StreamWriter& stream_writer);
 
 	private:
 		Writer(const Writer&) = delete;
