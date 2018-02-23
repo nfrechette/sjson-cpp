@@ -768,13 +768,13 @@ namespace sjson
 			ParserState initial_state = save_state();
 			bool skipped_bom = false;
 
-			if (m_state.symbol == char(unsigned char(0xEF)))
+			if (m_state.symbol == char(uint8_t(0xEF)))
 			{
 				advance();
-				if (m_state.symbol == char(unsigned char(0xBB)))
+				if (m_state.symbol == char(uint8_t(0xBB)))
 				{
 					advance();
-					if (m_state.symbol == char(unsigned char(0xBF)))
+					if (m_state.symbol == char(uint8_t(0xBF)))
 					{
 						advance();
 						skipped_bom = true;
