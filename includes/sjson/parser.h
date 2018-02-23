@@ -24,6 +24,11 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
+// This define allows external libraries using sjson-cpp to detect if it has already be included as a dependency
+#if !defined(SJSON_CPP_PARSER)
+#define SJSON_CPP_PARSER
+#endif
+
 #include "parser_error.h"
 #include "parser_state.h"
 #include "string_view.h"
