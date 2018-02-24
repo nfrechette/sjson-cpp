@@ -11,7 +11,7 @@ It aims to be minimal, fast, and get out of the way of the programmer.
 
 By design, the library does no memory allocations. This is in contrast to the [nflibs C parser](https://github.com/niklasfrykholm/nflibs).
 
-Everything is 100% C++ header based for easy and trivial integration.
+Everything is **100% C++11** header based for easy and trivial integration.
 
 This parser is intended to accept only pure SJSON, and it will fail if given a JSON file, unlike the [Autodesk JS Stingray parser](https://github.com/Autodesk/sjson).
 
@@ -32,16 +32,39 @@ UTF-8 support is as follow:
 
 Unicode formats other than UTF-8 aren't supported.
 
+## Supported platforms
+
+The library aims to support the most common platforms for the most common use cases. There is very little platform specific code as such it should work nearly everywhere.
+
+*  Windows (VS2015, VS2017) x86 and x64
+*  Linux (gcc5, gcc6, gcc7, clang4, clang5) x86 and x64
+*  OS X (Xcode 8.3, Xcode 9.2) x86 and x64
+
 ## External dependencies
 
 There are none! You don't need anything else to get started: everything is self contained.
 See [here](./external) for details on the ones we do include.
+
+## Getting up and running
+
+### Windows, Linux, and OS X
+
+1. Install CMake 3.2 or higher, Python 3, and the proper compiler for your platform
+2. Generate the IDE solution with: `python make.py`  
+   The solution is generated under `./build`  
+   Note that if you do not have CMake in your `PATH`, you should define the `SJSON_CPP_CMAKE_HOME` environment variable to something like `C:\Program Files\CMake`.
+3. Build the IDE solution with: `python make.py -build`
+4. Run the unit tests with: `python make.py -unit_test`
 
 ## Authors
 
 *  [Nicholas Frechette](https://github.com/nfrechette)
 *  [Cody Jones](https://github.com/CodyDWJones)
 
-## MIT License
+## License, copyright, and code of conduct
+
+This project uses the [MIT license](LICENSE).
 
 Copyright (c) 2017 Nicholas Frechette, Cody Jones, and sjson-cpp contributors
+
+Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
