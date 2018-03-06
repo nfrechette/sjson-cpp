@@ -34,12 +34,10 @@ Unicode formats other than UTF-8 aren't supported.
 
 ## Supported platforms
 
-The library aims to support the most common platforms for the most common use cases. There is very little platform specific code as such it should work nearly everywhere.
-
 *  Windows (VS2015, VS2017) x86 and x64
 *  Linux (gcc5, gcc6, gcc7, clang4, clang5) x86 and x64
 *  OS X (Xcode 8.3, Xcode 9.2) x86 and x64
-*  Android (NVIDIA CodeWorks)
+*  Android (NVIDIA CodeWorks) ARMv7-A
 
 ## External dependencies
 
