@@ -66,6 +66,15 @@ namespace sjson
 			return std::strtoll(str, endptr, base);
 #endif
 		}
+
+		inline float strtof(const char* str, char** endptr)
+		{
+#if defined(__ANDROID__)
+			return ::strtof(str, endptr);
+#else
+			return std::strtof(str, endptr);
+#endif
+		}
 	}
 
 	class Parser
@@ -749,7 +758,7 @@ namespace sjson
 			if (dbl_value != nullptr)
 				*dbl_value = std::strtod(slice, &last_used_symbol);
 			else
-				*flt_value = std::strtof(slice, &last_used_symbol);
+				*flt_value = impl::strtof(slice, &last_used_symbol);
 
 			if (last_used_symbol != slice + length)
 			{
