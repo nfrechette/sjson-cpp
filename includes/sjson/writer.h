@@ -26,7 +26,7 @@
 
 // This define allows external libraries using sjson-cpp to detect if it has already be included as a dependency
 #if !defined(SJSON_CPP_WRITER)
-#define SJSON_CPP_WRITER
+	#define SJSON_CPP_WRITER
 #endif
 
 #include "sjson/error.h"
@@ -305,8 +305,8 @@ namespace sjson
 
 	inline void ObjectWriter::insert(const char* key, const char* value)
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON value in locked object");
-		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot insert SJSON value in locked object");
+		SJSON_CPP_ASSERT(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
 
 		write_indentation();
 
@@ -319,8 +319,8 @@ namespace sjson
 
 	inline void ObjectWriter::insert(const char* key, bool value)
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON value in locked object");
-		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot insert SJSON value in locked object");
+		SJSON_CPP_ASSERT(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
 
 		write_indentation();
 
@@ -329,14 +329,14 @@ namespace sjson
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%s%s", value ? "true" : "false", k_line_terminator);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %s]", key, value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %s]", key, value);
 		m_stream_writer.write(buffer, length);
 	}
 
 	inline void ObjectWriter::insert(const char* key, double value)
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON value in locked object");
-		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot insert SJSON value in locked object");
+		SJSON_CPP_ASSERT(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
 
 		write_indentation();
 
@@ -345,14 +345,14 @@ namespace sjson
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%.17g%s", value, k_line_terminator);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %.17g]", key, value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %.17g]", key, value);
 		m_stream_writer.write(buffer, length);
 	}
 
 	inline void ObjectWriter::insert_signed_integer(const char* key, int64_t value)
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON value in locked object");
-		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot insert SJSON value in locked object");
+		SJSON_CPP_ASSERT(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
 
 		write_indentation();
 
@@ -361,14 +361,14 @@ namespace sjson
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%" PRId64 "%s", value, k_line_terminator);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %lld]", key, value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %lld]", key, value);
 		m_stream_writer.write(buffer, length);
 	}
 
 	inline void ObjectWriter::insert_unsigned_integer(const char* key, uint64_t value)
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON value in locked object");
-		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot insert SJSON value in locked object");
+		SJSON_CPP_ASSERT(!m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
 
 		write_indentation();
 
@@ -377,7 +377,7 @@ namespace sjson
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%" PRIu64 "%s", value, k_line_terminator);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %llu]", key, value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %llu]", key, value);
 		m_stream_writer.write(buffer, length);
 	}
 
@@ -389,8 +389,8 @@ namespace sjson
 	ObjectWriter::insert(const char* key, F writer_fun)
 #endif
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON object in locked object");
-		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON object in object when it has a live ValueRef");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot insert SJSON object in locked object");
+		SJSON_CPP_ASSERT(!m_has_live_value_ref, "Cannot insert SJSON object in object when it has a live ValueRef");
 
 		write_indentation();
 
@@ -417,8 +417,8 @@ namespace sjson
 	ObjectWriter::insert(const char* key, F writer_fun)
 #endif
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert SJSON array in locked object");
-		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert SJSON array in object when it has a live ValueRef");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot insert SJSON array in locked object");
+		SJSON_CPP_ASSERT(!m_has_live_value_ref, "Cannot insert SJSON array in object when it has a live ValueRef");
 
 		write_indentation();
 
@@ -452,8 +452,8 @@ namespace sjson
 
 	inline void ObjectWriter::insert_newline()
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert newline in locked object");
-		SJSON_CPP_ENSURE(!m_has_live_value_ref, "Cannot insert newline in object when it has a live ValueRef");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot insert newline in locked object");
+		SJSON_CPP_ASSERT(!m_has_live_value_ref, "Cannot insert newline in object when it has a live ValueRef");
 
 		m_stream_writer.write(k_line_terminator);
 	}
@@ -463,8 +463,8 @@ namespace sjson
 		, m_is_empty(true)
 		, m_is_locked(false)
 	{
-		SJSON_CPP_ENSURE(!object_writer.m_is_locked, "Cannot insert SJSON value in locked object");
-		SJSON_CPP_ENSURE(!object_writer.m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
+		SJSON_CPP_ASSERT(!object_writer.m_is_locked, "Cannot insert SJSON value in locked object");
+		SJSON_CPP_ASSERT(!object_writer.m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
 
 		object_writer.write_indentation();
 		object_writer.m_stream_writer.write(key);
@@ -485,10 +485,10 @@ namespace sjson
 	{
 		if (m_object_writer != nullptr)
 		{
-			SJSON_CPP_ENSURE(!m_is_empty, "ValueRef has no associated value");
-			SJSON_CPP_ENSURE(!m_is_locked, "ValueRef is locked");
-			SJSON_CPP_ENSURE(m_object_writer->m_has_live_value_ref, "Expected a live ValueRef to be present");
-			SJSON_CPP_ENSURE(m_object_writer->m_is_locked, "Expected object writer to be locked");
+			SJSON_CPP_ASSERT(!m_is_empty, "ValueRef has no associated value");
+			SJSON_CPP_ASSERT(!m_is_locked, "ValueRef is locked");
+			SJSON_CPP_ASSERT(m_object_writer->m_has_live_value_ref, "Expected a live ValueRef to be present");
+			SJSON_CPP_ASSERT(m_object_writer->m_is_locked, "Expected object writer to be locked");
 
 			m_object_writer->m_has_live_value_ref = false;
 			m_object_writer->m_is_locked = false;
@@ -497,9 +497,9 @@ namespace sjson
 
 	inline void ObjectWriter::ValueRef::operator=(const char* value)
 	{
-		SJSON_CPP_ENSURE(m_is_empty, "Cannot write multiple values within a ValueRef");
-		SJSON_CPP_ENSURE(m_object_writer != nullptr, "ValueRef not initialized");
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot assign a value when locked");
+		SJSON_CPP_ASSERT(m_is_empty, "Cannot write multiple values within a ValueRef");
+		SJSON_CPP_ASSERT(m_object_writer != nullptr, "ValueRef not initialized");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot assign a value when locked");
 
 		m_object_writer->m_stream_writer.write("\"");
 		m_object_writer->m_stream_writer.write(value);
@@ -510,26 +510,26 @@ namespace sjson
 
 	inline void ObjectWriter::ValueRef::operator=(bool value)
 	{
-		SJSON_CPP_ENSURE(m_is_empty, "Cannot write multiple values within a ValueRef");
-		SJSON_CPP_ENSURE(m_object_writer != nullptr, "ValueRef not initialized");
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot assign a value when locked");
+		SJSON_CPP_ASSERT(m_is_empty, "Cannot write multiple values within a ValueRef");
+		SJSON_CPP_ASSERT(m_object_writer != nullptr, "ValueRef not initialized");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot assign a value when locked");
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%s%s", value ? "true" : "false", k_line_terminator);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %s", value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %s", value);
 		m_object_writer->m_stream_writer.write(buffer, length);
 		m_is_empty = false;
 	}
 
 	inline void ObjectWriter::ValueRef::operator=(double value)
 	{
-		SJSON_CPP_ENSURE(m_is_empty, "Cannot write multiple values within a ValueRef");
-		SJSON_CPP_ENSURE(m_object_writer != nullptr, "ValueRef not initialized");
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot assign a value when locked");
+		SJSON_CPP_ASSERT(m_is_empty, "Cannot write multiple values within a ValueRef");
+		SJSON_CPP_ASSERT(m_object_writer != nullptr, "ValueRef not initialized");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot assign a value when locked");
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%.17g%s", value, k_line_terminator);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %.17g", value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %.17g", value);
 		m_object_writer->m_stream_writer.write(buffer, length);
 		m_is_empty = false;
 	}
@@ -542,9 +542,9 @@ namespace sjson
 	ObjectWriter::ValueRef::operator=(F writer_fun)
 #endif
 	{
-		SJSON_CPP_ENSURE(m_is_empty, "Cannot write multiple values within a ValueRef");
-		SJSON_CPP_ENSURE(m_object_writer != nullptr, "ValueRef not initialized");
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot assign a value when locked");
+		SJSON_CPP_ASSERT(m_is_empty, "Cannot write multiple values within a ValueRef");
+		SJSON_CPP_ASSERT(m_object_writer != nullptr, "ValueRef not initialized");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot assign a value when locked");
 
 		m_object_writer->m_stream_writer.write("{");
 		m_object_writer->m_stream_writer.write(k_line_terminator);
@@ -568,9 +568,9 @@ namespace sjson
 	ObjectWriter::ValueRef::operator=(F writer_fun)
 #endif
 	{
-		SJSON_CPP_ENSURE(m_is_empty, "Cannot write multiple values within a ValueRef");
-		SJSON_CPP_ENSURE(m_object_writer != nullptr, "ValueRef not initialized");
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot assign a value when locked");
+		SJSON_CPP_ASSERT(m_is_empty, "Cannot write multiple values within a ValueRef");
+		SJSON_CPP_ASSERT(m_object_writer != nullptr, "ValueRef not initialized");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot assign a value when locked");
 
 		m_object_writer->m_stream_writer.write("[ ");
 		m_is_locked = true;
@@ -596,26 +596,26 @@ namespace sjson
 
 	inline void ObjectWriter::ValueRef::assign_signed_integer(int64_t value)
 	{
-		SJSON_CPP_ENSURE(m_is_empty, "Cannot write multiple values within a ValueRef");
-		SJSON_CPP_ENSURE(m_object_writer != nullptr, "ValueRef not initialized");
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot assign a value when locked");
+		SJSON_CPP_ASSERT(m_is_empty, "Cannot write multiple values within a ValueRef");
+		SJSON_CPP_ASSERT(m_object_writer != nullptr, "ValueRef not initialized");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot assign a value when locked");
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%" PRId64 "%s", value, k_line_terminator);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %lld", value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %lld", value);
 		m_object_writer->m_stream_writer.write(buffer, length);
 		m_is_empty = false;
 	}
 
 	inline void ObjectWriter::ValueRef::assign_unsigned_integer(uint64_t value)
 	{
-		SJSON_CPP_ENSURE(m_is_empty, "Cannot write multiple values within a ValueRef");
-		SJSON_CPP_ENSURE(m_object_writer != nullptr, "ValueRef not initialized");
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot assign a value when locked");
+		SJSON_CPP_ASSERT(m_is_empty, "Cannot write multiple values within a ValueRef");
+		SJSON_CPP_ASSERT(m_object_writer != nullptr, "ValueRef not initialized");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot assign a value when locked");
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%" PRIu64 "%s", value, k_line_terminator);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %llu", value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %llu", value);
 		m_object_writer->m_stream_writer.write(buffer, length);
 		m_is_empty = false;
 	}
@@ -632,7 +632,7 @@ namespace sjson
 
 	inline void ArrayWriter::push(const char* value)
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON value in locked array");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot push SJSON value in locked array");
 
 		if (!m_is_empty && !m_is_newline)
 			m_stream_writer.write(", ");
@@ -649,7 +649,7 @@ namespace sjson
 
 	inline void ArrayWriter::push(bool value)
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON value in locked array");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot push SJSON value in locked array");
 
 		if (!m_is_empty && !m_is_newline)
 			m_stream_writer.write(", ");
@@ -659,7 +659,7 @@ namespace sjson
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%s", value ? "true" : "false");
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %s", value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %s", value);
 		m_stream_writer.write(buffer, length);
 		m_is_empty = false;
 		m_is_newline = false;
@@ -667,7 +667,7 @@ namespace sjson
 
 	inline void ArrayWriter::push(double value)
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON value in locked array");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot push SJSON value in locked array");
 
 		if (!m_is_empty && !m_is_newline)
 			m_stream_writer.write(", ");
@@ -677,7 +677,7 @@ namespace sjson
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%.17g", value);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %.17g", value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %.17g", value);
 		m_stream_writer.write(buffer, length);
 		m_is_empty = false;
 		m_is_newline = false;
@@ -685,7 +685,7 @@ namespace sjson
 
 	inline void ArrayWriter::push_signed_integer(int64_t value)
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON value in locked array");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot push SJSON value in locked array");
 
 		if (!m_is_empty && !m_is_newline)
 			m_stream_writer.write(", ");
@@ -695,7 +695,7 @@ namespace sjson
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%" PRId64, value);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %lld", value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %lld", value);
 		m_stream_writer.write(buffer, length);
 		m_is_empty = false;
 		m_is_newline = false;
@@ -703,7 +703,7 @@ namespace sjson
 
 	inline void ArrayWriter::push_unsigned_integer(uint64_t value)
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON value in locked array");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot push SJSON value in locked array");
 
 		if (!m_is_empty && !m_is_newline)
 			m_stream_writer.write(", ");
@@ -713,7 +713,7 @@ namespace sjson
 
 		char buffer[256];
 		size_t length = snprintf(buffer, sizeof(buffer), "%" PRIu64, value);
-		SJSON_CPP_ENSURE(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %llu", value);
+		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %llu", value);
 		m_stream_writer.write(buffer, length);
 		m_is_empty = false;
 		m_is_newline = false;
@@ -727,7 +727,7 @@ namespace sjson
 	ArrayWriter::push(F writer_fun)
 #endif
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON object in locked array");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot push SJSON object in locked array");
 
 		if (!m_is_empty && !m_is_newline)
 		{
@@ -762,7 +762,7 @@ namespace sjson
 	ArrayWriter::push(F writer_fun)
 #endif
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot push SJSON array in locked array");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot push SJSON array in locked array");
 
 		if (!m_is_empty && !m_is_newline)
 			m_stream_writer.write(", ");
@@ -784,7 +784,7 @@ namespace sjson
 
 	inline void ArrayWriter::push_newline()
 	{
-		SJSON_CPP_ENSURE(!m_is_locked, "Cannot insert newline in locked array");
+		SJSON_CPP_ASSERT(!m_is_locked, "Cannot insert newline in locked array");
 
 		m_stream_writer.write(k_line_terminator);
 		m_is_newline = true;

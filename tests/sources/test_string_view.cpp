@@ -24,7 +24,6 @@
 
 #include <catch.hpp>
 
-#include "error_exceptions.h"
 #include <sjson/string_view.h>
 
 #include <cstring>

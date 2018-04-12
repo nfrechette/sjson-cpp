@@ -58,7 +58,7 @@ namespace sjson
 		{
 #if defined(SJSON_CPP_USE_ERROR_CHECKS) && !defined(NDEBUG)
 			for (size_t i = 0; i < length; ++i)
-				SJSON_CPP_ENSURE(c_str[i] != '\0', "StringView cannot contain NULL terminators");
+				SJSON_CPP_ASSERT(c_str[i] != '\0', "StringView cannot contain NULL terminators");
 #endif
 		}
 

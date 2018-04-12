@@ -24,90 +24,113 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-// To override these macros, simply define them before including headers from the library.
+//////////////////////////////////////////////////////////////////////////
+// This library uses a simple system to handle asserts. Asserts are fatal and must terminate
+// otherwise the behavior is undefined if execution continues.
+//
+// A total of 4 behaviors are supported:
+//    - We can print to stderr and abort
+//    - We can throw and exception
+//    - We can call a custom function
+//    - Do nothing and strip the check at compile time (default behavior)
+//
+// Aborting:
+//    In order to enable the aborting behavior, simply define the macro SJSON_CPP_ON_ASSERT_ABORT:
+//    #define SJSON_CPP_ON_ASSERT_ABORT
+//
+// Throwing:
+//    In order to enable the throwing behavior, simply define the macro SJSON_CPP_ON_ASSERT_THROW:
+//    #define SJSON_CPP_ON_ASSERT_THROW
+//    Note that the type of the exception thrown is std::runtime_error.
+//
+// Custom function:
+//    In order to enable the custom function calling behavior, define the macro SJSON_CPP_ON_ASSERT_CUSTOM
+//    with the name of the function to call:
+//    #define SJSON_CPP_ON_ASSERT_CUSTOM on_custom_assert_impl
+//    Note that the function signature is as follow:
+//    void on_custom_assert_impl(const char* expression, int line, const char* file, const char* format, ...) {}
+//
+//    You can also define your own assert implementation by defining the SJSON_CPP_ASSERT macro as well:
+//    #define SJSON_CPP_ON_ASSERT_CUSTOM
+//    #define SJSON_CPP_ASSERT(expression, format, ...) checkf(expression, ANSI_TO_TCHAR(format), #__VA_ARGS__)
+//
+// No checks:
+//    By default if no macro mentioned above is defined, all asserts will be stripped
+//    at compile time.
+//////////////////////////////////////////////////////////////////////////
 
-#if !defined(SJSON_CPP_NO_ERROR_CHECKS)
-	// Always enabled by default
-	#define SJSON_CPP_USE_ERROR_CHECKS
-#endif
+#if defined(SJSON_CPP_ON_ASSERT_ABORT)
 
-#if (!defined(SJSON_CPP_ASSERT) || !defined(SJSON_CPP_ENSURE)) && defined(SJSON_CPP_USE_ERROR_CHECKS)
-	#include <assert.h>
+	#include <cstdio>
+	#include <cstdarg>
 	#include <cstdlib>
-#endif
 
-#include <cstdio>
-#include <cstdarg>
-
-// Asserts are properly handled by the library and can be optionally skipped by the user.
-// The code found something unexpected but recovered.
-#if !defined(SJSON_CPP_ASSERT)
-	#if defined(SJSON_CPP_USE_ERROR_CHECKS)
-		// Note: STD assert(..) is fatal, it calls abort
-		//#define SJSON_CPP_ASSERT(expression, format, ...) assert(expression)
-		namespace sjson
+	namespace sjson
+	{
+		namespace error_impl
 		{
-			namespace error_impl
+			inline void on_assert_abort(const char* expression, int line, const char* file, const char* format, ...)
 			{
-				inline void assert_impl(bool expression, const char* format, ...)
-				{
-				#if !defined(NDEBUG)
-					assert(expression);
-				#endif
+				va_list args;
+				va_start(args, format);
 
-					if (!expression) std::abort();
-				}
+				std::vfprintf(stderr, format, args);
+				std::fprintf(stderr, "\n");
+
+				va_end(args);
+
+				std::abort();
+			}
+		}
+	}
+
+	#define SJSON_CPP_ASSERT(expression, format, ...) if (!(expression)) sjson::error_impl::on_assert_abort(#expression, __LINE__, __FILE__, format, ## __VA_ARGS__)
+	#define SJSON_CPP_HAS_ASSERT_CHECKS
+
+#elif defined(SJSON_CPP_ON_ASSERT_THROW)
+
+	#include <cstdio>
+	#include <cstdarg>
+	#include <string>
+	#include <stdexcept>
+
+	namespace sjson
+	{
+		namespace error_impl
+		{
+			inline void on_assert_throw(const char* expression, int line, const char* file, const char* format, ...)
+			{
+				constexpr int buffer_size = 64 * 1024;
+				char buffer[buffer_size];
+
+				va_list args;
+				va_start(args, format);
+
+				const int count = vsnprintf(buffer, buffer_size, format, args);
+
+				va_end(args);
+
+				if (count >= 0 && count < buffer_size)
+					throw std::runtime_error(std::string(&buffer[0], count));
+				else
+					throw std::runtime_error("Failed to format assert message!\n");
+	}
 			}
 		}
 
-		#define SJSON_CPP_ASSERT(expression, format, ...) sjson::error_impl::assert_impl(expression, format, ## __VA_ARGS__)
-	#else
-		#define SJSON_CPP_ASSERT(expression, format, ...) ((void)0)
+	#define SJSON_CPP_ASSERT(expression, format, ...) if (!(expression)) sjson::error_impl::on_assert_throw(#expression, __LINE__, __FILE__, format, ## __VA_ARGS__)
+	#define SJSON_CPP_HAS_ASSERT_CHECKS
+
+#elif defined(SJSON_CPP_ON_ASSERT_CUSTOM)
+
+	#if !defined(SJSON_CPP_ASSERT)
+		#define SJSON_CPP_ASSERT(expression, format, ...) if (!(expression)) SJSON_CPP_ON_ASSERT_CUSTOM(#expression, __LINE__, __FILE__, format, ## __VA_ARGS__)
 	#endif
-#endif
 
-// Ensure is fatal, the library does not handle skipping this safely.
-#if !defined(SJSON_CPP_ENSURE)
-	#if defined(SJSON_CPP_USE_ERROR_CHECKS)
-		#define SJSON_CPP_ENSURE(expression, format, ...) sjson::error_impl::assert_impl(expression, format, ## __VA_ARGS__)
-	#else
-		#define SJSON_CPP_ENSURE(expression, format, ...) ((void)0)
-	#endif
-#endif
+	#define SJSON_CPP_HAS_ASSERT_CHECKS
 
-// Handy macro to handle asserts in if statement, usage:
-// if (SJSON_CPP_TRY_ASSERT(foo != bar, "omg so bad!")) return error;
-#if !defined(SJSON_CPP_TRY_ASSERT)
-	#if defined(SJSON_CPP_USE_ERROR_CHECKS)
-		namespace sjson
-		{
-			namespace error_impl
-			{
-				// A shim is often required because an engine assert macro might do any number of things which
-				// are not compatible with an 'if' statement which breaks SJSON_CPP_TRY_ASSERT
-				inline void assert_shim(bool expression, const char* format, ...)
-				{
-					if (!expression)
-					{
-						constexpr int buffer_size = 64 * 1024;
-						char buffer[buffer_size];
+#else
 
-						va_list args;
-						va_start(args, format);
+	#define SJSON_CPP_ASSERT(expression, format, ...) ((void)0)
 
-						int count = vsnprintf(buffer, buffer_size, format, args);
-						SJSON_CPP_ENSURE(count >= 0 && count < buffer_size, "Failed to format assert");
-
-						SJSON_CPP_ASSERT(expression, &buffer[0]);
-
-						va_end(args);
-					}
-				}
-			}
-		}
-
-		#define SJSON_CPP_TRY_ASSERT(expression, format, ...) sjson::error_impl::assert_shim(expression, format, ## __VA_ARGS__), !(expression)
-	#else
-		#define SJSON_CPP_TRY_ASSERT(expression, format, ...) !(expression)
-	#endif
 #endif
