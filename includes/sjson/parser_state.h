@@ -24,7 +24,7 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "parser_error.h"
+#include "sjson/parser_error.h"
 
 #include <cstdlib>
 #include <cstdint>
