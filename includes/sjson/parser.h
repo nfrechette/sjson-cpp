@@ -31,6 +31,7 @@
 
 #include "sjson/parser_error.h"
 #include "sjson/parser_state.h"
+#include "sjson/platform.h"
 #include "sjson/string_view.h"
 
 #include <cctype>
@@ -39,44 +40,8 @@
 #include <cstdint>
 #include <algorithm>
 
-#if defined(__ANDROID__)
-	#include <stdlib.h>
-#else
-	#include <cstdlib>
-#endif
-
 namespace sjson
 {
-	namespace impl
-	{
-		inline unsigned long long int strtoull(const char* str, char** endptr, int base)
-		{
-#if defined(__ANDROID__)
-			return ::strtoull(str, endptr, base);
-#else
-			return std::strtoull(str, endptr, base);
-#endif
-		}
-
-		inline long long int strtoll(const char* str, char** endptr, int base)
-		{
-#if defined(__ANDROID__)
-			return ::strtoll(str, endptr, base);
-#else
-			return std::strtoll(str, endptr, base);
-#endif
-		}
-
-		inline float strtof(const char* str, char** endptr)
-		{
-#if defined(__ANDROID__)
-			return ::strtof(str, endptr);
-#else
-			return std::strtof(str, endptr);
-#endif
-		}
-	}
-
 	class Parser
 	{
 	public:
