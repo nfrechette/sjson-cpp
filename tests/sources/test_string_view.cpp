@@ -62,4 +62,13 @@ TEST_CASE("StringView", "[string]")
 	REQUIRE(StringView().empty() == true);
 	REQUIRE(StringView("").empty() == true);
 	REQUIRE(view0.empty() == false);
+
+	REQUIRE(view0[0] == 't');
+	REQUIRE(view0[1] == 'h');
+	REQUIRE(view0[2] == 'i');
+	REQUIRE(view0[3] == 's');
+	REQUIRE(view0[4] == ' ');
+	REQUIRE(view0[5] == 'i');
+	REQUIRE(view0[view0.size() - 1] == 'g');
+	REQUIRE_THROWS(view0[view0.size()]);
 }

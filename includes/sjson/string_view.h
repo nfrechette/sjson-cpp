@@ -105,6 +105,12 @@ namespace sjson
 
 		bool operator !=(const StringView& other) const { return !(*this == other); }
 
+		char operator[](size_t offset) const
+		{
+			SJSON_CPP_ASSERT(offset < m_length, "Invalid offset");
+			return m_c_str[offset];
+		}
+
 	private:
 		const char* m_c_str;
 		size_t m_length;
