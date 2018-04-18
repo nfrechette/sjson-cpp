@@ -651,102 +651,206 @@ TEST_CASE("Reader Array Reading", "[reader]")
 		REQUIRE(error.empty());
 		REQUIRE(num_pairs == 1);
 
+		int pair_count = 0;
 		for (PairReader pair : reader.get_pairs(&error))
 		{
 			REQUIRE(error.empty());
 			REQUIRE(pair.name == "key");
-			//REQUIRE(pair.value.get_type(&error) == ValueType::Bool);
+			REQUIRE(pair.value.get_type(&error) == ValueType::Array);
 			REQUIRE(error.empty());
-			//bool value = pair.value.read<bool>(false, &error);
-			//REQUIRE(error.empty());
-			//REQUIRE(value == true);
+
+			int value_count = 0;
+			for (ValueReader value : pair.value.get_values(&error))
+			{
+				double value1 = value.read<double>(0.0, &error);
+				switch (value_count)
+				{
+				case 0:
+					REQUIRE(value1 == 123.456789);
+					break;
+				case 1:
+					REQUIRE(value1 == 456.789);
+					break;
+				case 2:
+					REQUIRE(value1 == 151.091);
+					break;
+				}
+				value_count++;
+			}
+
+			REQUIRE(error.empty());
+			REQUIRE(value_count == 3);
+			pair_count++;
 		}
-		//double value[3] = { 0.0, 0.0, 0.0 };
-		//REQUIRE(parser.read("key", value, 3));
-		//REQUIRE(value[0] == 123.456789);
-		//REQUIRE(value[1] == 456.789);
-		//REQUIRE(value[2] == 151.091);
-		//REQUIRE(parser.eof());
-		//REQUIRE(parser.is_valid());
-	}
-
-#if 0
-	{
-		Parser parser = parser_from_c_str("key = [ 123.456789, 456.789, 151.091 ]");
-		double value[3] = { 0.0, 0.0, 0.0 };
-		REQUIRE(parser.read("key", value, 3));
-		REQUIRE(value[0] == 123.456789);
-		REQUIRE(value[1] == 456.789);
-		REQUIRE(value[2] == 151.091);
-		REQUIRE(parser.eof());
-		REQUIRE(parser.is_valid());
+		REQUIRE(error.empty());
+		REQUIRE(pair_count == 1);
 	}
 
 	{
-		Parser parser = parser_from_c_str("key = [ \"123.456789\", \"456.789\", \"151.091\" ]");
-		StringView value[3];
-		REQUIRE(parser.read("key", value, 3));
-		REQUIRE(value[0] == "123.456789");
-		REQUIRE(value[1] == "456.789");
-		REQUIRE(value[2] == "151.091");
-		REQUIRE(parser.eof());
-		REQUIRE(parser.is_valid());
+		Reader reader = reader_from_c_str("key = [ 123.456789, 456.789, 151.091 ]");
+		ReaderError error;
+		size_t num_pairs = reader.get_num_pairs(&error);
+		REQUIRE(error.empty());
+		REQUIRE(num_pairs == 1);
+
+		int pair_count = 0;
+		for (PairReader pair : reader.get_pairs(&error))
+		{
+			REQUIRE(error.empty());
+			REQUIRE(pair.name == "key");
+			REQUIRE(pair.value.get_type(&error) == ValueType::Array);
+			REQUIRE(error.empty());
+
+			int value_count = 0;
+			for (ValueReader value : pair.value.get_values(&error))
+			{
+				double value1 = value.read<double>(0.0, &error);
+				REQUIRE(value1 == 123.456789);
+				value_count++;
+
+				// Break in the middle of the iteration
+				if (value_count == 1)
+					break;
+			}
+
+			REQUIRE(error.empty());
+			REQUIRE(value_count == 1);
+			pair_count++;
+		}
+		REQUIRE(error.empty());
+		REQUIRE(pair_count == 1);
 	}
 
 	{
-		Parser parser = parser_from_c_str("bad_key = \"bad\"");
-		double value[3] = { 0.0, 0.0, 0.0 };
-		REQUIRE_FALSE(parser.try_read("key", value, 3, 1.0));
-		REQUIRE(value[0] == 1.0);
-		REQUIRE(value[1] == 1.0);
-		REQUIRE(value[2] == 1.0);
-		REQUIRE_FALSE(parser.eof());
-		REQUIRE(parser.is_valid());
-	}
+		Reader reader = reader_from_c_str("key = [ 123.456789, false, [ 1.0, true ], \"456.789\", [ 1.0, false, [] ] ]");
+		ReaderError error;
+		size_t num_pairs = reader.get_num_pairs(&error);
+		REQUIRE(error.empty());
+		REQUIRE(num_pairs == 1);
 
-	{
-		Parser parser = parser_from_c_str("key = [ 123.456789, 456.789, 151.091 ]");
-		double value[3] = { 0.0, 0.0, 0.0 };
-		REQUIRE(parser.try_read("key", value, 3, 1.0));
-		REQUIRE(value[0] == 123.456789);
-		REQUIRE(value[1] == 456.789);
-		REQUIRE(value[2] == 151.091);
-		REQUIRE(parser.eof());
-		REQUIRE(parser.is_valid());
-	}
+		int pair_count = 0;
+		for (PairReader pair : reader.get_pairs(&error))
+		{
+			REQUIRE(error.empty());
+			REQUIRE(pair.name == "key");
+			REQUIRE(pair.value.get_type(&error) == ValueType::Array);
+			REQUIRE(error.empty());
 
-	{
-		Parser parser = parser_from_c_str("bad_key = \"bad\"");
-		StringView value[3];
-		REQUIRE_FALSE(parser.try_read("key", value, 3, "default"));
-		REQUIRE(value[0] == "default");
-		REQUIRE(value[1] == "default");
-		REQUIRE(value[2] == "default");
-		REQUIRE_FALSE(parser.eof());
-		REQUIRE(parser.is_valid());
-	}
+			int value_count0 = 0;
+			for (ValueReader value : pair.value.get_values(&error))
+			{
+				switch (value_count0)
+				{
+				case 0:
+				{
+					double value1 = value.read<double>(0.0, &error);
+					REQUIRE(error.empty());
+					REQUIRE(value1 == 123.456789);
+					break;
+				}
+				case 1:
+				{
+					bool value2 = value.read<bool>(true, &error);
+					REQUIRE(error.empty());
+					REQUIRE(value2 == false);
+					break;
+				}
+				case 2:
+				{
+					REQUIRE(value.get_num_values(&error) == 2);
+					REQUIRE(error.empty());
 
-	{
-		Parser parser = parser_from_c_str("key = [ \"123.456789\", \"456.789\", \"151.091\" ]");
-		StringView value[3];
-		REQUIRE(parser.try_read("key", value, 3, "default"));
-		REQUIRE(value[0] == "123.456789");
-		REQUIRE(value[1] == "456.789");
-		REQUIRE(value[2] == "151.091");
-		REQUIRE(parser.eof());
-		REQUIRE(parser.is_valid());
-	}
-#endif
+					int value_count1 = 0;
+					for (ValueReader value3 : value.get_values(&error))
+					{
+						switch (value_count1)
+						{
+						case 0:
+						{
+							double value4 = value3.read<double>(0.0, &error);
+							REQUIRE(error.empty());
+							REQUIRE(value4 == 1.0);
+							break;
+						}
+						case 1:
+						{
+							bool value5 = value3.read<bool>(false, &error);
+							REQUIRE(error.empty());
+							REQUIRE(value5 == true);
+							break;
+						}
+						}
 
-#if 0
-	{
-		Parser parser = parser_from_c_str("key = [ 123.456789, \"456.789\", false, [ 1.0, true ], { key0 = 1.0, key1 = false } ]");
+						value_count1++;
+					}
 
-		REQUIRE(parser.array_begins("key"));
-		// TODO
-		REQUIRE(parser.array_ends());
-		REQUIRE(parser.eof());
-		REQUIRE(parser.is_valid());
+					REQUIRE(error.empty());
+					REQUIRE(value_count1 == 2);
+					break;
+				}
+				case 3:
+				{
+					StringView value6 = value.read<StringView>("", &error);
+					REQUIRE(error.empty());
+					REQUIRE(value6 == "456.789");
+					break;
+				}
+				case 4:
+				{
+					REQUIRE(value.get_num_values(&error) == 3);
+					REQUIRE(error.empty());
+
+					int value_count2 = 0;
+					for (ValueReader value7 : value.get_values(&error))
+					{
+						switch (value_count2)
+						{
+						case 0:
+						{
+							double value8 = value7.read<double>(0.0, &error);
+							REQUIRE(error.empty());
+							REQUIRE(value8 == 1.0);
+							break;
+						}
+						case 1:
+						{
+							bool value9 = value7.read<bool>(true, &error);
+							REQUIRE(error.empty());
+							REQUIRE(value9 == false);
+							break;
+						}
+						case 2:
+						{
+							REQUIRE(value7.get_type(&error) == ValueType::Array);
+							REQUIRE(error.empty());
+							REQUIRE(value7.get_num_values(&error) == 0);
+							REQUIRE(error.empty());
+							int value_count3 = 0;
+							for (ValueReader value10 : value7.get_values(&error))
+								value_count3++;
+							REQUIRE(error.empty());
+							REQUIRE(value_count3 == 0);
+							break;
+						}
+						}
+
+						value_count2++;
+					}
+
+					REQUIRE(error.empty());
+					REQUIRE(value_count2 == 3);
+					break;
+				}
+				}
+
+				value_count0++;
+			}
+
+			REQUIRE(error.empty());
+			REQUIRE(value_count0 == 5);
+			pair_count++;
+		}
+		REQUIRE(error.empty());
+		REQUIRE(pair_count == 1);
 	}
-#endif
 }

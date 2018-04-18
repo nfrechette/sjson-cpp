@@ -99,9 +99,11 @@ namespace sjson
 		Bool,
 		String,
 		Number,
-		//Array,
+		Array,
 		//Object,
 	};
+
+	class ValueReader;
 
 	namespace impl
 	{
@@ -517,11 +519,149 @@ namespace sjson
 				return ReaderError();
 			}
 		}
+
+		//class PairReaderIterator;
+		inline ReaderError skip_value(ReaderContext& context, ValueReader& value_to_skip);
 	}
 
 	class ValueReader
 	{
 	public:
+		class ValueReaderIterator
+		{
+		public:
+			ValueReaderIterator() : m_context(impl::k_invalid_context), m_value_context(impl::k_invalid_context), m_out_error(nullptr), m_value_offset(0) {}
+			ValueReaderIterator(const impl::ReaderContext& context, ReaderError* out_error)
+				: m_context(context)
+				, m_value_context(impl::k_invalid_context)
+				, m_out_error(out_error)
+				, m_value_offset(context.offset - 1)
+			{
+				if (context.is_eof())
+					return;
+
+				SJSON_CPP_ASSERT(context.str[context.offset] == '[', "Expected a '['");
+
+				m_context.offset++;		// Skip '['
+
+				++(*this);
+			}
+
+			inline ValueReaderIterator& operator++()
+			{
+				if (m_context.offset == m_value_offset)
+				{
+					ReaderError error = skip_value();
+					if (error.any())
+					{
+						if (m_out_error != nullptr)
+							*m_out_error = error;
+
+						m_context = impl::k_invalid_context;
+						return *this;
+					}
+				}
+
+				ReaderError error = skip_comments_and_whitespace(m_context);
+				if (error.any())
+				{
+					if (m_out_error != nullptr)
+						*m_out_error = error;
+
+					m_context = impl::k_invalid_context;
+					return *this;
+				}
+
+				if (m_context.is_eof())
+				{
+					m_context = impl::k_invalid_context;
+					return *this;
+				}
+
+				if (m_context.str[m_context.offset] == ',')
+				{
+					// Skip and consume
+					m_context.offset++;
+
+					error = skip_comments_and_whitespace(m_context);
+					if (error.any())
+					{
+						if (m_out_error != nullptr)
+							*m_out_error = error;
+
+						m_context = impl::k_invalid_context;
+						return *this;
+					}
+
+					if (m_context.is_eof())
+					{
+						if (m_out_error != nullptr)
+							*m_out_error = ReaderError("Input truncated");
+
+						m_context = impl::k_invalid_context;
+						return *this;
+					}
+				}
+
+				if (m_context.str[m_context.offset] == ']')
+				{
+					// We are done, skip, and consume
+					m_context.offset++;
+
+					// TODO: Just update the offset?
+					m_value_context = m_context;
+					m_value_context.parent = &m_context;
+					m_context = impl::k_invalid_context;
+					return *this;
+				}
+
+				m_value_offset = m_context.offset;
+
+				// TODO: Just update the offset?
+				m_value_context = m_context;
+				m_value_context.parent = &m_context;
+
+				return *this;
+			}
+
+			inline ValueReader operator*() const { return ValueReader(m_value_context); }
+
+			inline bool operator==(const ValueReaderIterator& other) const { return m_context.offset == other.m_context.offset; }
+			inline bool operator!=(const ValueReaderIterator& other) const { return m_context.offset != other.m_context.offset; }
+
+		private:
+			inline ReaderError skip_value()
+			{
+				ValueReader value(m_value_context);
+				return impl::skip_value(m_context, value);
+			}
+
+			impl::ReaderContext	m_context;
+			impl::ReaderContext	m_value_context;
+			ReaderError*	m_out_error;
+
+			size_t			m_value_offset;		// TODO: Can we remove this and use m_value_context.offset?
+
+			friend ReaderError impl::skip_value(ReaderContext& context, ValueReader& value_to_skip);
+		};
+
+		class ValueReaderList
+		{
+		public:
+			inline ValueReaderList(const impl::ReaderContext& context, ReaderError* out_error)
+				: m_context(context)
+				, m_out_error(out_error)
+			{}
+
+			inline ValueReaderIterator begin() { return ValueReaderIterator(m_context, m_out_error); }
+			inline ValueReaderIterator begin(ReaderError* out_error) { return ValueReaderIterator(m_context, out_error); }
+			inline ValueReaderIterator end() { return ValueReaderIterator(); }
+
+		private:
+			const impl::ReaderContext&	m_context;
+			ReaderError*				m_out_error;
+		};
+
 		ValueReader() : m_context(impl::k_invalid_context) {}
 		ValueReader(const impl::ReaderContext& context) : m_context(context) {}
 
@@ -928,6 +1068,35 @@ namespace sjson
 			return value;
 		}
 
+		inline ValueReaderList get_values(ReaderError* out_error = nullptr)
+		{
+			if (m_context.is_eof())
+			{
+				if (out_error != nullptr)
+					*out_error = ReaderError("Input truncated");
+
+				return ValueReaderList(impl::k_invalid_context, out_error);
+			}
+
+			if (get_type() != ValueType::Array)
+			{
+				if (out_error != nullptr)
+					*out_error = ReaderError("Expected an array");
+
+				return ValueReaderList(impl::k_invalid_context, out_error);
+			}
+
+			return ValueReaderList(m_context, out_error);
+		}
+
+		inline size_t get_num_values(ReaderError* out_error = nullptr)
+		{
+			size_t count = 0;
+			for (ValueReader value : get_values(out_error))
+				count++;
+			return count;
+		}
+
 		ValueType get_type(ReaderError* out_error = nullptr) const
 		{
 			const char symbol = m_context.str[m_context.offset];
@@ -942,6 +1111,8 @@ namespace sjson
 				return ValueType::String;
 			else if (symbol == '-' || std::isdigit(symbol))
 				return ValueType::Number;
+			else if (symbol == '[')
+				return ValueType::Array;
 
 			if (out_error != nullptr)
 				*out_error = ReaderError("Unknown value type");
@@ -1075,40 +1246,7 @@ namespace sjson
 			inline bool operator!=(const PairReaderIterator& other) const { return m_context.offset != other.m_context.offset; }
 
 		private:
-			inline ReaderError skip_value()
-			{
-				ReaderError error;
-				switch (m_curr_pair.value.get_type(&error))
-				{
-				case ValueType::Unknown:
-				default:
-					break;
-				case ValueType::Null:
-					error = impl::read_null(m_context);
-					break;
-				case ValueType::Bool:
-					{
-						bool value;
-						error = impl::read_bool(m_context, value);
-					}
-					break;
-				case ValueType::String:
-					{
-						StringView value;
-						error = impl::read_string(m_context, value);
-					}
-					break;
-				case ValueType::Number:
-					{
-						StringView value;
-						int base;
-						error = impl::read_number(m_context, value, base);
-					}
-					break;
-				}
-
-				return error;
-			}
+			inline ReaderError skip_value() { return impl::skip_value(m_context, m_curr_pair.value); }
 
 			ReaderContext	m_context;
 			ReaderError*	m_out_error;
@@ -1176,4 +1314,60 @@ namespace sjson
 
 	//////////////////////////////////////////////////////////////////////////
 
+	namespace impl
+	{
+		inline ReaderError skip_value(ReaderContext& context, ValueReader& value_to_skip)
+		{
+			ReaderError error;
+			switch (value_to_skip.get_type(&error))
+			{
+			case ValueType::Unknown:
+			default:
+				break;
+			case ValueType::Null:
+				error = impl::read_null(context);
+				break;
+			case ValueType::Bool:
+			{
+				bool value;
+				error = impl::read_bool(context, value);
+				break;
+			}
+			case ValueType::String:
+			{
+				StringView value;
+				error = impl::read_string(context, value);
+				break;
+			}
+			case ValueType::Number:
+			{
+				StringView value;
+				int base;
+				error = impl::read_number(context, value, base);
+				break;
+			}
+			case ValueType::Array:
+			{
+				auto value_list = value_to_skip.get_values(&error);
+				if (error.any())
+					return error;
+
+				auto it = value_list.begin(&error);
+				if (error.any())
+					return error;
+
+				auto end_it = value_list.end();
+				for (; it != end_it; ++it);
+
+				if (error.any())
+					return error;
+
+				context.offset = it.m_value_context.offset;
+				break;
+			}
+			}
+
+			return error;
+		}
+	}
 }
