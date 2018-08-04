@@ -1,5 +1,5 @@
 [![CLA assistant](https://cla-assistant.io/readme/badge/nfrechette/sjson-cpp)](https://cla-assistant.io/nfrechette/sjson-cpp)
-[![Build status](https://ci.appveyor.com/api/projects/status/8h1jwmhumqh9ie3h?svg=true)](https://ci.appveyor.com/project/nfrechette/sjson-cpp)
+[![Build status](https://ci.appveyor.com/api/projects/status/oynd3x3d9umjaruf/branch/develop?svg=true)](https://ci.appveyor.com/project/nfrechette/sjson-cpp)
 [![Build Status](https://travis-ci.org/nfrechette/sjson-cpp.svg?branch=develop)](https://travis-ci.org/nfrechette/sjson-cpp)
 [![GitHub (pre-)release](https://img.shields.io/github/release/nfrechette/sjson-cpp/all.svg)](https://github.com/nfrechette/sjson-cpp/releases)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/nfrechette/sjson-cpp/master/LICENSE)
