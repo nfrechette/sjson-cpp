@@ -331,7 +331,7 @@ TEST_CASE("Writer Object Array Writing", "[writer]")
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
-		writer.insert("key", [](ArrayWriter& array_writer)
+		writer.insert("key", [](ArrayWriter& /*array_writer*/)
 		{
 		});
 		REQUIRE(str_writer.str() == "key = [  ]\r\n");
@@ -365,7 +365,7 @@ TEST_CASE("Writer Object Object Writing", "[writer]")
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
-		writer.insert("key", [](ObjectWriter& object_writer)
+		writer.insert("key", [](ObjectWriter& /*object_writer*/)
 		{
 		});
 		REQUIRE(str_writer.str() == "key = {\r\n}\r\n");
@@ -598,7 +598,7 @@ TEST_CASE("Writer Array Array Writing", "[writer]")
 		Writer writer(str_writer);
 		writer.insert("key", [](ArrayWriter& array_writer)
 		{
-			array_writer.push([](ArrayWriter& array_writer)
+			array_writer.push([](ArrayWriter& /*array_writer*/)
 			{
 			});
 		});
@@ -627,7 +627,7 @@ TEST_CASE("Writer Array Object Writing", "[writer]")
 		Writer writer(str_writer);
 		writer.insert("key", [](ArrayWriter& array_writer)
 		{
-			array_writer.push([](ObjectWriter& object_writer)
+			array_writer.push([](ObjectWriter& /*object_writer*/)
 			{
 			});
 		});
