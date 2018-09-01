@@ -1,5 +1,11 @@
 # Significant changes per release
 
+## 0.5.0
+
+*  Cleaned up error handling
+*  Enabled as many warnings as possible
+*  Other minor misc changes
+
 ## 0.4.0
 
 *  Added iOS support
