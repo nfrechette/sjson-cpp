@@ -45,7 +45,7 @@ The above supported platform list is only what is tested every release but if it
 ## External dependencies
 
 There are none! You don't need anything else to get started: everything is self contained.
-See [here](./external) for details on the ones we do include.
+See [here](./external) for details.
 
 ## Getting up and running
 
