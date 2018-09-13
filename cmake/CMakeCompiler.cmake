@@ -26,7 +26,7 @@ macro(setup_default_compiler_flags _project_name)
 			target_link_libraries(${_project_name} PRIVATE "-m64")
 		endif()
 
-		target_compile_options(${_project_name} PRIVATE -Wall)				# Enable all warnings
+		target_compile_options(${_project_name} PRIVATE -Wall -Wextra)		# Enable all warnings
 		target_compile_options(${_project_name} PRIVATE -Werror)			# Treat warnings as errors
 	endif()
 endmacro()
