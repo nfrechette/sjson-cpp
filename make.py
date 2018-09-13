@@ -51,6 +51,9 @@ def parse_argv():
 		if value == '-clang5':
 			options['compiler'] = 'clang5'
 
+		if value == '-clang6':
+			options['compiler'] = 'clang6'
+
 		if value == '-gcc5':
 			options['compiler'] = 'gcc5'
 
@@ -59,6 +62,9 @@ def parse_argv():
 
 		if value == '-gcc7':
 			options['compiler'] = 'gcc7'
+
+		if value == '-gcc8':
+			options['compiler'] = 'gcc8'
 
 		if value == '-osx':
 			options['compiler'] = 'osx'
@@ -147,6 +153,9 @@ def set_compiler_env(compiler, options):
 		elif compiler == 'clang5':
 			os.environ['CC'] = 'clang-5.0'
 			os.environ['CXX'] = 'clang++-5.0'
+		elif compiler == 'clang6':
+			os.environ['CC'] = 'clang-6.0'
+			os.environ['CXX'] = 'clang++-6.0'
 		elif compiler == 'gcc5':
 			os.environ['CC'] = 'gcc-5'
 			os.environ['CXX'] = 'g++-5'
@@ -156,6 +165,9 @@ def set_compiler_env(compiler, options):
 		elif compiler == 'gcc7':
 			os.environ['CC'] = 'gcc-7'
 			os.environ['CXX'] = 'g++-7'
+		elif compiler == 'gcc8':
+			os.environ['CC'] = 'gcc-8'
+			os.environ['CXX'] = 'g++-8'
 		else:
 			print('Unknown compiler: {}'.format(compiler))
 			sys.exit(1)
