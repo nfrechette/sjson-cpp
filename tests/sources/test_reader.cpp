@@ -720,9 +720,114 @@ TEST_CASE("Reader Array Reading", "[reader]")
 		REQUIRE(error.empty());
 		REQUIRE(pair_count == 1);
 	}
+}
+
+TEST_CASE("Reader Object Reading", "[reader]")
+{
+	{
+		Reader reader = reader_from_c_str("root_key = { key0 = false, key1 = 123.0, key2 = \"ok\" }, tmp = true");
+		ReaderError error;
+		size_t num_pairs = reader.get_num_pairs(&error);
+		REQUIRE(error.empty());
+		REQUIRE(num_pairs == 2);
+
+		int pair_count = 0;
+		for (PairReader pair : reader.get_pairs(&error))
+		{
+			REQUIRE(error.empty());
+			if (pair_count == 0)
+			{
+				REQUIRE(pair.name == "root_key");
+				REQUIRE(pair.value.get_type(&error) == ValueType::Object);
+				REQUIRE(error.empty());
+
+				int pair1_count = 0;
+				for (PairReader pair1 : pair.value.get_pairs(&error))
+				{
+					switch (pair1_count)
+					{
+					case 0:
+						REQUIRE(pair1.name == "key0");
+						REQUIRE(pair1.value.read<bool>(true, &error) == false);
+						break;
+					case 1:
+						REQUIRE(pair1.name == "key1");
+						REQUIRE(pair1.value.read<float>(0.0f, &error) == 123.0);
+						break;
+					case 2:
+						REQUIRE(pair1.name == "key2");
+						REQUIRE(pair1.value.read<StringView>("", &error) == "ok");
+						break;
+					}
+
+					REQUIRE(error.empty());
+					pair1_count++;
+				}
+
+				REQUIRE(error.empty());
+				REQUIRE(pair1_count == 3);
+			}
+			else if (pair_count == 1)
+			{
+				REQUIRE(pair.name == "tmp");
+				REQUIRE(pair.value.read<bool>(false, &error));
+			}
+
+			pair_count++;
+		}
+		REQUIRE(error.empty());
+		REQUIRE(pair_count == 2);
+	}
 
 	{
-		Reader reader = reader_from_c_str("key = [ 123.456789, false, [ 1.0, true ], \"456.789\", [ 1.0, false, [] ] ]");
+		Reader reader = reader_from_c_str("root_key = { key0 = false, key1 = 123.0, key2 = \"ok\" }, tmp = true");
+		ReaderError error;
+		size_t num_pairs = reader.get_num_pairs(&error);
+		REQUIRE(error.empty());
+		REQUIRE(num_pairs == 2);
+
+		int pair_count = 0;
+		for (PairReader pair : reader.get_pairs(&error))
+		{
+			REQUIRE(error.empty());
+			if (pair_count == 0)
+			{
+				REQUIRE(pair.name == "root_key");
+				REQUIRE(pair.value.get_type(&error) == ValueType::Object);
+				REQUIRE(error.empty());
+
+				int pair1_count = 0;
+				for (PairReader pair1 : pair.value.get_pairs(&error))
+				{
+					REQUIRE(pair1.name == "key0");
+					REQUIRE(pair1.value.read<bool>(true, &error) == false);
+					pair1_count++;
+
+					// Break in the middle of the iteration
+					if (pair1_count == 1)
+						break;
+				}
+
+				REQUIRE(error.empty());
+				REQUIRE(pair1_count == 1);
+			}
+			else if (pair_count == 1)
+			{
+				REQUIRE(pair.name == "tmp");
+				REQUIRE(pair.value.read<bool>(false, &error));
+			}
+
+			pair_count++;
+		}
+		REQUIRE(error.empty());
+		REQUIRE(pair_count == 2);
+	}
+}
+
+TEST_CASE("Reader Mixed Reading", "[reader]")
+{
+	{
+		Reader reader = reader_from_c_str("key = [ 123.456789, false, [ 1.0, true, { tmp0 = false, tmp1 = 2.0 } ], \"456.789\", [ 1.0, false, [], {} ] ]");
 		ReaderError error;
 		size_t num_pairs = reader.get_num_pairs(&error);
 		REQUIRE(error.empty());
@@ -743,21 +848,19 @@ TEST_CASE("Reader Array Reading", "[reader]")
 				{
 				case 0:
 				{
-					double value1 = value.read<double>(0.0, &error);
+					REQUIRE(value.read<double>(0.0, &error) == 123.456789);
 					REQUIRE(error.empty());
-					REQUIRE(value1 == 123.456789);
 					break;
 				}
 				case 1:
 				{
-					bool value2 = value.read<bool>(true, &error);
+					REQUIRE(value.read<bool>(true, &error) == false);
 					REQUIRE(error.empty());
-					REQUIRE(value2 == false);
 					break;
 				}
 				case 2:
 				{
-					REQUIRE(value.get_num_values(&error) == 2);
+					REQUIRE(value.get_num_values(&error) == 3);
 					REQUIRE(error.empty());
 
 					int value_count1 = 0;
@@ -767,16 +870,45 @@ TEST_CASE("Reader Array Reading", "[reader]")
 						{
 						case 0:
 						{
-							double value4 = value3.read<double>(0.0, &error);
+							REQUIRE(value3.read<double>(0.0, &error) == 1.0);
 							REQUIRE(error.empty());
-							REQUIRE(value4 == 1.0);
 							break;
 						}
 						case 1:
 						{
-							bool value5 = value3.read<bool>(false, &error);
+							REQUIRE(value3.read<bool>(false, &error) == true);
 							REQUIRE(error.empty());
-							REQUIRE(value5 == true);
+							break;
+						}
+						case 2:
+						{
+							REQUIRE(value3.get_type(&error) == ValueType::Object);
+							REQUIRE(error.empty());
+							REQUIRE(value3.get_num_pairs(&error) == 2);
+							REQUIRE(error.empty());
+
+							int pair1_count = 0;
+							for (PairReader pair1 : value3.get_pairs(&error))
+							{
+								REQUIRE(error.empty());
+								switch (pair1_count)
+								{
+								case 0:
+									REQUIRE(pair1.name == "tmp0");
+									REQUIRE(pair1.value.read<bool>(true, &error) == false);
+									REQUIRE(error.empty());
+									break;
+								case 1:
+									REQUIRE(pair1.name == "tmp1");
+									REQUIRE(pair1.value.read<double>(0.0, &error) == 2.0);
+									REQUIRE(error.empty());
+									break;
+								}
+								pair1_count++;
+							}
+
+							REQUIRE(error.empty());
+							REQUIRE(pair1_count == 2);
 							break;
 						}
 						}
@@ -785,7 +917,7 @@ TEST_CASE("Reader Array Reading", "[reader]")
 					}
 
 					REQUIRE(error.empty());
-					REQUIRE(value_count1 == 2);
+					REQUIRE(value_count1 == 3);
 					break;
 				}
 				case 3:
@@ -797,7 +929,7 @@ TEST_CASE("Reader Array Reading", "[reader]")
 				}
 				case 4:
 				{
-					REQUIRE(value.get_num_values(&error) == 3);
+					REQUIRE(value.get_num_values(&error) == 4);
 					REQUIRE(error.empty());
 
 					int value_count2 = 0;
@@ -832,13 +964,26 @@ TEST_CASE("Reader Array Reading", "[reader]")
 							REQUIRE(value_count3 == 0);
 							break;
 						}
+						case 3:
+						{
+							REQUIRE(value7.get_type(&error) == ValueType::Object);
+							REQUIRE(error.empty());
+							REQUIRE(value7.get_num_pairs(&error) == 0);
+							REQUIRE(error.empty());
+							int pair_count2 = 0;
+							for (PairReader pair2 : value7.get_pairs(&error))
+								pair_count2++;
+							REQUIRE(error.empty());
+							REQUIRE(pair_count2 == 0);
+							break;
+						}
 						}
 
 						value_count2++;
 					}
 
 					REQUIRE(error.empty());
-					REQUIRE(value_count2 == 3);
+					REQUIRE(value_count2 == 4);
 					break;
 				}
 				}

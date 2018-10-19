@@ -40,41 +40,6 @@
 #include <algorithm>
 #include <type_traits>
 
-#if 0
-sjson::Reader r(buffer, buffer_size);
-sjson::Error err;
-
-for (sjson::Pair p in r.pairs(err))		// returns an object entry iterator, on error 'err' is populated
-StringView key = p.key
-//float tmp1 = p.value.get(err, 0.2f)	// default value, entry must be present, if missing 'err' is populated and the default value is returned
-//float tmp2 = p.value.try_get(0.2f)	// default value, entry is optional, if missing default value is returned
-float tmp3 = p.value.get(0.2f)		// Optional? Coercion failure?
-float tmp4 = p.value.get(0.2f, err)	// Required?
-
-for (auto p in r.try_pairs())
-// etc
-
-for (sjson::Value v in r.values(err))	// returns an array entry iterator, on error 'err' is populated
-										// etc
-
-// Slow, we always start scanning from the start of the object
-sjson::Value v = r.get("foo", err)		// looks up an entry by key, if missing null object is returned
-sjson::Value v = r.try_get("foo")		//
-
-An object contains a list of pairs.
-A pair is a string view key and an sjson value.
-An array contains a list of sjson values.
-An sjson value is either : missing, null, an object, an array, a string, a bool, a number, ? ?
-
-template<Type>
-Value::get(Type default_value, Error* err)
-
-Value::get_type()
-
-A value points at a particular location in the sjson buffer.
-A value contains a context for parsing used for arrays and objects.
-#endif
-
 namespace sjson
 {
 	class ReaderError
@@ -100,13 +65,15 @@ namespace sjson
 		String,
 		Number,
 		Array,
-		//Object,
+		Object,
 	};
 
 	class ValueReader;
 
 	namespace impl
 	{
+		class PairReaderIterator;
+
 		struct ReaderContext
 		{
 			StringView		str;
@@ -520,13 +487,194 @@ namespace sjson
 			}
 		}
 
-		//class PairReaderIterator;
-		inline ReaderError skip_value(ReaderContext& context, ValueReader& value_to_skip);
-	}
+		inline ReaderError skip_value(ReaderContext& context, const ReaderContext& value_context);
 
-	class ValueReader
-	{
-	public:
+		struct PairReaderProxy
+		{
+			const StringView& name;
+			const ReaderContext& context;
+
+			PairReaderProxy(const StringView& name_, const ReaderContext& context_)
+				: name(name_)
+				, context(context_)
+			{}
+		};
+
+		class PairReaderIterator
+		{
+		public:
+			PairReaderIterator() : m_context(k_invalid_context), m_out_error(nullptr), m_is_root_object(false), m_value_offset(0), m_pair_name(), m_pair_context() {}
+			PairReaderIterator(const ReaderContext& context, bool is_root_object, ReaderError* out_error)
+				: m_context(context)
+				, m_out_error(out_error)
+				, m_is_root_object(is_root_object)
+				, m_value_offset(context.offset - 1)
+				, m_pair_name()
+				, m_pair_context()
+			{
+				if (context.is_eof())
+					return;
+
+				if (is_root_object)
+				{
+					SJSON_CPP_ASSERT(!std::isspace(context.str[context.offset]), "Expected a value");
+				}
+				else
+				{
+					SJSON_CPP_ASSERT(context.str[context.offset] == '{', "Expected a '{'");
+
+					m_context.offset++;		// Skip '{'
+				}
+
+				++(*this);
+			}
+
+			inline PairReaderIterator& operator++()
+			{
+				if (m_context.offset == m_value_offset)
+				{
+					ReaderError error = skip_value();
+					if (error.any())
+					{
+						if (m_out_error != nullptr)
+							*m_out_error = error;
+
+						m_context = k_invalid_context;
+						return *this;
+					}
+				}
+
+				ReaderError error = skip_comments_and_whitespace(m_context);
+				if (error.any())
+				{
+					if (m_out_error != nullptr)
+						*m_out_error = error;
+
+					m_context = k_invalid_context;
+					return *this;
+				}
+
+				if (m_context.is_eof())
+				{
+					m_context = k_invalid_context;
+					return *this;
+				}
+
+				if (m_context.str[m_context.offset] == ',')
+				{
+					// Skip and consume
+					m_context.offset++;
+
+					error = skip_comments_and_whitespace(m_context);
+					if (error.any())
+					{
+						if (m_out_error != nullptr)
+							*m_out_error = error;
+
+						m_context = impl::k_invalid_context;
+						return *this;
+					}
+
+					if (m_context.is_eof())
+					{
+						if (m_out_error != nullptr)
+							*m_out_error = ReaderError("Input truncated");
+
+						m_context = impl::k_invalid_context;
+						return *this;
+					}
+				}
+
+				if (!m_is_root_object && m_context.str[m_context.offset] == '}')
+				{
+					// We are done, skip, and consume
+					m_context.offset++;	// TODO: Useless?
+
+					// TODO: Just update the offset?
+					m_pair_context = m_context;
+					m_pair_context.parent = &m_context;
+					m_context = k_invalid_context;
+					return *this;
+				}
+
+				error = read_pair_name(m_context, m_pair_name);
+				if (error.any())
+				{
+					if (m_out_error != nullptr)
+						*m_out_error = error;
+
+					m_context = k_invalid_context;
+					return *this;
+				}
+
+				error = skip_comments_and_whitespace(m_context);
+				if (error.any())
+				{
+					if (m_out_error != nullptr)
+						*m_out_error = error;
+
+					m_context = k_invalid_context;
+					return *this;
+				}
+
+				if (m_context.is_eof())
+				{
+					if (m_out_error != nullptr)
+						*m_out_error = ReaderError("Input truncated");
+
+					m_context = k_invalid_context;
+					return *this;
+				}
+
+				if (m_context.str[m_context.offset] != '=')
+				{
+					if (m_out_error != nullptr)
+						*m_out_error = ReaderError("Equal sign expected");
+
+					m_context = k_invalid_context;
+					return *this;
+				}
+
+				m_context.offset++;
+
+				error = skip_comments_and_whitespace(m_context);
+				if (error.any())
+				{
+					if (m_out_error != nullptr)
+						*m_out_error = error;
+
+					m_context = k_invalid_context;
+					return *this;
+				}
+
+				m_value_offset = m_context.offset;
+
+				ReaderContext ctx = m_context;
+				ctx.parent = &m_context;
+				m_pair_context = ctx;
+
+				return *this;
+			}
+
+			inline PairReaderProxy operator*() const { return PairReaderProxy(m_pair_name, m_pair_context); }
+
+			inline bool operator==(const PairReaderIterator& other) const { return m_context.offset == other.m_context.offset; }
+			inline bool operator!=(const PairReaderIterator& other) const { return m_context.offset != other.m_context.offset; }
+
+		private:
+			inline ReaderError skip_value() { return impl::skip_value(m_context, m_pair_context); }
+
+			ReaderContext	m_context;
+			ReaderError*	m_out_error;
+			bool			m_is_root_object;
+
+			size_t			m_value_offset;
+			StringView		m_pair_name;
+			ReaderContext	m_pair_context;
+
+			friend ReaderError impl::skip_value(ReaderContext& context, const ReaderContext& value_context);
+		};
+
 		class ValueReaderIterator
 		{
 		public:
@@ -606,7 +754,7 @@ namespace sjson
 				if (m_context.str[m_context.offset] == ']')
 				{
 					// We are done, skip, and consume
-					m_context.offset++;
+					m_context.offset++;	// TODO: Useless?
 
 					// TODO: Just update the offset?
 					m_value_context = m_context;
@@ -624,7 +772,7 @@ namespace sjson
 				return *this;
 			}
 
-			inline ValueReader operator*() const { return ValueReader(m_value_context); }
+			inline const impl::ReaderContext& operator*() const { return m_value_context; }
 
 			inline bool operator==(const ValueReaderIterator& other) const { return m_context.offset == other.m_context.offset; }
 			inline bool operator!=(const ValueReaderIterator& other) const { return m_context.offset != other.m_context.offset; }
@@ -632,8 +780,7 @@ namespace sjson
 		private:
 			inline ReaderError skip_value()
 			{
-				ValueReader value(m_value_context);
-				return impl::skip_value(m_context, value);
+				return impl::skip_value(m_context, m_value_context);
 			}
 
 			impl::ReaderContext	m_context;
@@ -642,33 +789,54 @@ namespace sjson
 
 			size_t			m_value_offset;		// TODO: Can we remove this and use m_value_context.offset?
 
-			friend ReaderError impl::skip_value(ReaderContext& context, ValueReader& value_to_skip);
+			friend ReaderError impl::skip_value(ReaderContext& context, const ReaderContext& value_context);
 		};
+	}
 
-		class ValueReaderList
-		{
-		public:
-			inline ValueReaderList(const impl::ReaderContext& context, ReaderError* out_error)
-				: m_context(context)
-				, m_out_error(out_error)
-			{}
+	class PairReaderList
+	{
+	public:
+		inline PairReaderList(const impl::ReaderContext& context, bool is_root_object, ReaderError* out_error)
+			: m_context(context)
+			, m_out_error(out_error)
+			, m_is_root_object(is_root_object)
+		{}
 
-			inline ValueReaderIterator begin() { return ValueReaderIterator(m_context, m_out_error); }
-			inline ValueReaderIterator begin(ReaderError* out_error) { return ValueReaderIterator(m_context, out_error); }
-			inline ValueReaderIterator end() { return ValueReaderIterator(); }
+		inline impl::PairReaderIterator begin() { return impl::PairReaderIterator(m_context, m_is_root_object, m_out_error); }
+		inline impl::PairReaderIterator end() { return impl::PairReaderIterator(); }
 
-		private:
-			const impl::ReaderContext&	m_context;
-			ReaderError*				m_out_error;
-		};
+	private:
+		const impl::ReaderContext&	m_context;
+		ReaderError*				m_out_error;
+		bool						m_is_root_object;
+	};
 
+	class ValueReaderList
+	{
+	public:
+		inline ValueReaderList(const impl::ReaderContext& context, ReaderError* out_error)
+			: m_context(context)
+			, m_out_error(out_error)
+		{}
+
+		inline impl::ValueReaderIterator begin() { return impl::ValueReaderIterator(m_context, m_out_error); }
+		inline impl::ValueReaderIterator end() { return impl::ValueReaderIterator(); }
+
+	private:
+		const impl::ReaderContext&	m_context;
+		ReaderError*				m_out_error;
+	};
+
+	class ValueReader
+	{
+	public:
 		ValueReader() : m_context(impl::k_invalid_context) {}
 		ValueReader(const impl::ReaderContext& context) : m_context(context) {}
 
 		template<typename ElementType>
 		ElementType read(ElementType default_value, ReaderError* out_error = nullptr)
 		{
-			// TODO: Implement some to_sjson(..) way to support custom types
+			// TODO: Implement some from_sjson(..) way to support custom types
 			return default_value;
 		}
 
@@ -1097,6 +1265,35 @@ namespace sjson
 			return count;
 		}
 
+		inline PairReaderList get_pairs(ReaderError* out_error = nullptr)
+		{
+			if (m_context.is_eof())
+			{
+				if (out_error != nullptr)
+					*out_error = ReaderError("Input truncated");
+
+				return PairReaderList(impl::k_invalid_context, false, out_error);
+			}
+
+			if (get_type() != ValueType::Object)
+			{
+				if (out_error != nullptr)
+					*out_error = ReaderError("Expected an object");
+
+				return PairReaderList(impl::k_invalid_context, false, out_error);
+			}
+
+			return PairReaderList(m_context, false, out_error);
+		}
+
+		inline size_t get_num_pairs(ReaderError* out_error = nullptr)
+		{
+			size_t count = 0;
+			for (impl::PairReaderProxy pair : get_pairs(out_error))
+				count++;
+			return count;
+		}
+
 		ValueType get_type(ReaderError* out_error = nullptr) const
 		{
 			const char symbol = m_context.str[m_context.offset];
@@ -1113,6 +1310,8 @@ namespace sjson
 				return ValueType::Number;
 			else if (symbol == '[')
 				return ValueType::Array;
+			else if (symbol == '{')
+				return ValueType::Object;
 
 			if (out_error != nullptr)
 				*out_error = ReaderError("Unknown value type");
@@ -1122,155 +1321,20 @@ namespace sjson
 
 	private:
 		impl::ReaderContext m_context;
+
+		friend impl::PairReaderIterator;
 	};
 
 	struct PairReader
 	{
 		StringView		name;
 		ValueReader		value;
-	};
 
-	namespace impl
-	{
-		class PairReaderIterator
-		{
-		public:
-			PairReaderIterator() : m_context(k_invalid_context), m_out_error(nullptr), m_value_offset(0), m_curr_pair() {}
-			PairReaderIterator(const ReaderContext& context, ReaderError* out_error)
-				: m_context(context)
-				, m_out_error(out_error)
-				, m_value_offset(context.offset - 1)
-				, m_curr_pair()
-			{
-				if (context.is_eof())
-					return;
-
-				SJSON_CPP_ASSERT(!std::isspace(context.str[context.offset]), "Expected a value");
-
-				++(*this);
-			}
-
-			inline PairReaderIterator& operator++()
-			{
-				if (m_context.offset == m_value_offset)
-				{
-					ReaderError error = skip_value();
-					if (error.any())
-					{
-						if (m_out_error != nullptr)
-							*m_out_error = error;
-
-						m_context = k_invalid_context;
-						return *this;
-					}
-				}
-
-				ReaderError error = skip_comments_and_whitespace(m_context);
-				if (error.any())
-				{
-					if (m_out_error != nullptr)
-						*m_out_error = error;
-
-					m_context = k_invalid_context;
-					return *this;
-				}
-
-				if (m_context.is_eof())
-				{
-					m_context = k_invalid_context;
-					return *this;
-				}
-
-				error = read_pair_name(m_context, m_curr_pair.name);
-				if (error.any())
-				{
-					if (m_out_error != nullptr)
-						*m_out_error = error;
-
-					m_context = k_invalid_context;
-					return *this;
-				}
-
-				error = skip_comments_and_whitespace(m_context);
-				if (error.any())
-				{
-					if (m_out_error != nullptr)
-						*m_out_error = error;
-
-					m_context = k_invalid_context;
-					return *this;
-				}
-
-				if (m_context.is_eof())
-				{
-					if (m_out_error != nullptr)
-						*m_out_error = ReaderError("Input truncated");
-
-					m_context = k_invalid_context;
-					return *this;
-				}
-
-				if (m_context.str[m_context.offset] != '=')
-				{
-					if (m_out_error != nullptr)
-						*m_out_error = ReaderError("Equal sign expected");
-
-					m_context = k_invalid_context;
-					return *this;
-				}
-
-				m_context.offset++;
-
-				error = skip_comments_and_whitespace(m_context);
-				if (error.any())
-				{
-					if (m_out_error != nullptr)
-						*m_out_error = error;
-
-					m_context = k_invalid_context;
-					return *this;
-				}
-
-				m_value_offset = m_context.offset;
-
-				ReaderContext ctx = m_context;
-				ctx.parent = &m_context;
-				m_curr_pair.value = ValueReader(ctx);
-
-				return *this;
-			}
-
-			inline PairReader operator*() const { return m_curr_pair; }
-
-			inline bool operator==(const PairReaderIterator& other) const { return m_context.offset == other.m_context.offset; }
-			inline bool operator!=(const PairReaderIterator& other) const { return m_context.offset != other.m_context.offset; }
-
-		private:
-			inline ReaderError skip_value() { return impl::skip_value(m_context, m_curr_pair.value); }
-
-			ReaderContext	m_context;
-			ReaderError*	m_out_error;
-
-			size_t			m_value_offset;
-			PairReader		m_curr_pair;
-		};
-	}
-
-	class PairReaderList
-	{
-	public:
-		inline PairReaderList(const impl::ReaderContext& context, ReaderError* out_error)
-			: m_context(context)
-			, m_out_error(out_error)
+		PairReader() {}
+		PairReader(const impl::PairReaderProxy& proxy)
+			: name(proxy.name)
+			, value(proxy.context)
 		{}
-
-		inline impl::PairReaderIterator begin() { return impl::PairReaderIterator(m_context, m_out_error); }
-		inline impl::PairReaderIterator begin(ReaderError* out_error) { return impl::PairReaderIterator(m_context, out_error); }
-		inline impl::PairReaderIterator end() { return impl::PairReaderIterator(); }
-
-	private:
-		const impl::ReaderContext&	m_context;
-		ReaderError*				m_out_error;
 	};
 
 	class Reader
@@ -1291,13 +1355,13 @@ namespace sjson
 				if (out_error != nullptr)
 					*out_error = error;
 
-				return PairReaderList(impl::k_invalid_context, out_error);
+				return PairReaderList(impl::k_invalid_context, true, out_error);
 			}
 
 			if (m_context.is_eof())
-				return PairReaderList(impl::k_invalid_context, out_error);
+				return PairReaderList(impl::k_invalid_context, true, out_error);
 
-			return PairReaderList(m_context, out_error);
+			return PairReaderList(m_context, true, out_error);
 		}
 
 		inline size_t get_num_pairs(ReaderError* out_error = nullptr)
@@ -1316,8 +1380,10 @@ namespace sjson
 
 	namespace impl
 	{
-		inline ReaderError skip_value(ReaderContext& context, ValueReader& value_to_skip)
+		ReaderError skip_value(ReaderContext& context, const ReaderContext& value_context)
 		{
+			ValueReader value_to_skip(value_context);
+
 			ReaderError error;
 			switch (value_to_skip.get_type(&error))
 			{
@@ -1348,21 +1414,48 @@ namespace sjson
 			}
 			case ValueType::Array:
 			{
-				auto value_list = value_to_skip.get_values(&error);
+				ValueReaderList value_list = value_to_skip.get_values(&error);
 				if (error.any())
 					return error;
 
-				auto it = value_list.begin(&error);
+				auto it = value_list.begin();
 				if (error.any())
 					return error;
 
 				auto end_it = value_list.end();
-				for (; it != end_it; ++it);
+				for (; it != end_it; ++it)
+				{
+					if (error.any())
+						return error;
+				}
 
 				if (error.any())
 					return error;
 
 				context.offset = it.m_value_context.offset;
+				break;
+			}
+			case ValueType::Object:
+			{
+				PairReaderList pair_list = value_to_skip.get_pairs(&error);
+				if (error.any())
+					return error;
+
+				auto it = pair_list.begin();
+				if (error.any())
+					return error;
+
+				auto end_it = pair_list.end();
+				for (; it != end_it; ++it)
+				{
+					if (error.any())
+						return error;
+				}
+
+				if (error.any())
+					return error;
+
+				context.offset = it.m_pair_context.offset;
 				break;
 			}
 			}
