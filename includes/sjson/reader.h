@@ -365,46 +365,54 @@ namespace sjson
 				if (!std::isdigit(context.str[offset]))
 					return ReaderError("Number expected");
 
-				if (context.str[offset] == '0')
+				if (context.str[offset] == '0' && context.str[offset + 1] != '.')
 				{
-					if (context.str[offset + 1] != '.')
-						return ReaderError("Decimal dot expected");
-
-					offset += 2;
-
-					while (!is_eof(context, offset) && std::isdigit(context.str[offset]))
-						offset++;
+					// Just 0
+					offset++;
 				}
 				else
 				{
-					while (!is_eof(context, offset) && std::isdigit(context.str[offset]))
-						offset++;
-
-					if (!is_eof(context, offset) && context.str[offset] == '.')
+					if (context.str[offset] == '0')
 					{
-						offset++;
+						if (context.str[offset + 1] != '.')
+							return ReaderError("Decimal dot expected");
+
+						offset += 2;
 
 						while (!is_eof(context, offset) && std::isdigit(context.str[offset]))
 							offset++;
 					}
-				}
+					else
+					{
+						while (!is_eof(context, offset) && std::isdigit(context.str[offset]))
+							offset++;
 
-				if (!is_eof(context, offset) && (context.str[offset] == 'e' || context.str[offset] == 'E'))
-				{
-					offset++;
+						if (!is_eof(context, offset) && context.str[offset] == '.')
+						{
+							offset++;
 
-					if (!is_eof(context, offset) && (context.str[offset] == '+' || context.str[offset] == '-'))
+							while (!is_eof(context, offset) && std::isdigit(context.str[offset]))
+								offset++;
+						}
+					}
+
+					if (!is_eof(context, offset) && (context.str[offset] == 'e' || context.str[offset] == 'E'))
 					{
 						offset++;
 
-						if (!std::isdigit(context.str[offset]))
-							return ReaderError("Invalid number");
-					}
-					else if (!std::isdigit(context.str[offset]))
-						return ReaderError("Invalid number");
+						if (!is_eof(context, offset) && (context.str[offset] == '+' || context.str[offset] == '-'))
+						{
+							offset++;
 
-					while (!is_eof(context, offset) && std::isdigit(context.str[offset]))
-						offset++;
+							if (!std::isdigit(context.str[offset]))
+								return ReaderError("Invalid number");
+						}
+						else if (!std::isdigit(context.str[offset]))
+							return ReaderError("Invalid number");
+
+						while (!is_eof(context, offset) && std::isdigit(context.str[offset]))
+							offset++;
+					}
 				}
 			}
 
