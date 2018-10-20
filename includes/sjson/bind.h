@@ -26,6 +26,9 @@
 
 #include "sjson/reader.h"
 
+#include <type_traits>
+#include <vector>
+
 /*
 	struct foo
 	{
@@ -45,9 +48,9 @@
 
 	// Macros work well and are clean
 	SJSON_BIND_BEGIN(reader, &error);
-		SJSON_BIND_VAR("tmp0", f.tmp0, StringView, "");
-		SJSON_BIND_VAR("tmp1", f.tmp1, int32, 0);
-		SJSON_BIND_VAR("tmp2", f.tmp2, bool, false);
+		SJSON_BIND_VAR("tmp0", f.tmp0, "");
+		SJSON_BIND_VAR("tmp1", f.tmp1, 0);
+		SJSON_BIND_VAR("tmp2", f.tmp2, false);
 	SJSON_BIND_END();
 */
 
@@ -59,10 +62,78 @@
 		if (_bind_error->any()) \
 			break
 
-#define SJSON_BIND_VAR(key_name_, variable_, type_, default_value_) \
+#define SJSON_BIND_VAR(key_name_, variable_, default_value_) \
 		else if (_pair.name == key_name_) \
-			variable_ = _pair.value.read<type_>(default_value_, _bind_error)
+			variable_ = _pair.value.read(default_value_, _bind_error)
+
+#define SJSON_BIND_STR(key_name_, variable_, default_value_) \
+		else if (_pair.name == key_name_) \
+			variable_ = _pair.value.read<sjson::StringView>(default_value_, _bind_error)
+
+#define SJSON_BIND_ARR(key_name_, array_, num_elements_, default_value_) \
+		else if (_pair.name == key_name_) \
+			sjson::impl::bound_array_read<std::remove_all_extents<decltype(array_)>::type>(_pair.value, array_, num_elements_, default_value_, *_bind_error)
+
+#define SJSON_BIND_VEC(key_name_, vector_, default_value_) \
+		else if (_pair.name == key_name_) \
+			sjson::impl::bound_vector_read<sjson::vector_element_type<decltype(vector_)>::type>(_pair.value, vector_, default_value_, *_bind_error)
 
 #define SJSON_BIND_END() \
 	} \
 	do {} while (false)
+
+namespace sjson
+{
+	template<typename VectorType>
+	struct vector_element_type
+	{};
+
+	template<typename ElementType>
+	struct vector_element_type<std::vector<ElementType>>
+	{
+		using type = ElementType;
+	};
+
+	template<typename ElementType>
+	static void vector_push(std::vector<ElementType>& vec, ElementType value)
+	{
+		vec.push_back(value);
+	}
+
+	namespace impl
+	{
+		template<typename ElementType>
+		inline void bound_array_read(ValueReader& sjson_value, ElementType* out_data, size_t num_elements, ElementType default_value, ReaderError& out_error)
+		{
+			size_t num_read_elements = 0;
+			for (ValueReader element_value : sjson_value.get_values(&out_error))
+			{
+				if (num_read_elements >= num_elements)
+				{
+					out_error = ReaderError("Expected fewer elements when reading array");
+					break;
+				}
+
+				out_data[num_read_elements++] = element_value.read(default_value, &out_error);
+
+				if (out_error.any())
+					break;
+			}
+
+			while (num_read_elements < num_elements)
+				out_data[num_read_elements++] = default_value;
+		}
+
+		template<typename ElementType, typename VectorType>
+		inline void bound_vector_read(ValueReader& sjson_value, VectorType& out_data, ElementType default_value, ReaderError& out_error)
+		{
+			for (ValueReader element_value : sjson_value.get_values(&out_error))
+			{
+				sjson::vector_push<ElementType>(out_data, element_value.read(default_value, &out_error));
+
+				if (out_error.any())
+					break;
+			}
+		}
+	}
+}
