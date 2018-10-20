@@ -827,6 +827,20 @@ namespace sjson
 		ReaderError*				m_out_error;
 	};
 
+	// These convert SJSON text into built-in types
+	inline bool from_sjson(ValueReader& sjson_value, bool default_value, ReaderError* out_error);
+	inline StringView from_sjson(ValueReader& sjson_value, StringView default_value, ReaderError* out_error);
+	inline double from_sjson(ValueReader& sjson_value, double default_value, ReaderError* out_error);
+	inline float from_sjson(ValueReader& sjson_value, float default_value, ReaderError* out_error);
+	inline int8_t from_sjson(ValueReader& sjson_value, int8_t default_value, ReaderError* out_error);
+	inline uint8_t from_sjson(ValueReader& sjson_value, uint8_t default_value, ReaderError* out_error);
+	inline int16_t from_sjson(ValueReader& sjson_value, int16_t default_value, ReaderError* out_error);
+	inline uint16_t from_sjson(ValueReader& sjson_value, uint16_t default_value, ReaderError* out_error);
+	inline int32_t from_sjson(ValueReader& sjson_value, int32_t default_value, ReaderError* out_error);
+	inline uint32_t from_sjson(ValueReader& sjson_value, uint32_t default_value, ReaderError* out_error);
+	inline int64_t from_sjson(ValueReader& sjson_value, int64_t default_value, ReaderError* out_error);
+	inline uint64_t from_sjson(ValueReader& sjson_value, uint64_t default_value, ReaderError* out_error);
+
 	class ValueReader
 	{
 	public:
@@ -836,404 +850,7 @@ namespace sjson
 		template<typename ElementType>
 		ElementType read(ElementType default_value, ReaderError* out_error = nullptr)
 		{
-			// TODO: Implement some from_sjson(..) way to support custom types
-			return default_value;
-		}
-
-		template<>
-		bool read<bool>(bool default_value, ReaderError* out_error)
-		{
-			bool value = default_value;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_bool(*m_context.parent, value);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_bool(context, value);
-			}
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
-		}
-
-		template<>
-		StringView read<StringView>(StringView default_value, ReaderError* out_error)
-		{
-			StringView value = default_value;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_string(*m_context.parent, value);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_string(context, value);
-			}
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
-		}
-
-		template<>
-		double read<double>(double default_value, ReaderError* out_error)
-		{
-			StringView number;
-			int base;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_number(*m_context.parent, number, base);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_number(context, number, base);
-			}
-
-			if (error.any())
-			{
-				if (out_error != nullptr)
-					*out_error = error;
-
-				return default_value;
-			}
-
-			double value = default_value;
-			error = impl::number_to_double(number, base, value);
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
-		}
-
-		template<>
-		float read<float>(float default_value, ReaderError* out_error)
-		{
-			StringView number;
-			int base;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_number(*m_context.parent, number, base);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_number(context, number, base);
-			}
-
-			if (error.any())
-			{
-				if (out_error != nullptr)
-					*out_error = error;
-
-				return default_value;
-			}
-
-			float value = default_value;
-			error = impl::number_to_float(number, base, value);
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
-		}
-
-		template<>
-		int8_t read<int8_t>(int8_t default_value, ReaderError* out_error)
-		{
-			StringView number;
-			int base;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_number(*m_context.parent, number, base);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_number(context, number, base);
-			}
-
-			if (error.any())
-			{
-				if (out_error != nullptr)
-					*out_error = error;
-
-				return default_value;
-			}
-
-			int8_t value = default_value;
-			error = impl::number_to_integer<int8_t>(number, base, value);
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
-		}
-
-		template<>
-		uint8_t read<uint8_t>(uint8_t default_value, ReaderError* out_error)
-		{
-			StringView number;
-			int base;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_number(*m_context.parent, number, base);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_number(context, number, base);
-			}
-
-			if (error.any())
-			{
-				if (out_error != nullptr)
-					*out_error = error;
-
-				return default_value;
-			}
-
-			uint8_t value = default_value;
-			error = impl::number_to_integer<uint8_t>(number, base, value);
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
-		}
-
-		template<>
-		int16_t read<int16_t>(int16_t default_value, ReaderError* out_error)
-		{
-			StringView number;
-			int base;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_number(*m_context.parent, number, base);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_number(context, number, base);
-			}
-
-			if (error.any())
-			{
-				if (out_error != nullptr)
-					*out_error = error;
-
-				return default_value;
-			}
-
-			int16_t value = default_value;
-			error = impl::number_to_integer<int16_t>(number, base, value);
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
-		}
-
-		template<>
-		uint16_t read<uint16_t>(uint16_t default_value, ReaderError* out_error)
-		{
-			StringView number;
-			int base;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_number(*m_context.parent, number, base);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_number(context, number, base);
-			}
-
-			if (error.any())
-			{
-				if (out_error != nullptr)
-					*out_error = error;
-
-				return default_value;
-			}
-
-			uint16_t value = default_value;
-			error = impl::number_to_integer<uint16_t>(number, base, value);
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
-		}
-
-		template<>
-		int32_t read<int32_t>(int32_t default_value, ReaderError* out_error)
-		{
-			StringView number;
-			int base;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_number(*m_context.parent, number, base);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_number(context, number, base);
-			}
-
-			if (error.any())
-			{
-				if (out_error != nullptr)
-					*out_error = error;
-
-				return default_value;
-			}
-
-			int32_t value = default_value;
-			error = impl::number_to_integer<int32_t>(number, base, value);
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
-		}
-
-		template<>
-		uint32_t read<uint32_t>(uint32_t default_value, ReaderError* out_error)
-		{
-			StringView number;
-			int base;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_number(*m_context.parent, number, base);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_number(context, number, base);
-			}
-
-			if (error.any())
-			{
-				if (out_error != nullptr)
-					*out_error = error;
-
-				return default_value;
-			}
-
-			uint32_t value = default_value;
-			error = impl::number_to_integer<uint32_t>(number, base, value);
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
-		}
-
-		template<>
-		int64_t read<int64_t>(int64_t default_value, ReaderError* out_error)
-		{
-			StringView number;
-			int base;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_number(*m_context.parent, number, base);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_number(context, number, base);
-			}
-
-			if (error.any())
-			{
-				if (out_error != nullptr)
-					*out_error = error;
-
-				return default_value;
-			}
-
-			int64_t value = default_value;
-			error = impl::number_to_integer<int64_t>(number, base, value);
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
-		}
-
-		template<>
-		uint64_t read<uint64_t>(uint64_t default_value, ReaderError* out_error)
-		{
-			StringView number;
-			int base;
-
-			ReaderError error;
-			if (m_context.parent != nullptr)
-			{
-				error = impl::read_number(*m_context.parent, number, base);
-				m_context.parent = nullptr;
-			}
-			else
-			{
-				impl::ReaderContext context = m_context;
-				error = impl::read_number(context, number, base);
-			}
-
-			if (error.any())
-			{
-				if (out_error != nullptr)
-					*out_error = error;
-
-				return default_value;
-			}
-
-			uint64_t value = default_value;
-			error = impl::number_to_integer<uint64_t>(number, base, value);
-
-			if (error.any() && out_error != nullptr)
-				*out_error = error;
-
-			return value;
+			return from_sjson(*this, default_value, out_error);
 		}
 
 		inline ValueReaderList get_values(ReaderError* out_error = nullptr)
@@ -1323,7 +940,417 @@ namespace sjson
 		impl::ReaderContext m_context;
 
 		friend impl::PairReaderIterator;
+
+		// Built-in types are our friends
+		friend bool from_sjson(ValueReader& sjson_value, bool default_value, ReaderError* out_error);
+		friend StringView from_sjson(ValueReader& sjson_value, StringView default_value, ReaderError* out_error);
+		friend double from_sjson(ValueReader& sjson_value, double default_value, ReaderError* out_error);
+		friend float from_sjson(ValueReader& sjson_value, float default_value, ReaderError* out_error);
+		friend int8_t from_sjson(ValueReader& sjson_value, int8_t default_value, ReaderError* out_error);
+		friend uint8_t from_sjson(ValueReader& sjson_value, uint8_t default_value, ReaderError* out_error);
+		friend int16_t from_sjson(ValueReader& sjson_value, int16_t default_value, ReaderError* out_error);
+		friend uint16_t from_sjson(ValueReader& sjson_value, uint16_t default_value, ReaderError* out_error);
+		friend int32_t from_sjson(ValueReader& sjson_value, int32_t default_value, ReaderError* out_error);
+		friend uint32_t from_sjson(ValueReader& sjson_value, uint32_t default_value, ReaderError* out_error);
+		friend int64_t from_sjson(ValueReader& sjson_value, int64_t default_value, ReaderError* out_error);
+		friend uint64_t from_sjson(ValueReader& sjson_value, uint64_t default_value, ReaderError* out_error);
 	};
+
+	inline bool from_sjson(ValueReader& sjson_value, bool default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		bool value = default_value;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_bool(*value_context.parent, value);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_bool(context, value);
+		}
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
+
+	inline StringView from_sjson(ValueReader& sjson_value, StringView default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		StringView value = default_value;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_string(*value_context.parent, value);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_string(context, value);
+		}
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
+
+	inline double from_sjson(ValueReader& sjson_value, double default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		StringView number;
+		int base;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_number(*value_context.parent, number, base);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_number(context, number, base);
+		}
+
+		if (error.any())
+		{
+			if (out_error != nullptr)
+				*out_error = error;
+
+			return default_value;
+		}
+
+		double value = default_value;
+		error = impl::number_to_double(number, base, value);
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
+
+	inline float from_sjson(ValueReader& sjson_value, float default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		StringView number;
+		int base;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_number(*value_context.parent, number, base);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_number(context, number, base);
+		}
+
+		if (error.any())
+		{
+			if (out_error != nullptr)
+				*out_error = error;
+
+			return default_value;
+		}
+
+		float value = default_value;
+		error = impl::number_to_float(number, base, value);
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
+
+	inline int8_t from_sjson(ValueReader& sjson_value, int8_t default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		StringView number;
+		int base;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_number(*value_context.parent, number, base);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_number(context, number, base);
+		}
+
+		if (error.any())
+		{
+			if (out_error != nullptr)
+				*out_error = error;
+
+			return default_value;
+		}
+
+		int8_t value = default_value;
+		error = impl::number_to_integer<int8_t>(number, base, value);
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
+
+	inline uint8_t from_sjson(ValueReader& sjson_value, uint8_t default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		StringView number;
+		int base;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_number(*value_context.parent, number, base);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_number(context, number, base);
+		}
+
+		if (error.any())
+		{
+			if (out_error != nullptr)
+				*out_error = error;
+
+			return default_value;
+		}
+
+		uint8_t value = default_value;
+		error = impl::number_to_integer<uint8_t>(number, base, value);
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
+
+	inline int16_t from_sjson(ValueReader& sjson_value, int16_t default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		StringView number;
+		int base;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_number(*value_context.parent, number, base);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_number(context, number, base);
+		}
+
+		if (error.any())
+		{
+			if (out_error != nullptr)
+				*out_error = error;
+
+			return default_value;
+		}
+
+		int16_t value = default_value;
+		error = impl::number_to_integer<int16_t>(number, base, value);
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
+
+	inline uint16_t from_sjson(ValueReader& sjson_value, uint16_t default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		StringView number;
+		int base;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_number(*value_context.parent, number, base);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_number(context, number, base);
+		}
+
+		if (error.any())
+		{
+			if (out_error != nullptr)
+				*out_error = error;
+
+			return default_value;
+		}
+
+		uint16_t value = default_value;
+		error = impl::number_to_integer<uint16_t>(number, base, value);
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
+
+	inline int32_t from_sjson(ValueReader& sjson_value, int32_t default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		StringView number;
+		int base;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_number(*value_context.parent, number, base);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_number(context, number, base);
+		}
+
+		if (error.any())
+		{
+			if (out_error != nullptr)
+				*out_error = error;
+
+			return default_value;
+		}
+
+		int32_t value = default_value;
+		error = impl::number_to_integer<int32_t>(number, base, value);
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
+
+	inline uint32_t from_sjson(ValueReader& sjson_value, uint32_t default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		StringView number;
+		int base;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_number(*value_context.parent, number, base);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_number(context, number, base);
+		}
+
+		if (error.any())
+		{
+			if (out_error != nullptr)
+				*out_error = error;
+
+			return default_value;
+		}
+
+		uint32_t value = default_value;
+		error = impl::number_to_integer<uint32_t>(number, base, value);
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
+
+	inline int64_t from_sjson(ValueReader& sjson_value, int64_t default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		StringView number;
+		int base;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_number(*value_context.parent, number, base);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_number(context, number, base);
+		}
+
+		if (error.any())
+		{
+			if (out_error != nullptr)
+				*out_error = error;
+
+			return default_value;
+		}
+
+		int64_t value = default_value;
+		error = impl::number_to_integer<int64_t>(number, base, value);
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
+
+	inline uint64_t from_sjson(ValueReader& sjson_value, uint64_t default_value, ReaderError* out_error)
+	{
+		impl::ReaderContext& value_context = sjson_value.m_context;
+		StringView number;
+		int base;
+
+		ReaderError error;
+		if (value_context.parent != nullptr)
+		{
+			error = impl::read_number(*value_context.parent, number, base);
+			value_context.parent = nullptr;
+		}
+		else
+		{
+			impl::ReaderContext context = value_context;
+			error = impl::read_number(context, number, base);
+		}
+
+		if (error.any())
+		{
+			if (out_error != nullptr)
+				*out_error = error;
+
+			return default_value;
+		}
+
+		uint64_t value = default_value;
+		error = impl::number_to_integer<uint64_t>(number, base, value);
+
+		if (error.any() && out_error != nullptr)
+			*out_error = error;
+
+		return value;
+	}
 
 	struct PairReader
 	{
