@@ -2,8 +2,12 @@
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
-  <Type Name="sjson::StringView">
-    <DisplayString>{m_c_str,[m_length]s8}</DisplayString>
-  </Type>
+	<Type Name="sjson::StringView">
+		<DisplayString>{m_c_str,[m_length]s8}</DisplayString>
+	</Type>
+
+	<Type Name="sjson::ValueReader">
+		<DisplayString>{m_context.str.m_c_str + m_context.offset}</DisplayString>
+	</Type>
 
 </AutoVisualizer>
