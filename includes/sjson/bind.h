@@ -27,6 +27,7 @@
 #include "sjson/reader.h"
 
 #include <type_traits>
+#include <string.h>
 #include <vector>
 
 /*
@@ -48,9 +49,9 @@
 
 	// Macros work well and are clean
 	SJSON_BIND_BEGIN(reader, &error);
-		SJSON_BIND_VAR("tmp0", f.tmp0, "");
-		SJSON_BIND_VAR("tmp1", f.tmp1, 0);
-		SJSON_BIND_VAR("tmp2", f.tmp2, false);
+		SJSON_BIND_VAR("tmp0", f.tmp0);
+		SJSON_BIND_VAR("tmp1", f.tmp1);
+		SJSON_BIND_VAR("tmp2", f.tmp2);
 	SJSON_BIND_END();
 */
 
@@ -62,21 +63,21 @@
 		if (_bind_error->any()) \
 			break
 
-#define SJSON_BIND_VAR(key_name_, variable_, default_value_) \
+#define SJSON_BIND_VAR(key_name_, variable_) \
 		else if (_pair.name == key_name_) \
-			variable_ = _pair.value.read(default_value_, _bind_error)
+			variable_ = _pair.value.read(variable_, _bind_error)
 
-#define SJSON_BIND_STR(key_name_, variable_, default_value_) \
+#define SJSON_BIND_STR(key_name_, variable_) \
 		else if (_pair.name == key_name_) \
-			variable_ = _pair.value.read<sjson::StringView>(default_value_, _bind_error)
+			sjson::impl::bound_string_read(_pair.value, variable_, *_bind_error)
 
-#define SJSON_BIND_ARR(key_name_, array_, num_elements_, default_value_) \
+#define SJSON_BIND_ARR(key_name_, array_, num_elements_) \
 		else if (_pair.name == key_name_) \
-			sjson::impl::bound_array_read<std::remove_all_extents<decltype(array_)>::type>(_pair.value, array_, num_elements_, default_value_, *_bind_error)
+			sjson::impl::bound_array_read<std::remove_all_extents<decltype(array_)>::type>(_pair.value, array_, num_elements_, *_bind_error)
 
-#define SJSON_BIND_VEC(key_name_, vector_, default_value_) \
+#define SJSON_BIND_VEC(key_name_, vector_) \
 		else if (_pair.name == key_name_) \
-			sjson::impl::bound_vector_read<sjson::vector_element_type<decltype(vector_)>::type>(_pair.value, vector_, default_value_, *_bind_error)
+			sjson::impl::bound_vector_read<sjson::vector_element_type<decltype(vector_)>::type>(_pair.value, vector_, *_bind_error)
 
 #define SJSON_BIND_END() \
 	} \
@@ -95,15 +96,33 @@ namespace sjson
 	};
 
 	template<typename ElementType>
-	static void vector_push(std::vector<ElementType>& vec, ElementType value)
+	inline void vector_push(std::vector<ElementType>& vec, ElementType value)
 	{
 		vec.push_back(value);
 	}
 
+	inline void string_copy(std::string& str, const StringView& value)
+	{
+		str = std::string(value.c_str(), value.size());
+	}
+
 	namespace impl
 	{
+		template<typename StringType>
+		inline void bound_string_read(ValueReader& sjson_value, StringType& out_data, ReaderError& out_error)
+		{
+			StringView value = sjson_value.read<StringView>("", &out_error);
+			sjson::string_copy(out_data, value);
+		}
+
+		template<>
+		inline void bound_string_read<StringView>(ValueReader& sjson_value, StringView& out_data, ReaderError& out_error)
+		{
+			out_data = sjson_value.read(out_data, &out_error);
+		}
+
 		template<typename ElementType>
-		inline void bound_array_read(ValueReader& sjson_value, ElementType* out_data, size_t num_elements, ElementType default_value, ReaderError& out_error)
+		inline void bound_array_read(ValueReader& sjson_value, ElementType* out_data, size_t num_elements, ReaderError& out_error)
 		{
 			size_t num_read_elements = 0;
 			for (ValueReader element_value : sjson_value.get_values(&out_error))
@@ -114,19 +133,18 @@ namespace sjson
 					break;
 				}
 
-				out_data[num_read_elements++] = element_value.read(default_value, &out_error);
+				out_data[num_read_elements] = element_value.read(out_data[num_read_elements], &out_error);
+				num_read_elements++;
 
 				if (out_error.any())
 					break;
 			}
-
-			while (num_read_elements < num_elements)
-				out_data[num_read_elements++] = default_value;
 		}
 
 		template<typename ElementType, typename VectorType>
-		inline void bound_vector_read(ValueReader& sjson_value, VectorType& out_data, ElementType default_value, ReaderError& out_error)
+		inline void bound_vector_read(ValueReader& sjson_value, VectorType& out_data, ReaderError& out_error)
 		{
+			ElementType default_value = ElementType();
 			for (ValueReader element_value : sjson_value.get_values(&out_error))
 			{
 				sjson::vector_push<ElementType>(out_data, element_value.read(default_value, &out_error));
