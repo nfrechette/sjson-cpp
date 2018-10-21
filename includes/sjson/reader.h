@@ -341,6 +341,8 @@ namespace sjson
 
 		inline ReaderError read_number(ReaderContext& context, StringView& out_number, int& out_base)
 		{
+			out_base = 10;	// Make sure we always write something to initialize the variable
+
 			if (context.is_eof())
 				return ReaderError("Input truncated");
 
