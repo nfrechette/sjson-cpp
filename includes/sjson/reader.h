@@ -886,7 +886,11 @@ namespace sjson
 		{
 			size_t count = 0;
 			for (ValueReader value : get_values(out_error))
+			{
+				(void)value;
 				count++;
+			}
+
 			return count;
 		}
 
@@ -915,7 +919,11 @@ namespace sjson
 		{
 			size_t count = 0;
 			for (impl::PairReaderProxy pair : get_pairs(out_error))
+			{
+				(void)pair;
 				count++;
+			}
+
 			return count;
 		}
 
@@ -1403,7 +1411,11 @@ namespace sjson
 		{
 			size_t count = 0;
 			for (PairReader pair : get_pairs(out_error))
+			{
+				(void)pair;
 				count++;
+			}
+
 			return count;
 		}
 

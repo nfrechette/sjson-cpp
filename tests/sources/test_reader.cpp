@@ -959,7 +959,10 @@ TEST_CASE("Reader Mixed Reading", "[reader]")
 							REQUIRE(error.empty());
 							int value_count3 = 0;
 							for (ValueReader value10 : value7.get_values(&error))
+							{
+								(void)value10;
 								value_count3++;
+							}
 							REQUIRE(error.empty());
 							REQUIRE(value_count3 == 0);
 							break;
@@ -972,7 +975,10 @@ TEST_CASE("Reader Mixed Reading", "[reader]")
 							REQUIRE(error.empty());
 							int pair_count2 = 0;
 							for (PairReader pair2 : value7.get_pairs(&error))
+							{
+								(void)pair2;
 								pair_count2++;
+							}
 							REQUIRE(error.empty());
 							REQUIRE(pair_count2 == 0);
 							break;

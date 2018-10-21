@@ -58,28 +58,43 @@
 #define SJSON_BIND_BEGIN(source_, error_) \
 	for (sjson::PairReader _pair : source_.get_pairs(error_)) \
 	{ \
-		sjson::ReaderError _tmp_error; \
-		sjson::ReaderError* _bind_error = error_ != nullptr ? error_ : &_tmp_error; \
-		if (_bind_error->any()) \
-			break
+		sjson::ReaderError* _bind_error = error_
 
 #define SJSON_BIND_VAR(key_name_, variable_) \
-		else if (_pair.name == key_name_) \
-			variable_ = _pair.value.read(variable_, _bind_error)
+		if (_pair.name == key_name_) \
+		{ \
+			variable_ = _pair.value.read(variable_, _bind_error); \
+			continue; \
+		} \
+		do {} while (false)
 
 #define SJSON_BIND_STR(key_name_, variable_) \
-		else if (_pair.name == key_name_) \
-			sjson::impl::bound_string_read(_pair.value, variable_, *_bind_error)
+		if (_pair.name == key_name_) \
+		{ \
+			sjson::impl::bound_string_read(_pair.value, variable_, *_bind_error); \
+			continue; \
+		} \
+		do {} while (false)
 
 #define SJSON_BIND_ARR(key_name_, array_, num_elements_) \
-		else if (_pair.name == key_name_) \
-			sjson::impl::bound_array_read<std::remove_all_extents<decltype(array_)>::type>(_pair.value, array_, num_elements_, *_bind_error)
+		if (_pair.name == key_name_) \
+		{ \
+			sjson::impl::bound_array_read<std::remove_all_extents<decltype(array_)>::type>(_pair.value, array_, num_elements_, *_bind_error); \
+			continue; \
+		} \
+		do {} while (false)
 
 #define SJSON_BIND_VEC(key_name_, vector_) \
-		else if (_pair.name == key_name_) \
-			sjson::impl::bound_vector_read<sjson::vector_element_type<decltype(vector_)>::type>(_pair.value, vector_, *_bind_error)
+		if (_pair.name == key_name_) \
+		{ \
+			sjson::impl::bound_vector_read<sjson::vector_element_type<decltype(vector_)>::type>(_pair.value, vector_, *_bind_error); \
+			continue; \
+		} \
+		do {} while (false)
 
 #define SJSON_BIND_END() \
+		if (_bind_error != nullptr && _bind_error->any()) \
+			break; \
 	} \
 	do {} while (false)
 
