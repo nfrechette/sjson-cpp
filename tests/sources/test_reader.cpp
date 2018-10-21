@@ -625,11 +625,11 @@ TEST_CASE("Reader Number Reading", "[reader]")
 			REQUIRE(error.empty());
 			uint64_t value = pair.value.read<uint64_t>(0, &error);
 			REQUIRE(error.empty());
-			REQUIRE(value == 1234567890123456);
+			REQUIRE(value == 1234567890123456ull);
 
 			uint64_t value1 = pair.value.read<uint64_t>(0, &error);
 			REQUIRE(error.empty());
-			REQUIRE(value1 == 1234567890123456);
+			REQUIRE(value1 == 1234567890123456ull);
 
 			StringView value2 = pair.value.read<StringView>("bad", &error);
 			REQUIRE(error.any());
