@@ -33,11 +33,12 @@
 #include "sjson/string_view.h"
 #include "sjson/platform.h"
 
+#include <algorithm>
 #include <cctype>
 #include <cmath>
-#include <cstring>
 #include <cstdint>
-#include <algorithm>
+#include <cstring>
+#include <string>
 #include <type_traits>
 
 namespace sjson
@@ -1366,6 +1367,12 @@ namespace sjson
 			*out_error = error;
 
 		return value;
+	}
+
+	inline std::string from_sjson(ValueReader& sjson_value, const std::string& default_value, ReaderError* out_error)
+	{
+		StringView value = sjson_value.read<StringView>(StringView(default_value.c_str(), default_value.length()), out_error);
+		return std::string(value.c_str(), value.size());
 	}
 
 	struct PairReader

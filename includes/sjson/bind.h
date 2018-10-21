@@ -68,14 +68,6 @@
 		} \
 		do {} while (false)
 
-#define SJSON_BIND_STR(key_name_, variable_) \
-		if (_pair.name == key_name_) \
-		{ \
-			sjson::impl::bound_string_read(_pair.value, variable_, *_bind_error); \
-			continue; \
-		} \
-		do {} while (false)
-
 #define SJSON_BIND_ARR(key_name_, array_, num_elements_) \
 		if (_pair.name == key_name_) \
 		{ \
@@ -116,26 +108,8 @@ namespace sjson
 		vec.push_back(value);
 	}
 
-	inline void string_copy(std::string& str, const StringView& value)
-	{
-		str = std::string(value.c_str(), value.size());
-	}
-
 	namespace impl
 	{
-		template<typename StringType>
-		inline void bound_string_read(ValueReader& sjson_value, StringType& out_data, ReaderError& out_error)
-		{
-			StringView value = sjson_value.read<StringView>("", &out_error);
-			sjson::string_copy(out_data, value);
-		}
-
-		template<>
-		inline void bound_string_read<StringView>(ValueReader& sjson_value, StringView& out_data, ReaderError& out_error)
-		{
-			out_data = sjson_value.read(out_data, &out_error);
-		}
-
 		template<typename ElementType>
 		inline void bound_array_read(ValueReader& sjson_value, ElementType* out_data, size_t num_elements, ReaderError& out_error)
 		{
