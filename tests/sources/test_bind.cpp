@@ -104,8 +104,9 @@ TEST_CASE("Bind Macros", "[bind]")
 		int8_t var4[4] = { 1, 1, 1, 1 };
 		std::vector<int16_t> var5;
 		std::string var6;
+		TestStruct var7;
 
-		sjson::Reader reader = reader_from_c_str("root = { var0 = \"ok\", var1 = true, var2 = 31, var3 = 42.0, var4 = [ 0, 2, 3, 4 ], var5 = [ 0, 1, 2, 3, 4 ], var6 = \"nice\" }");
+		sjson::Reader reader = reader_from_c_str("root = { var0 = \"ok\", var1 = true, var2 = 31, var3 = 42.0, var4 = [ 0, 2, 3, 4 ], var5 = [ 0, 1, 2, 3, 4 ], var6 = \"nice\", var7 = { field1 = 13, field2 = 45.125 } }");
 		sjson::ReaderError error;
 
 		REQUIRE(reader.get_num_pairs(&error) == 1);
@@ -123,6 +124,7 @@ TEST_CASE("Bind Macros", "[bind]")
 				SJSON_BIND_ARR("var4", var4, 4);
 				SJSON_BIND_VEC("var5", var5);
 				SJSON_BIND_VAR("var6", var6);
+				SJSON_BIND_VAR("var7", var7);
 			SJSON_BIND_END();
 
 			REQUIRE(error.empty());
@@ -140,6 +142,8 @@ TEST_CASE("Bind Macros", "[bind]")
 			REQUIRE(var5[3] == 3);
 			REQUIRE(var5[4] == 4);
 			REQUIRE(var6 == "nice");
+			REQUIRE(var7.field1 == 13);
+			REQUIRE(var7.field2 == 45.125f);
 		}
 
 		REQUIRE(error.empty());
