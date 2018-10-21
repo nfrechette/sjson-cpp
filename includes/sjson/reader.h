@@ -86,7 +86,7 @@ namespace sjson
 			size_t remaining_size() const { return str.size() - offset; }
 		};
 
-		static constexpr ReaderContext k_invalid_context = { StringView(), size_t(~0ull), nullptr };
+		static constexpr ReaderContext k_invalid_context = { StringView(), ~size_t(0), nullptr };
 
 		inline bool is_eof(const ReaderContext& context, size_t offset) { return offset >= context.str.size(); }
 
