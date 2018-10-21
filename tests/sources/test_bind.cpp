@@ -61,7 +61,7 @@ TEST_CASE("Bind Macros", "[bind]")
 		int8_t var4[4] = { 1, 1, 1, 1 };
 		std::vector<int16_t> var5;
 		std::string var6;
-		TestStruct var7;
+		TestStruct var7 = { 99, 99.9f };
 
 		sjson::Reader reader = reader_from_c_str("var0 = \"ok\", var1 = true, var2 = 31, var3 = 42.0, var4 = [ 0, 2, 3, 4 ], var5 = [ 0, 1, 2, 3, 4 ], var6 = \"nice\", var7 = { field1 = 13, field2 = 45.125 }");
 		sjson::ReaderError error;
@@ -104,7 +104,7 @@ TEST_CASE("Bind Macros", "[bind]")
 		int8_t var4[4] = { 1, 1, 1, 1 };
 		std::vector<int16_t> var5;
 		std::string var6;
-		TestStruct var7;
+		TestStruct var7 = { 99, 99.9f };
 
 		sjson::Reader reader = reader_from_c_str("root = { var0 = \"ok\", var1 = true, var2 = 31, var3 = 42.0, var4 = [ 0, 2, 3, 4 ], var5 = [ 0, 1, 2, 3, 4 ], var6 = \"nice\", var7 = { field1 = 13, field2 = 45.125 } }");
 		sjson::ReaderError error;
