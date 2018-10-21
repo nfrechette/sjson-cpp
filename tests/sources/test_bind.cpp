@@ -67,7 +67,7 @@ TEST_CASE("Bind Macros", "[bind]")
 		sjson::ReaderError error;
 
 		SJSON_BIND_BEGIN(reader, &error);
-		SJSON_BIND_VAR("var0", var0);
+			SJSON_BIND_VAR("var0", var0);
 			SJSON_BIND_VAR("var1", var1);
 			SJSON_BIND_VAR("var2", var2);
 			SJSON_BIND_VAR("var3", var3);
