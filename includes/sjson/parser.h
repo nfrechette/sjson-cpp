@@ -31,7 +31,7 @@
 
 #include "sjson/parser_error.h"
 #include "sjson/parser_state.h"
-#include "sjson/platform.h"
+#include "sjson/impl/compiler_utils.h"
 #include "sjson/string_view.h"
 
 #include <cctype>
@@ -723,7 +723,7 @@ namespace sjson
 			if (dbl_value != nullptr)
 				*dbl_value = std::strtod(slice, &last_used_symbol);
 			else
-				*flt_value = impl::strtof(slice, &last_used_symbol);
+				*flt_value = sjson_impl::strtof(slice, &last_used_symbol);
 
 			if (last_used_symbol != slice + length)
 			{
@@ -800,7 +800,7 @@ namespace sjson
 			char* last_used_symbol = nullptr;
 			if (std::is_unsigned<IntegralType>::value)
 			{
-				const uint64_t raw_value = impl::strtoull(slice, &last_used_symbol, base);
+				const uint64_t raw_value = sjson_impl::strtoull(slice, &last_used_symbol, base);
 				value = static_cast<IntegralType>(raw_value);
 
 				if (static_cast<uint64_t>(value) != raw_value)
@@ -811,7 +811,7 @@ namespace sjson
 			}
 			else
 			{
-				const int64_t raw_value = impl::strtoll(slice, &last_used_symbol, base);
+				const int64_t raw_value = sjson_impl::strtoll(slice, &last_used_symbol, base);
 				value = static_cast<IntegralType>(raw_value);
 
 				if (static_cast<int64_t>(value) != raw_value)
