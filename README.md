@@ -52,7 +52,7 @@ See [here](./external) for details.
 
 ### Windows, Linux, and OS X
 
-1. Install CMake 3.2 or higher, Python 3, and the proper compiler for your platform
+1. Install *CMake 3.2* or higher (*3.10* is required on OS X with *Xcode 10*), *Python 3*, and the proper compiler for your platform
 2. Generate the IDE solution with: `python make.py`  
    The solution is generated under `./build`  
    Note that if you do not have CMake in your `PATH`, you should define the `SJSON_CPP_CMAKE_HOME` environment variable to something like `C:\Program Files\CMake`.
@@ -61,11 +61,11 @@ See [here](./external) for details.
 
 ### Android
 
-For Android, the steps are identical to Windows, Linux, and OS X but you also need to install NVIDIA CodeWorks 1R5 (or higher).
+For *Android*, the steps are identical to *Windows, Linux, and OS X* but you also need to install *NVIDIA CodeWorks 1R5* (or higher).
 
 ### iOS
 
-For iOS, the steps are identical to the other platforms but due to code signing, you will need to perform the builds from Xcode manually. Note that this is only an issue if you attempt to use the tools or run the unit tests locally.
+For *iOS*, the steps are identical to the other platforms but due to code signing, you will need to perform the builds from *Xcode* manually. Note that this is only an issue if you attempt to use the tools or run the unit tests locally.
 
 ## Authors
 
