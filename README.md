@@ -37,7 +37,7 @@ Unicode formats other than UTF-8 aren't supported.
 
 *  Windows (VS2015, VS2017) x86 and x64
 *  Linux (gcc5, gcc6, gcc7, gcc8, clang4, clang5, clang6) x86 and x64
-*  OS X (Xcode 8.3, Xcode 9.4, Xcode 10) x86 and x64
+*  OS X (Xcode 8.3, Xcode 9.4, Xcode 10.1) x86 and x64
 *  Android (NVIDIA CodeWorks) ARMv7-A
 *  iOS (Xcode 8.3, Xcode 9.4, Xcode 10) ARM64
 
