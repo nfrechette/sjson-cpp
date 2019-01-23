@@ -610,10 +610,10 @@ TEST_CASE("Writer Array Array Writing", "[writer]")
 		Writer writer(str_writer);
 		writer.insert("key", [](ArrayWriter& array_writer)
 		{
-			array_writer.push([](ArrayWriter& array_writer)
+			array_writer.push([](ArrayWriter& array_writer1)
 			{
-				array_writer.push(123.5);
-				array_writer.push(456.5);
+				array_writer1.push(123.5);
+				array_writer1.push(456.5);
 			});
 		});
 		REQUIRE(str_writer.str() == "key = [ [ 123.5, 456.5 ] ]\r\n");
@@ -639,10 +639,10 @@ TEST_CASE("Writer Array Object Writing", "[writer]")
 		Writer writer(str_writer);
 		writer.insert("key", [](ArrayWriter& array_writer)
 		{
-			array_writer.push([](ObjectWriter& object_writer)
+			array_writer.push([](ObjectWriter& object_writer1)
 			{
-				object_writer["key0"] = 123.5;
-				object_writer["key1"] = 456.5;
+				object_writer1["key0"] = 123.5;
+				object_writer1["key1"] = 456.5;
 			});
 		});
 		REQUIRE(str_writer.str() == "key = [ \r\n\t{\r\n\t\tkey0 = 123.5\r\n\t\tkey1 = 456.5\r\n\t}\r\n]\r\n");
