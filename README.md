@@ -52,12 +52,13 @@ See [here](./external) for details.
 
 ### Windows, Linux, and OS X
 
-1. Install *CMake 3.2* or higher (*3.10* is required on OS X with *Xcode 10*), *Python 3*, and the proper compiler for your platform
-2. Generate the IDE solution with: `python make.py`  
+1. Install *CMake 3.2* or higher (*3.10* is required on OS X with *Xcode 10*), *Python 3*, and the proper compiler for your platform.
+2. Execute `git submodule update --init` to get the files of thirdparty submodules (e.g. Catch2).
+3. Generate the IDE solution with: `python make.py`  
    The solution is generated under `./build`  
    Note that if you do not have CMake in your `PATH`, you should define the `SJSON_CPP_CMAKE_HOME` environment variable to something like `C:\Program Files\CMake`.
-3. Build the IDE solution with: `python make.py -build`
-4. Run the unit tests with: `python make.py -unit_test`
+4. Build the IDE solution with: `python make.py -build`
+5. Run the unit tests with: `python make.py -unit_test`
 
 ### Android
 
