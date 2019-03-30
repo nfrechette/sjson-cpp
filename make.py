@@ -67,7 +67,7 @@ def get_generator(compiler, cpu):
 		if compiler == 'vs2015':
 			if cpu == 'x86':
 				return 'Visual Studio 14'
-			else:
+			elif cpu == 'x64':
 				return 'Visual Studio 14 Win64'
 		elif compiler == 'vs2017':
 			if cpu == 'x86':
@@ -87,6 +87,7 @@ def get_generator(compiler, cpu):
 		return 'Unix Makefiles'
 
 	print('Unknown compiler: {}'.format(compiler))
+	print('See help with: python make.py -help')
 	sys.exit(1)
 
 def get_architecture(compiler, cpu):
