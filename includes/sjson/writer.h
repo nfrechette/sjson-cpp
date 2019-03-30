@@ -37,6 +37,8 @@
 #include <cinttypes>
 #include <cstring>
 
+#define IMPL_SJSON_CPP_VS2015_VER 1900
+
 namespace sjson
 {
 	// TODO: Cleanup the locking stuff, wrap it in #ifdef to strip when asserts are disabled
@@ -75,7 +77,26 @@ namespace sjson
 		std::FILE* m_file;
 	};
 
-#if !defined(_MSC_VER)
+#if !defined(_MSC_VER) || _MSC_VER > IMPL_SJSON_CPP_VS2015_VER
+	// SFINAE HACK
+	// Note: This is funky because of C++ lambda coercion rules
+	// A lambda that does not capture anything is equivalent to a static function
+	// and calling a function with it as an argument is equivalent to passing a function pointer.
+	// Of course, a pointer can safely and automatically coerce to 'bool' and as such
+	// a clean signature like this does not work: void insert(const char*, std::function<void(ObjectWriter&)) foo)
+	// The compiler finds it ambiguous with `void insert(const char*, bool)` and fails to compile.
+	//
+	// To resolve this, we use SFINAE template logic to deduce a real type if we pass a function
+	// and if we pass bool, the type will not exist and the function is stripped.
+	// Different compilers behave differently here:
+	// VS2015 does not have any issues with the std::function overloads and there are no ambiguity with it but
+	// it does not support the SFINAE logic either with a return type or template argument. It complains the
+	// function is already declared.
+	// VS2017 works with the std::function overloads for x86 and x64 but not with ARM. It also does not work
+	// with a SFINAE return type but it works with a template argument.
+	// GCC and clang work with a SFINAE return type or template argument.
+	// As such, on VS2015, we use the std::function overloads and on VS2017, GCC, and clang we use SFINAE
+	// with a template argument.
 	namespace impl
 	{
 		template <class Sig, class = void>
@@ -119,27 +140,16 @@ namespace sjson
 		inline void push(int64_t value) { push_signed_integer(value); }
 		inline void push(uint64_t value) { push_unsigned_integer(value); }
 
-		// Note: This is funky because of C++ lambda coercion rules
-		// A lambda that does not capture anything is equivalent to a static function
-		// and calling a function with it as an argument is equivalent to passing a function pointer.
-		// Of course, a pointer can safely and automatically coerces to 'bool' and as such
-		// a clean signature like this does not work: void insert(const char*, std::function<void(ObjectWriter&)) foo)
-		// The compiler finds it ambiguous and fails to compile.
-		//
-		// To resolve this, we use template logic to deduce a real type if we pass a function
-		// and if we pass bool, the type will not exist and the function is stripped.
-		// Note that VisualStudio properly supports it but GCC/clang do not but VS does not support the template logic
-#if defined(_MSC_VER)
+		// See SFINAE HACK above
+#if defined(_MSC_VER) && _MSC_VER <= IMPL_SJSON_CPP_VS2015_VER
 		inline void push(std::function<void(ObjectWriter& object_writer)> writer_fun);
 		inline void push(std::function<void(ArrayWriter& object_writer)> writer_fun);
 #else
-		template<typename F>
-		inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
-		push(F writer_fun);
+		template<typename F, typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer), F>()>::type* dummy = nullptr>
+		inline void push(F writer_fun);
 
-		template<typename F>
-		inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
-		push(F writer_fun);
+		template<typename F, typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer), F>()>::type* dummy = nullptr>
+		inline void push(F writer_fun);
 #endif
 
 		// TODO: Introduce a newline type
@@ -180,27 +190,16 @@ namespace sjson
 		inline void insert(const char* key, int64_t value) { insert_signed_integer(key, int64_t(value)); }
 		inline void insert(const char* key, uint64_t value) { insert_unsigned_integer(key, uint64_t(value)); }
 
-		// Note: This is funky because of C++ lambda coercion rules
-		// A lambda that does not capture anything is equivalent to a static function
-		// and calling a function with it as an argument is equivalent to passing a function pointer.
-		// Of course, a pointer can safely and automatically coerces to 'bool' and as such
-		// a clean signature like this does not work: void insert(const char*, std::function<void(ObjectWriter&)) foo)
-		// The compiler finds it ambiguous and fails to compile.
-		//
-		// To resolve this, we use template logic to deduce a real type if we pass a function
-		// and if we pass bool, the type will not exist and the function is stripped.
-		// Note that VisualStudio properly supports it but GCC/clang do not but VS does not support the template logic
-#if defined(_MSC_VER)
+		// See SFINAE HACK above
+#if defined(_MSC_VER) && _MSC_VER <= IMPL_SJSON_CPP_VS2015_VER
 		inline void insert(const char* key, std::function<void(ObjectWriter& object_writer)> writer_fun);
 		inline void insert(const char* key, std::function<void(ArrayWriter& object_writer)> writer_fun);
 #else
-		template<typename F>
-		inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
-		insert(const char* key, F writer_fun);
+		template<typename F, typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer), F>()>::type* dummy = nullptr>
+		inline void insert(const char* key, F writer_fun);
 
-		template<typename F>
-		inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
-		insert(const char* key, F writer_fun);
+		template<typename F, typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer), F>()>::type* dummy = nullptr>
+		inline void insert(const char* key, F writer_fun);
 #endif
 
 		void insert_newline();
@@ -225,27 +224,16 @@ namespace sjson
 			inline void operator=(int64_t value) { assign_signed_integer(int64_t(value)); }
 			inline void operator=(uint64_t value) { assign_unsigned_integer(uint64_t(value)); }
 
-			// Note: This is funky because of C++ lambda coercion rules
-			// A lambda that does not capture anything is equivalent to a static function
-			// and calling a function with it as an argument is equivalent to passing a function pointer.
-			// Of course, a pointer can safely and automatically coerces to 'bool' and as such
-			// a clean signature like this does not work: void operator=(std::function<void(ObjectWriter&)) foo)
-			// The compiler finds it ambiguous and fails to compile.
-			//
-			// To resolve this, we use template logic to deduce a real type if we pass a function
-			// and if we pass bool, the type will not exist and the function is stripped.
-			// Note that VisualStudio properly supports it but GCC/clang do not but VS does not support the template logic
-#if defined(_MSC_VER)
+			// See SFINAE HACK above
+#if defined(_MSC_VER) && _MSC_VER <= IMPL_SJSON_CPP_VS2015_VER
 			inline void operator=(std::function<void(ObjectWriter& object_writer)> writer_fun);
 			inline void operator=(std::function<void(ArrayWriter& object_writer)> writer_fun);
 #else
-			template<typename F>
-			inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
-			operator=(F writer_fun);
+			template<typename F, typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer), F>()>::type* dummy = nullptr>
+			inline void operator=(F writer_fun);
 
-			template<typename F>
-			inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
-			operator=(F writer_fun);
+			template<typename F, typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer), F>()>::type* dummy = nullptr>
+			inline void operator=(F writer_fun);
 #endif
 
 		private:
@@ -381,12 +369,11 @@ namespace sjson
 		m_stream_writer.write(buffer, length);
 	}
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && _MSC_VER <= IMPL_SJSON_CPP_VS2015_VER
 	inline void ObjectWriter::insert(const char* key, std::function<void(ObjectWriter& object_writer)> writer_fun)
 #else
-	template<typename F>
-	inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
-	ObjectWriter::insert(const char* key, F writer_fun)
+	template<typename F, typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer), F>()>::type* dummy>
+	inline void ObjectWriter::insert(const char* key, F writer_fun)
 #endif
 	{
 		SJSON_CPP_ASSERT(!m_is_locked, "Cannot insert SJSON object in locked object");
@@ -409,12 +396,11 @@ namespace sjson
 		m_stream_writer.write(k_line_terminator);
 	}
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && _MSC_VER <= IMPL_SJSON_CPP_VS2015_VER
 	inline void ObjectWriter::insert(const char* key, std::function<void(ArrayWriter& array_writer)> writer_fun)
 #else
-	template<typename F>
-	inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
-	ObjectWriter::insert(const char* key, F writer_fun)
+	template<typename F, typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer), F>()>::type* dummy>
+	inline void ObjectWriter::insert(const char* key, F writer_fun)
 #endif
 	{
 		SJSON_CPP_ASSERT(!m_is_locked, "Cannot insert SJSON array in locked object");
@@ -534,12 +520,11 @@ namespace sjson
 		m_is_empty = false;
 	}
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && _MSC_VER <= IMPL_SJSON_CPP_VS2015_VER
 	inline void ObjectWriter::ValueRef::operator=(std::function<void(ObjectWriter& object_writer)> writer_fun)
 #else
-	template<typename F>
-	inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
-	ObjectWriter::ValueRef::operator=(F writer_fun)
+	template<typename F, typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer), F>()>::type* dummy>
+	inline void ObjectWriter::ValueRef::operator=(F writer_fun)
 #endif
 	{
 		SJSON_CPP_ASSERT(m_is_empty, "Cannot write multiple values within a ValueRef");
@@ -560,12 +545,11 @@ namespace sjson
 		m_is_empty = false;
 	}
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && _MSC_VER <= IMPL_SJSON_CPP_VS2015_VER
 	inline void ObjectWriter::ValueRef::operator=(std::function<void(ArrayWriter& array_writer)> writer_fun)
 #else
-	template<typename F>
-	inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
-	ObjectWriter::ValueRef::operator=(F writer_fun)
+	template<typename F, typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer), F>()>::type* dummy>
+	inline void ObjectWriter::ValueRef::operator=(F writer_fun)
 #endif
 	{
 		SJSON_CPP_ASSERT(m_is_empty, "Cannot write multiple values within a ValueRef");
@@ -719,12 +703,11 @@ namespace sjson
 		m_is_newline = false;
 	}
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && _MSC_VER <= IMPL_SJSON_CPP_VS2015_VER
 	inline void ArrayWriter::push(std::function<void(ObjectWriter& object_writer)> writer_fun)
 #else
-	template<typename F>
-	inline typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer),F>()>::type
-	ArrayWriter::push(F writer_fun)
+	template<typename F, typename std::enable_if<impl::invokable<void(ObjectWriter& object_writer), F>()>::type* dummy>
+	inline void ArrayWriter::push(F writer_fun)
 #endif
 	{
 		SJSON_CPP_ASSERT(!m_is_locked, "Cannot push SJSON object in locked array");
@@ -754,12 +737,11 @@ namespace sjson
 		m_is_newline = true;
 	}
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && _MSC_VER <= IMPL_SJSON_CPP_VS2015_VER
 	inline void ArrayWriter::push(std::function<void(ArrayWriter& array_writer)> writer_fun)
 #else
-	template<typename F>
-	inline typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer),F>()>::type
-	ArrayWriter::push(F writer_fun)
+	template<typename F, typename std::enable_if<impl::invokable<void(ArrayWriter& array_writer), F>()>::type* dummy>
+	inline void ArrayWriter::push(F writer_fun)
 #endif
 	{
 		SJSON_CPP_ASSERT(!m_is_locked, "Cannot push SJSON array in locked array");

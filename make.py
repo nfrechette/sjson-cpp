@@ -20,7 +20,7 @@ def parse_argv():
 	target = parser.add_argument_group(title='Target')
 	target.add_argument('-compiler', choices=['vs2015', 'vs2017', 'android', 'clang4', 'clang5', 'clang6', 'gcc5', 'gcc6', 'gcc7', 'gcc8', 'osx', 'ios'], help='Defaults to the host system\'s default compiler')
 	target.add_argument('-config', choices=['Debug', 'Release'], type=str.capitalize)
-	target.add_argument('-cpu', choices=['x86', 'x64'], help='Only supported for Windows, OS X, and Linux; defaults to the host system\'s architecture')
+	target.add_argument('-cpu', choices=['x86', 'x64', 'arm64'], help='Only supported for Windows, OS X, and Linux; defaults to the host system\'s architecture')
 
 	misc = parser.add_argument_group(title='Miscellaneous')
 	misc.add_argument('-num_threads', help='No. to use while compiling')
@@ -46,6 +46,11 @@ def parse_argv():
 			print('iOS is only supported on OS X')
 			sys.exit(1)
 
+	if args.cpu == 'arm64':
+		if not args.compiler in ['vs2017', 'ios']:
+			print('ARM64 is only supported with VS2017 and iOS')
+			sys.exit(1)
+
 	return args
 
 def get_cmake_exes():
@@ -67,8 +72,12 @@ def get_generator(compiler, cpu):
 		elif compiler == 'vs2017':
 			if cpu == 'x86':
 				return 'Visual Studio 15'
-			else:
+			elif cpu == 'x64':
 				return 'Visual Studio 15 Win64'
+			elif cpu == 'arm64':
+				# VS2017 ARM/ARM64 support only works with cmake 3.13 and up and the architecture must be specified with
+				# the -A cmake switch
+				return 'Visual Studio 15 2017'
 		elif compiler == 'android':
 			return 'Visual Studio 14'
 	elif platform.system() == 'Darwin':
@@ -79,6 +88,19 @@ def get_generator(compiler, cpu):
 
 	print('Unknown compiler: {}'.format(compiler))
 	sys.exit(1)
+
+def get_architecture(compiler, cpu):
+	if compiler == None:
+		return None
+
+	if platform.system() == 'Windows':
+		if compiler == 'vs2017':
+			if cpu == 'arm64':
+				return 'ARM64'
+
+	# This compiler/cpu pair does not need the architecture switch
+	return None
+
 
 def get_toolchain(compiler):
 	if platform.system() == 'Windows' and compiler == 'android':
@@ -122,29 +144,33 @@ def do_generate_solution(cmake_exe, build_dir, cmake_script_dir, args):
 	cpu = args.cpu
 	config = args.config
 
-	if not compiler == None:
+	if compiler:
 		set_compiler_env(compiler, args)
 
 	extra_switches = ['--no-warn-unused-cli']
-	if not platform.system() == 'Windows':
-		extra_switches.append('-DCPU_INSTRUCTION_SET:STRING={}'.format(cpu))
+	extra_switches.append('-DCPU_INSTRUCTION_SET:STRING={}'.format(cpu))
 
 	if not platform.system() == 'Windows' and not platform.system() == 'Darwin':
 		extra_switches.append('-DCMAKE_BUILD_TYPE={}'.format(config.upper()))
 
 	toolchain = get_toolchain(compiler)
-	if not toolchain == None:
+	if toolchain:
 		extra_switches.append('-DCMAKE_TOOLCHAIN_FILE={}'.format(os.path.join(cmake_script_dir, toolchain)))
 
 	# Generate IDE solution
 	print('Generating build files ...')
 	cmake_cmd = '"{}" .. -DCMAKE_INSTALL_PREFIX="{}" {}'.format(cmake_exe, build_dir, ' '.join(extra_switches))
 	cmake_generator = get_generator(compiler, cpu)
-	if cmake_generator == None:
+	if not cmake_generator:
 		print('Using default generator')
 	else:
 		print('Using generator: {}'.format(cmake_generator))
 		cmake_cmd += ' -G "{}"'.format(cmake_generator)
+
+	cmake_arch = get_architecture(compiler, cpu)
+	if cmake_arch:
+		print('Using architecture: {}'.format(cmake_arch))
+		cmake_cmd += ' -A {}'.format(cmake_arch)
 
 	result = subprocess.call(cmake_cmd, shell=True)
 	if result != 0:

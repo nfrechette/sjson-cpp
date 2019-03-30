@@ -35,13 +35,15 @@ Unicode formats other than UTF-8 aren't supported.
 
 ## Supported platforms
 
-*  Windows (VS2015, VS2017) x86 and x64
+*  Windows VS2015 x86 and x64, VS2017 x86, x64, and ARM64*
 *  Linux (gcc5, gcc6, gcc7, gcc8, clang4, clang5, clang6) x86 and x64
 *  OS X (Xcode 8.3, Xcode 9.4, Xcode 10.1) x86 and x64
 *  Android (NVIDIA CodeWorks) ARMv7-A
 *  iOS (Xcode 8.3, Xcode 9.4, Xcode 10.1) ARM64
 
 The above supported platform list is only what is tested every release but if it compiles, it should run just fine.
+
+Note: *VS2017* compiles with *ARM64* on *AppVeyor* but I have no device to test it with.
 
 ## External dependencies
 
@@ -50,7 +52,9 @@ See [here](./external) for details.
 
 ## Getting up and running
 
-### Windows, Linux, and OS X
+This library is **100%** headers as such you just need to include them in your own project to start using it. However, if you wish to run the unit tests you will need a few things, see below.
+
+### Windows, Linux, and OS X for x86 and x64
 
 1. Install *CMake 3.2* or higher (*3.10* is required on OS X with *Xcode 10*), *Python 3*, and the proper compiler for your platform.
 2. Execute `git submodule update --init` to get the files of thirdparty submodules (e.g. Catch2).
@@ -59,6 +63,10 @@ See [here](./external) for details.
    Note that if you do not have CMake in your `PATH`, you should define the `SJSON_CPP_CMAKE_HOME` environment variable to something like `C:\Program Files\CMake`.
 4. Build the IDE solution with: `python make.py -build`
 5. Run the unit tests with: `python make.py -unit_test`
+
+### Windows ARM64
+
+For *Windows on ARM64*, the steps are identical to *x86 and x64* but you will need *CMake 3.13 or higher* and you must provide the architecture on the command line: `python make.py -compiler vs2017 -cpu arm64`
 
 ### Android
 
