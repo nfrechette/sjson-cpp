@@ -1,5 +1,11 @@
 # Significant changes per release
 
+## 0.6.0
+
+*  Added support for Windows ARM64, GCC 8, clang 6, and Xcode 10
+*  Integrated SonarCloud
+*  Cleanup and minor changes & fixes
+
 ## 0.5.0
 
 *  Cleaned up error handling
