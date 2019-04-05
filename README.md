@@ -5,7 +5,7 @@
 [![GitHub (pre-)release](https://img.shields.io/github/release/nfrechette/sjson-cpp/all.svg)](https://github.com/nfrechette/sjson-cpp/releases)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/nfrechette/sjson-cpp/master/LICENSE)
 
-# SJSON CPP
+# sjson-cpp
 
 `sjson-cpp` is a C++ library to read and write [Simplified JSON](http://help.autodesk.com/view/Stingray/ENU/?guid=__stingray_help_managing_content_sjson_html) files.
 It aims to be minimal, fast, and get out of the way of the programmer.
@@ -38,7 +38,7 @@ Unicode formats other than UTF-8 aren't supported.
 *  Windows VS2015 x86 and x64, VS2017 x86, x64, and ARM64*
 *  Linux (gcc5, gcc6, gcc7, gcc8, clang4, clang5, clang6) x86 and x64
 *  OS X (Xcode 8.3, Xcode 9.4, Xcode 10.1) x86 and x64
-*  Android (NVIDIA CodeWorks) ARMv7-A
+*  Android (NVIDIA CodeWorks) ARMv7-A and ARM64
 *  iOS (Xcode 8.3, Xcode 9.4, Xcode 10.1) ARM64
 
 The above supported platform list is only what is tested every release but if it compiles, it should run just fine.
