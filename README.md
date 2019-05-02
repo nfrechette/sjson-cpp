@@ -76,6 +76,10 @@ For *Android*, the steps are identical to *Windows, Linux, and OS X* but you als
 
 For *iOS*, the steps are identical to the other platforms but due to code signing, you will need to perform the builds from *Xcode* manually. Note that this is only an issue if you attempt to use the tools or run the unit tests locally.
 
+## Commit message format
+
+This library uses the [angular.js message format](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits) and it is enforced with commit linting through every pull request.
+
 ## Authors
 
 *  [Nicholas Frechette](https://github.com/nfrechette)
