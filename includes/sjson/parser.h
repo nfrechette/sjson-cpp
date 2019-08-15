@@ -252,6 +252,15 @@ namespace sjson
 			return false;
 		}
 
+		bool try_read(const char* key, int8_t& value, int8_t default_value) { return try_read_integer_impl<int8_t>(key, value, default_value); }
+		bool try_read(const char* key, uint8_t& value, uint8_t default_value) { return try_read_integer_impl<uint8_t>(key, value, default_value); }
+		bool try_read(const char* key, int16_t& value, int16_t default_value) { return try_read_integer_impl<int16_t>(key, value, default_value); }
+		bool try_read(const char* key, uint16_t& value, uint16_t default_value) { return try_read_integer_impl<uint16_t>(key, value, default_value); }
+		bool try_read(const char* key, int32_t& value, int32_t default_value) { return try_read_integer_impl<int32_t>(key, value, default_value); }
+		bool try_read(const char* key, uint32_t& value, uint32_t default_value) { return try_read_integer_impl<uint32_t>(key, value, default_value); }
+		bool try_read(const char* key, int64_t& value, int64_t default_value) { return try_read_integer_impl<int64_t>(key, value, default_value); }
+		bool try_read(const char* key, uint64_t& value, uint64_t default_value) { return try_read_integer_impl<uint64_t>(key, value, default_value); }
+
 		bool try_read(const char* key, double* values, uint32_t num_elements, double default_value)
 		{
 			ParserState s = save_state();
@@ -828,6 +837,28 @@ namespace sjson
 			}
 
 			return true;
+		}
+
+		template<typename IntegerType>
+		bool try_read_integer_impl(const char* key, IntegerType& value, IntegerType default_value)
+		{
+			ParserState s = save_state();
+
+			if (read_key(key) && read_equal_sign())
+			{
+				if (try_read_null())
+				{
+					value = default_value;
+					return false;
+				}
+
+				if (read_integer(value))
+					return true;
+			}
+
+			restore_state(s);
+			value = default_value;
+			return false;
 		}
 
 		static bool is_hex_digit(char value)
