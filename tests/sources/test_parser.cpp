@@ -237,6 +237,7 @@ TEST_CASE("Parser String Reading", "[parser]")
 
 TEST_CASE("Parser Number Reading", "[parser]")
 {
+	// Number reading
 	{
 		Parser parser = parser_from_c_str("key = 123.456789");
 		double value;
@@ -327,6 +328,8 @@ TEST_CASE("Parser Number Reading", "[parser]")
 		REQUIRE(parser.is_valid());
 	}
 
+	// Number try reading
+
 	{
 		Parser parser = parser_from_c_str("bad_key = \"bad\"");
 		double value = 0.0;
@@ -359,6 +362,150 @@ TEST_CASE("Parser Number Reading", "[parser]")
 		float value = 0.0f;
 		REQUIRE(parser.try_read("key", value, 1.0f));
 		REQUIRE(value == 2.0f);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("bad_key = \"bad\"");
+		int8_t value = 0;
+		REQUIRE_FALSE(parser.try_read("key", value, 1));
+		REQUIRE(value == 1);
+		REQUIRE_FALSE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = -123");
+		int8_t value;
+		REQUIRE(parser.try_read("key", value, 1));
+		REQUIRE(value == -123);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("bad_key = \"bad\"");
+		uint8_t value = 0;
+		REQUIRE_FALSE(parser.try_read("key", value, 1));
+		REQUIRE(value == 1);
+		REQUIRE_FALSE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = 123");
+		uint8_t value;
+		REQUIRE(parser.try_read("key", value, 1));
+		REQUIRE(value == 123);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("bad_key = \"bad\"");
+		int16_t value = 0;
+		REQUIRE_FALSE(parser.try_read("key", value, 1));
+		REQUIRE(value == 1);
+		REQUIRE_FALSE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = -1234");
+		int16_t value;
+		REQUIRE(parser.try_read("key", value, 1));
+		REQUIRE(value == -1234);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("bad_key = \"bad\"");
+		uint16_t value = 0;
+		REQUIRE_FALSE(parser.try_read("key", value, 1));
+		REQUIRE(value == 1);
+		REQUIRE_FALSE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = 1234");
+		uint16_t value;
+		REQUIRE(parser.try_read("key", value, 1));
+		REQUIRE(value == 1234);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("bad_key = \"bad\"");
+		int32_t value = 0;
+		REQUIRE_FALSE(parser.try_read("key", value, 1));
+		REQUIRE(value == 1);
+		REQUIRE_FALSE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = -123456");
+		int32_t value;
+		REQUIRE(parser.try_read("key", value, 1));
+		REQUIRE(value == -123456);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("bad_key = \"bad\"");
+		uint32_t value = 0;
+		REQUIRE_FALSE(parser.try_read("key", value, 1));
+		REQUIRE(value == 1);
+		REQUIRE_FALSE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = 123456");
+		uint32_t value;
+		REQUIRE(parser.try_read("key", value, 1));
+		REQUIRE(value == 123456);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("bad_key = \"bad\"");
+		int64_t value = 0;
+		REQUIRE_FALSE(parser.try_read("key", value, 1));
+		REQUIRE(value == 1);
+		REQUIRE_FALSE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = -1234567890123456");
+		int64_t value;
+		REQUIRE(parser.try_read("key", value, 1));
+		REQUIRE(value == -1234567890123456ll);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("bad_key = \"bad\"");
+		uint64_t value = 0;
+		REQUIRE_FALSE(parser.try_read("key", value, 1));
+		REQUIRE(value == 1);
+		REQUIRE_FALSE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = 1234567890123456");
+		uint64_t value;
+		REQUIRE(parser.try_read("key", value, 1));
+		REQUIRE(value == 1234567890123456ull);
 		REQUIRE(parser.eof());
 		REQUIRE(parser.is_valid());
 	}
