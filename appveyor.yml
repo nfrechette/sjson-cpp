@@ -1,7 +1,7 @@
 version: 0.6.0.{build}
 
 environment:
-  PYTHON: "C:\\Python33-x64"
+  PYTHON: "C:\\Python36-x64"
   VISUAL_STUDIO: "C:\\Program Files (x86)\\Microsoft Visual Studio"
 
 image:
