@@ -37,9 +37,9 @@ Unicode formats other than UTF-8 aren't supported.
 
 *  Windows VS2015 x86 and x64, VS2017/2019 x86, x64, and ARM64*
 *  Linux (gcc5, gcc6, gcc7, gcc8, clang4, clang5, clang6) x86 and x64
-*  OS X (Xcode 8.3, Xcode 9.4, Xcode 10.1) x86 and x64
+*  OS X (Xcode 8.3, 9.4, 10.3) x86 and x64
 *  Android (NVIDIA CodeWorks with clang5) ARMv7-A and ARM64
-*  iOS (Xcode 8.3, Xcode 9.4, Xcode 10.1) ARM64
+*  iOS (Xcode 8.3, 9.4, 10.3) ARM64
 
 The above supported platform list is only what is tested every release but if it compiles, it should run just fine.
 
@@ -56,7 +56,7 @@ This library is **100%** headers as such you just need to include them in your o
 
 ### Windows, Linux, and OS X for x86 and x64
 
-1. Install *CMake 3.2* or higher (*3.14* for Visual Studio 2019, or *3.10* on OS X with *Xcode 10*), *Python 3*, and the proper compiler for your platform.
+1. Install *CMake 3.2* or higher (*3.14* for Visual Studio 2019, or *3.10* on OS X with *Xcode 10*), *Python 2.7 or 3*, and the proper compiler for your platform.
 2. Execute `git submodule update --init` to get the files of thirdparty submodules (e.g. Catch2).
 3. Generate the IDE solution with: `python make.py`  
    The solution is generated under `./build`  
