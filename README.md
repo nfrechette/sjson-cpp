@@ -57,7 +57,7 @@ This library is **100%** headers as such you just need to include them in your o
 ### Windows, Linux, and OS X for x86 and x64
 
 1. Install *CMake 3.2* or higher (*3.14* for Visual Studio 2019, or *3.10* on OS X with *Xcode 10*), *Python 2.7 or 3*, and the proper compiler for your platform.
-2. Execute `git submodule update --init` to get the files of thirdparty submodules (e.g. Catch2).
+2. Execute `git submodule update --init` to get the files of external submodules (e.g. Catch2).
 3. Generate the IDE solution with: `python make.py`  
    The solution is generated under `./build`  
    Note that if you do not have CMake in your `PATH`, you should define the `SJSON_CPP_CMAKE_HOME` environment variable to something like `C:\Program Files\CMake`.
