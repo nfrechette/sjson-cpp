@@ -280,7 +280,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 		Parser parser = parser_from_c_str("key = 123.456789");
 		float value;
 		REQUIRE(parser.read("key", value));
-		REQUIRE(value == 123.456789f);
+		REQUIRE(value == 123.456789F);
 		REQUIRE(parser.eof());
 		REQUIRE(parser.is_valid());
 	}
@@ -372,7 +372,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 		Parser parser = parser_from_c_str("key = -1234567890123456");
 		int64_t value;
 		REQUIRE(parser.read("key", value));
-		REQUIRE(value == -1234567890123456ll);
+		REQUIRE(value == -1234567890123456LL);
 		REQUIRE(parser.eof());
 		REQUIRE(parser.is_valid());
 	}
@@ -381,7 +381,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 		Parser parser = parser_from_c_str("key = 1234567890123456");
 		uint64_t value;
 		REQUIRE(parser.read("key", value));
-		REQUIRE(value == 1234567890123456ull);
+		REQUIRE(value == 1234567890123456ULL);
 		REQUIRE(parser.eof());
 		REQUIRE(parser.is_valid());
 	}
@@ -408,18 +408,18 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("bad_key = \"bad\"");
-		float value = 0.0f;
-		REQUIRE_FALSE(parser.try_read("key", value, 1.0f));
-		REQUIRE(value == 1.0f);
+		float value = 0.0F;
+		REQUIRE_FALSE(parser.try_read("key", value, 1.0F));
+		REQUIRE(value == 1.0F);
 		REQUIRE_FALSE(parser.eof());
 		REQUIRE(parser.is_valid());
 	}
 
 	{
 		Parser parser = parser_from_c_str("key = 2.0");
-		float value = 0.0f;
-		REQUIRE(parser.try_read("key", value, 1.0f));
-		REQUIRE(value == 2.0f);
+		float value = 0.0F;
+		REQUIRE(parser.try_read("key", value, 1.0F));
+		REQUIRE(value == 2.0F);
 		REQUIRE(parser.eof());
 		REQUIRE(parser.is_valid());
 	}
@@ -545,7 +545,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 		Parser parser = parser_from_c_str("key = -1234567890123456");
 		int64_t value;
 		REQUIRE(parser.try_read("key", value, 1));
-		REQUIRE(value == -1234567890123456ll);
+		REQUIRE(value == -1234567890123456LL);
 		REQUIRE(parser.eof());
 		REQUIRE(parser.is_valid());
 	}
@@ -563,7 +563,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 		Parser parser = parser_from_c_str("key = 1234567890123456");
 		uint64_t value;
 		REQUIRE(parser.try_read("key", value, 1));
-		REQUIRE(value == 1234567890123456ull);
+		REQUIRE(value == 1234567890123456ULL);
 		REQUIRE(parser.eof());
 		REQUIRE(parser.is_valid());
 	}

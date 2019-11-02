@@ -65,7 +65,7 @@ namespace sjson
 	class FileStreamWriter final : public StreamWriter
 	{
 	public:
-		FileStreamWriter(std::FILE* file)
+		explicit FileStreamWriter(std::FILE* file)
 			: m_file(file)
 		{}
 
@@ -92,37 +92,37 @@ namespace sjson
 	class ArrayWriter
 	{
 	public:
-		inline void push(const char* value);
-		inline void push(bool value);
-		inline void push(double value);
-		inline void push(float value) { push(double(value)); }
-		inline void push(int8_t value) { push_signed_integer(int64_t(value)); }
-		inline void push(uint8_t value) { push_unsigned_integer(uint64_t(value)); }
-		inline void push(int16_t value) { push_signed_integer(int64_t(value)); }
-		inline void push(uint16_t value) { push_unsigned_integer(uint64_t(value)); }
-		inline void push(int32_t value) { push_signed_integer(int64_t(value)); }
-		inline void push(uint32_t value) { push_unsigned_integer(uint64_t(value)); }
-		inline void push(int64_t value) { push_signed_integer(value); }
-		inline void push(uint64_t value) { push_unsigned_integer(value); }
+		void push(const char* value);
+		void push(bool value);
+		void push(double value);
+		void push(float value) { push(double(value)); }
+		void push(int8_t value) { push_signed_integer(int64_t(value)); }
+		void push(uint8_t value) { push_unsigned_integer(uint64_t(value)); }
+		void push(int16_t value) { push_signed_integer(int64_t(value)); }
+		void push(uint16_t value) { push_unsigned_integer(uint64_t(value)); }
+		void push(int32_t value) { push_signed_integer(int64_t(value)); }
+		void push(uint32_t value) { push_unsigned_integer(uint64_t(value)); }
+		void push(int64_t value) { push_signed_integer(value); }
+		void push(uint64_t value) { push_unsigned_integer(value); }
 
 		template<typename F, typename HavingArgument<F, ObjectWriter&>::type* requirement = nullptr>
-		inline void push(F writer_fun);
+		void push(F writer_fun);
 
 		template<typename F, typename HavingArgument<F, ArrayWriter&>::type* requirement = nullptr>
-		inline void push(F writer_fun);
+		void push(F writer_fun);
 
 		// TODO: Introduce a newline type
 		void push_newline();
 
 	private:
-		inline ArrayWriter(StreamWriter& stream_writer, uint32_t indent_level);
+		ArrayWriter(StreamWriter& stream_writer, uint32_t indent_level);
 
 		ArrayWriter(const ArrayWriter&) = delete;
 		ArrayWriter& operator=(const ArrayWriter&) = delete;
 
-		inline void push_signed_integer(int64_t value);
-		inline void push_unsigned_integer(uint64_t value);
-		inline void write_indentation();
+		void push_signed_integer(int64_t value);
+		void push_unsigned_integer(uint64_t value);
+		void write_indentation();
 
 		StreamWriter& m_stream_writer;
 		uint32_t m_indent_level;
@@ -136,61 +136,61 @@ namespace sjson
 	class ObjectWriter
 	{
 	public:
-		inline void insert(const char* key, const char* value);
-		inline void insert(const char* key, bool value);
-		inline void insert(const char* key, double value);
-		inline void insert(const char* key, float value) { insert(key, double(value)); }
-		inline void insert(const char* key, int8_t value) { insert_signed_integer(key, int64_t(value)); }
-		inline void insert(const char* key, uint8_t value) { insert_unsigned_integer(key, uint64_t(value)); }
-		inline void insert(const char* key, int16_t value) { insert_signed_integer(key, int64_t(value)); }
-		inline void insert(const char* key, uint16_t value) { insert_unsigned_integer(key, uint64_t(value)); }
-		inline void insert(const char* key, int32_t value) { insert_signed_integer(key, int64_t(value)); }
-		inline void insert(const char* key, uint32_t value) { insert_unsigned_integer(key, uint64_t(value)); }
-		inline void insert(const char* key, int64_t value) { insert_signed_integer(key, int64_t(value)); }
-		inline void insert(const char* key, uint64_t value) { insert_unsigned_integer(key, uint64_t(value)); }
+		void insert(const char* key, const char* value);
+		void insert(const char* key, bool value);
+		void insert(const char* key, double value);
+		void insert(const char* key, float value) { insert(key, double(value)); }
+		void insert(const char* key, int8_t value) { insert_signed_integer(key, int64_t(value)); }
+		void insert(const char* key, uint8_t value) { insert_unsigned_integer(key, uint64_t(value)); }
+		void insert(const char* key, int16_t value) { insert_signed_integer(key, int64_t(value)); }
+		void insert(const char* key, uint16_t value) { insert_unsigned_integer(key, uint64_t(value)); }
+		void insert(const char* key, int32_t value) { insert_signed_integer(key, int64_t(value)); }
+		void insert(const char* key, uint32_t value) { insert_unsigned_integer(key, uint64_t(value)); }
+		void insert(const char* key, int64_t value) { insert_signed_integer(key, int64_t(value)); }
+		void insert(const char* key, uint64_t value) { insert_unsigned_integer(key, uint64_t(value)); }
 
 		template<typename F, typename HavingArgument<F, ObjectWriter&>::type* requirement = nullptr>
-		inline void insert(const char* key, F writer_fun);
+		void insert(const char* key, F writer_fun);
 
 		template<typename F, typename HavingArgument<F, ArrayWriter&>::type* requirement = nullptr>
-		inline void insert(const char* key, F writer_fun);
+		void insert(const char* key, F writer_fun);
 
 		void insert_newline();
 
 		// Implement operator[] for convenience
-		class ValueRef
+		class ValueRef final
 		{
 		public:
-			inline ValueRef(ValueRef&& other);
-			inline ~ValueRef();
+			ValueRef(ValueRef&& other);
+			~ValueRef();
 
-			inline void operator=(const char* value);
-			inline void operator=(bool value);
-			inline void operator=(double value);
-			inline void operator=(float value) { *this = double(value); }
-			inline void operator=(int8_t value) { assign_signed_integer(int64_t(value)); }
-			inline void operator=(uint8_t value) { assign_unsigned_integer(uint64_t(value)); }
-			inline void operator=(int16_t value) { assign_signed_integer(int64_t(value)); }
-			inline void operator=(uint16_t value) { assign_unsigned_integer(uint64_t(value)); }
-			inline void operator=(int32_t value) { assign_signed_integer(int64_t(value)); }
-			inline void operator=(uint32_t value) { assign_unsigned_integer(uint64_t(value)); }
-			inline void operator=(int64_t value) { assign_signed_integer(int64_t(value)); }
-			inline void operator=(uint64_t value) { assign_unsigned_integer(uint64_t(value)); }
+			void operator=(const char* value);
+			void operator=(bool value);
+			void operator=(double value);
+			void operator=(float value) { *this = double(value); }
+			void operator=(int8_t value) { assign_signed_integer(int64_t(value)); }
+			void operator=(uint8_t value) { assign_unsigned_integer(uint64_t(value)); }
+			void operator=(int16_t value) { assign_signed_integer(int64_t(value)); }
+			void operator=(uint16_t value) { assign_unsigned_integer(uint64_t(value)); }
+			void operator=(int32_t value) { assign_signed_integer(int64_t(value)); }
+			void operator=(uint32_t value) { assign_unsigned_integer(uint64_t(value)); }
+			void operator=(int64_t value) { assign_signed_integer(int64_t(value)); }
+			void operator=(uint64_t value) { assign_unsigned_integer(uint64_t(value)); }
 
 			template<typename F, typename HavingArgument<F, ObjectWriter&>::type* requirement = nullptr>
-			inline void operator=(F writer_fun);
+			void operator=(F writer_fun);
 
 			template<typename F, typename HavingArgument<F, ArrayWriter&>::type* requirement = nullptr>
-			inline void operator=(F writer_fun);
+			void operator=(F writer_fun);
 
 		private:
-			inline ValueRef(ObjectWriter& object_writer, const char* key);
+			ValueRef(ObjectWriter& object_writer, const char* key);
 
 			ValueRef(const ValueRef&) = delete;
 			ValueRef& operator=(const ValueRef&) = delete;
 
-			inline void assign_signed_integer(int64_t value);
-			inline void assign_unsigned_integer(uint64_t value);
+			void assign_signed_integer(int64_t value);
+			void assign_unsigned_integer(uint64_t value);
 
 			ObjectWriter* m_object_writer;
 			bool m_is_empty;
@@ -199,7 +199,7 @@ namespace sjson
 			friend ObjectWriter;
 		};
 
-		inline ValueRef operator[](const char* key) { return ValueRef(*this, key); }
+		ValueRef operator[](const char* key) { return ValueRef(*this, key); }
 
 	protected:
 		inline ObjectWriter(StreamWriter& stream_writer, uint32_t indent_level);
@@ -207,10 +207,11 @@ namespace sjson
 		ObjectWriter(const ObjectWriter&) = delete;
 		ObjectWriter& operator=(const ObjectWriter&) = delete;
 
-		inline void insert_signed_integer(const char* key, int64_t value);
-		inline void insert_unsigned_integer(const char* key, uint64_t value);
-		inline void write_indentation();
+		void insert_signed_integer(const char* key, int64_t value);
+		void insert_unsigned_integer(const char* key, uint64_t value);
+		void write_indentation();
 
+	private:
 		StreamWriter& m_stream_writer;
 		uint32_t m_indent_level;
 		bool m_is_locked;
@@ -222,7 +223,7 @@ namespace sjson
 	class Writer : public ObjectWriter
 	{
 	public:
-		inline Writer(StreamWriter& stream_writer);
+		explicit Writer(StreamWriter& stream_writer);
 
 	private:
 		Writer(const Writer&) = delete;
