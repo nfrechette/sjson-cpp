@@ -172,6 +172,48 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
+		writer.insert("key", std::nan(""));
+		REQUIRE(str_writer.str() == "key = \"nan\"\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer["key"] = std::nan("");
+		REQUIRE(str_writer.str() == "key = \"nan\"\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer.insert("key", std::numeric_limits<double>::infinity());
+		REQUIRE(str_writer.str() == "key = \"inf\"\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer["key"] = std::numeric_limits<double>::infinity();
+		REQUIRE(str_writer.str() == "key = \"inf\"\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer.insert("key", -std::numeric_limits<double>::infinity());
+		REQUIRE(str_writer.str() == "key = \"-inf\"\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer["key"] = -std::numeric_limits<double>::infinity();
+		REQUIRE(str_writer.str() == "key = \"-inf\"\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
 		writer.insert("key", 123.0f);
 		REQUIRE(str_writer.str() == "key = 123\r\n");
 	}
@@ -195,6 +237,48 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		writer["key"] = 123.5f;
 		REQUIRE(str_writer.str() == "key = 123.5\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer.insert("key", std::nanf(""));
+		REQUIRE(str_writer.str() == "key = \"nan\"\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer["key"] = std::nanf("");
+		REQUIRE(str_writer.str() == "key = \"nan\"\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer.insert("key", std::numeric_limits<float>::infinity());
+		REQUIRE(str_writer.str() == "key = \"inf\"\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer["key"] = std::numeric_limits<float>::infinity();
+		REQUIRE(str_writer.str() == "key = \"inf\"\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer.insert("key", -std::numeric_limits<float>::infinity());
+		REQUIRE(str_writer.str() == "key = \"-inf\"\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer["key"] = -std::numeric_limits<float>::infinity();
+		REQUIRE(str_writer.str() == "key = \"-inf\"\r\n");
 	}
 
 	{
@@ -487,6 +571,18 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 		Writer writer(str_writer);
 		writer.insert("key", [](ArrayWriter& array_writer)
 		{
+			array_writer.push(std::nan(""));
+			array_writer.push(std::numeric_limits<double>::infinity());
+			array_writer.push(-std::numeric_limits<double>::infinity());
+		});
+		REQUIRE(str_writer.str() == "key = [ \"nan\", \"inf\", \"-inf\" ]\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer.insert("key", [](ArrayWriter& array_writer)
+		{
 			array_writer.push(123.0f);
 		});
 		REQUIRE(str_writer.str() == "key = [ 123 ]\r\n");
@@ -500,6 +596,18 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 			array_writer.push(123.5f);
 		});
 		REQUIRE(str_writer.str() == "key = [ 123.5 ]\r\n");
+	}
+
+	{
+		StringStreamWriter str_writer;
+		Writer writer(str_writer);
+		writer.insert("key", [](ArrayWriter& array_writer)
+		{
+			array_writer.push(std::nanf(""));
+			array_writer.push(std::numeric_limits<float>::infinity());
+			array_writer.push(-std::numeric_limits<float>::infinity());
+		});
+		REQUIRE(str_writer.str() == "key = [ \"nan\", \"inf\", \"-inf\" ]\r\n");
 	}
 
 	{

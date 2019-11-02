@@ -248,10 +248,68 @@ TEST_CASE("Parser Number Reading", "[parser]")
 	}
 
 	{
+		Parser parser = parser_from_c_str("key = \"nan\"");
+		double value;
+		REQUIRE(parser.read("key", value));
+		REQUIRE(std::isnan(value));
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = \"inf\"");
+		double value;
+		REQUIRE(parser.read("key", value));
+		REQUIRE(std::isinf(value));
+		REQUIRE(value > 0.0);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = \"-inf\"");
+		double value;
+		REQUIRE(parser.read("key", value));
+		REQUIRE(std::isinf(value));
+		REQUIRE(value < 0.0);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
 		Parser parser = parser_from_c_str("key = 123.456789");
 		float value;
 		REQUIRE(parser.read("key", value));
 		REQUIRE(value == 123.456789f);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = \"nan\"");
+		float value;
+		REQUIRE(parser.read("key", value));
+		REQUIRE(std::isnan(value));
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = \"inf\"");
+		float value;
+		REQUIRE(parser.read("key", value));
+		REQUIRE(std::isinf(value));
+		REQUIRE(value > 0.0f);
+		REQUIRE(parser.eof());
+		REQUIRE(parser.is_valid());
+	}
+
+	{
+		Parser parser = parser_from_c_str("key = \"-inf\"");
+		float value;
+		REQUIRE(parser.read("key", value));
+		REQUIRE(std::isinf(value));
+		REQUIRE(value < 0.0f);
 		REQUIRE(parser.eof());
 		REQUIRE(parser.is_valid());
 	}

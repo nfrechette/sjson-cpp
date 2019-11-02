@@ -31,11 +31,13 @@
 
 #include "sjson/error.h"
 
-#include <functional>
 #include <cstdio>
 #include <cstdint>
 #include <cinttypes>
+#include <cmath>
 #include <cstring>
+#include <functional>
+#include <limits>
 #include <type_traits>
 
 namespace sjson
@@ -276,10 +278,28 @@ namespace sjson
 		m_stream_writer.write(key);
 		m_stream_writer.write(" = ");
 
-		char buffer[256];
-		size_t length = snprintf(buffer, sizeof(buffer), "%.17g%s", value, k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %.17g]", key, value);
-		m_stream_writer.write(buffer, length);
+		if (std::isnan(value))
+		{
+			m_stream_writer.write("\"nan\"");
+			m_stream_writer.write(k_line_terminator);
+		}
+		else if (std::isinf(value))
+		{
+			m_stream_writer.write("\"");
+
+			if (value < 0.0)
+				m_stream_writer.write("-");
+
+			m_stream_writer.write("inf\"");
+			m_stream_writer.write(k_line_terminator);
+		}
+		else
+		{
+			char buffer[256];
+			size_t length = snprintf(buffer, sizeof(buffer), "%.17g%s", value, k_line_terminator);
+			SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %.17g]", key, value);
+			m_stream_writer.write(buffer, length);
+		}
 	}
 
 	inline void ObjectWriter::insert_signed_integer(const char* key, int64_t value)
@@ -450,10 +470,29 @@ namespace sjson
 		SJSON_CPP_ASSERT(m_object_writer != nullptr, "ValueRef not initialized");
 		SJSON_CPP_ASSERT(!m_is_locked, "Cannot assign a value when locked");
 
-		char buffer[256];
-		size_t length = snprintf(buffer, sizeof(buffer), "%.17g%s", value, k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %.17g", value);
-		m_object_writer->m_stream_writer.write(buffer, length);
+		if (std::isnan(value))
+		{
+			m_object_writer->m_stream_writer.write("\"nan\"");
+			m_object_writer->m_stream_writer.write(k_line_terminator);
+		}
+		else if (std::isinf(value))
+		{
+			m_object_writer->m_stream_writer.write("\"");
+
+			if (value < 0.0)
+				m_object_writer->m_stream_writer.write("-");
+
+			m_object_writer->m_stream_writer.write("inf\"");
+			m_object_writer->m_stream_writer.write(k_line_terminator);
+		}
+		else
+		{
+			char buffer[256];
+			size_t length = snprintf(buffer, sizeof(buffer), "%.17g%s", value, k_line_terminator);
+			SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %.17g", value);
+			m_object_writer->m_stream_writer.write(buffer, length);
+		}
+
 		m_is_empty = false;
 	}
 
@@ -588,10 +627,27 @@ namespace sjson
 		if (m_is_newline)
 			write_indentation();
 
-		char buffer[256];
-		size_t length = snprintf(buffer, sizeof(buffer), "%.17g", value);
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %.17g", value);
-		m_stream_writer.write(buffer, length);
+		if (std::isnan(value))
+		{
+			m_stream_writer.write("\"nan\"");
+		}
+		else if (std::isinf(value))
+		{
+			m_stream_writer.write("\"");
+
+			if (value < 0.0)
+				m_stream_writer.write("-");
+
+			m_stream_writer.write("inf\"");
+		}
+		else
+		{
+			char buffer[256];
+			size_t length = snprintf(buffer, sizeof(buffer), "%.17g", value);
+			SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %.17g", value);
+			m_stream_writer.write(buffer, length);
+		}
+
 		m_is_empty = false;
 		m_is_newline = false;
 	}

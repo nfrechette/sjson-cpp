@@ -34,11 +34,12 @@
 #include "sjson/impl/compiler_utils.h"
 #include "sjson/string_view.h"
 
+#include <algorithm>
 #include <cctype>
 #include <cmath>
 #include <cstring>
 #include <cstdint>
-#include <algorithm>
+#include <limits>
 
 namespace sjson
 {
@@ -670,6 +671,53 @@ namespace sjson
 
 			size_t start_offset = m_state.offset;
 			size_t end_offset;
+
+			if (m_state.symbol == '"')
+			{
+				advance();
+
+				if (m_state.symbol == 'n' && advance())
+				{
+					if (m_state.symbol == 'a' && advance() &&
+						m_state.symbol == 'n' && advance() &&
+						m_state.symbol == '"' && advance())
+					{
+						if (dbl_value != nullptr)
+							*dbl_value = std::nan("");
+						else
+							*flt_value = std::nanf("");
+						return true;
+					}
+				}
+				else if (m_state.symbol == '-' && advance())
+				{
+					if (m_state.symbol == 'i' && advance() &&
+						m_state.symbol == 'n' && advance() &&
+						m_state.symbol == 'f' && advance() &&
+						m_state.symbol == '"' && advance())
+					{
+						if (dbl_value != nullptr)
+							*dbl_value = -std::numeric_limits<double>::infinity();
+						else
+							*flt_value = -std::numeric_limits<float>::infinity();
+						return true;
+					}
+				}
+				else if (m_state.symbol == 'i' && advance() &&
+					m_state.symbol == 'n' && advance() &&
+					m_state.symbol == 'f' && advance() &&
+					m_state.symbol == '"' && advance())
+				{
+					if (dbl_value != nullptr)
+						*dbl_value = std::numeric_limits<double>::infinity();
+					else
+						*flt_value = std::numeric_limits<float>::infinity();
+					return true;
+				}
+
+				set_error(ParserError::NumberExpected);
+				return false;
+			}
 
 			if (m_state.symbol == '-')
 				advance();
