@@ -88,7 +88,7 @@
 		}
 	}
 
-	#define SJSON_CPP_ASSERT(expression, format, ...) if (!(expression)) sjson::error_impl::on_assert_abort(#expression, __LINE__, __FILE__, format, ## __VA_ARGS__)
+	#define SJSON_CPP_ASSERT(expression, format, ...) if (!(expression)) sjson::error_impl::on_assert_abort(#expression, __LINE__, __FILE__, (format), ## __VA_ARGS__)
 	#define SJSON_CPP_HAS_ASSERT_CHECKS
 
 #elif defined(SJSON_CPP_ON_ASSERT_THROW)
@@ -133,13 +133,13 @@
 			}
 		}
 
-	#define SJSON_CPP_ASSERT(expression, format, ...) if (!(expression)) sjson::error_impl::on_assert_throw(#expression, __LINE__, __FILE__, format, ## __VA_ARGS__)
+	#define SJSON_CPP_ASSERT(expression, format, ...) if (!(expression)) sjson::error_impl::on_assert_throw(#expression, __LINE__, __FILE__, (format), ## __VA_ARGS__)
 	#define SJSON_CPP_HAS_ASSERT_CHECKS
 
 #elif defined(SJSON_CPP_ON_ASSERT_CUSTOM)
 
 	#if !defined(SJSON_CPP_ASSERT)
-		#define SJSON_CPP_ASSERT(expression, format, ...) if (!(expression)) SJSON_CPP_ON_ASSERT_CUSTOM(#expression, __LINE__, __FILE__, format, ## __VA_ARGS__)
+		#define SJSON_CPP_ASSERT(expression, format, ...) if (!(expression)) SJSON_CPP_ON_ASSERT_CUSTOM(#expression, __LINE__, __FILE__, (format), ## __VA_ARGS__)
 	#endif
 
 	#define SJSON_CPP_HAS_ASSERT_CHECKS
