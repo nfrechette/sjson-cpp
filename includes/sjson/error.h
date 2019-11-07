@@ -129,9 +129,9 @@
 					throw runtime_assert(std::string(&buffer[0], count));
 				else
 					throw runtime_assert("Failed to format assert message!\n");
-	}
 			}
 		}
+	}
 
 	#define SJSON_CPP_ASSERT(expression, format, ...) if (!(expression)) sjson::error_impl::on_assert_throw(#expression, __LINE__, __FILE__, (format), ## __VA_ARGS__)
 	#define SJSON_CPP_HAS_ASSERT_CHECKS
