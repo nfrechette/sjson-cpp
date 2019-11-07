@@ -55,6 +55,12 @@ def parse_argv():
 			print('ARM64 is only supported with VS2017, VS2019, and iOS')
 			sys.exit(1)
 
+	if platform.system() == 'Darwin' and args.cpu == 'x86':
+		result = subprocess.check_output(['xcodebuild', '-version'])
+		if 'Xcode 11' in result:
+			print('Versions of Xcode 11 and up no longer support x86')
+			sys.exit(1)
+
 	return args
 
 def get_cmake_exes():
