@@ -1,5 +1,11 @@
 # Significant changes per release
 
+## 0.7.0
+
+*  Added support for VS 2019, GCC9, clang 7, and Xcode 11
+*  Added custom support for NaN/Inf handling
+*  Cleanup and minor misc changes
+
 ## 0.6.0
 
 *  Added support for Windows ARM64, GCC 8, clang 6, and Xcode 10
