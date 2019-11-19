@@ -1,4 +1,4 @@
-package com.sjson.cpp;
+package com.sjson.unit_tests;
 
 import android.app.Activity;
 import android.widget.TextView;
