@@ -36,7 +36,8 @@ Unicode formats other than UTF-8 aren't supported.
 ## Supported platforms
 
 *  Windows VS2015 x86 and x64, VS2017/2019 x86, x64, and ARM64*
-*  Linux (gcc5, gcc6, gcc7, gcc8, gcc9, clang4, clang5, clang6, clang7) x86 and x64
+*  Linux (gcc5, gcc6, gcc7, gcc8, gcc9) x86 and x64
+*  Linux (clang4, clang5, clang6, clang7, clang8, clang9) x86 and x64
 *  OS X (Xcode 8.3, 9.4, 10.3, 11.2*) x86 and x64
 *  Android (NVIDIA CodeWorks with clang5) ARMv7-A and ARM64
 *  iOS (Xcode 8.3, 9.4, 10.3) ARM64
