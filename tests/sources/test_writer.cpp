@@ -55,28 +55,28 @@ TEST_CASE("Writer Object Bool Writing", "[writer]")
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", true);
-		REQUIRE(str_writer.str() == "key = true\r\n");
+		CHECK(str_writer.str() == "key = true\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", false);
-		REQUIRE(str_writer.str() == "key = false\r\n");
+		CHECK(str_writer.str() == "key = false\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = true;
-		REQUIRE(str_writer.str() == "key = true\r\n");
+		CHECK(str_writer.str() == "key = true\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = false;
-		REQUIRE(str_writer.str() == "key = false\r\n");
+		CHECK(str_writer.str() == "key = false\r\n");
 	}
 }
 
@@ -86,56 +86,56 @@ TEST_CASE("Writer Object String Writing", "[writer]")
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", "some string");
-		REQUIRE(str_writer.str() == "key = \"some string\"\r\n");
+		CHECK(str_writer.str() == "key = \"some string\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = "some string";
-		REQUIRE(str_writer.str() == "key = \"some string\"\r\n");
+		CHECK(str_writer.str() == "key = \"some string\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", "some\tstring");
-		REQUIRE(str_writer.str() == "key = \"some\tstring\"\r\n");
+		CHECK(str_writer.str() == "key = \"some\tstring\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = "some\tstring";
-		REQUIRE(str_writer.str() == "key = \"some\tstring\"\r\n");
+		CHECK(str_writer.str() == "key = \"some\tstring\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", "some\nstring");
-		REQUIRE(str_writer.str() == "key = \"some\nstring\"\r\n");
+		CHECK(str_writer.str() == "key = \"some\nstring\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = "some\nstring";
-		REQUIRE(str_writer.str() == "key = \"some\nstring\"\r\n");
+		CHECK(str_writer.str() == "key = \"some\nstring\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", "some\"string");
-		REQUIRE(str_writer.str() == "key = \"some\"string\"\r\n");
+		CHECK(str_writer.str() == "key = \"some\"string\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = "some\"string";
-		REQUIRE(str_writer.str() == "key = \"some\"string\"\r\n");
+		CHECK(str_writer.str() == "key = \"some\"string\"\r\n");
 	}
 }
 
@@ -145,140 +145,140 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", 123.0);
-		REQUIRE(str_writer.str() == "key = 123\r\n");
+		CHECK(str_writer.str() == "key = 123\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = 123.0;
-		REQUIRE(str_writer.str() == "key = 123\r\n");
+		CHECK(str_writer.str() == "key = 123\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", 123.456);
-		REQUIRE(str_writer.str() == "key = 123.456\r\n");
+		CHECK(str_writer.str() == "key = 123.456\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = 123.456;
-		REQUIRE(str_writer.str() == "key = 123.456\r\n");
+		CHECK(str_writer.str() == "key = 123.456\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", std::nan(""));
-		REQUIRE(str_writer.str() == "key = \"nan\"\r\n");
+		CHECK(str_writer.str() == "key = \"nan\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = std::nan("");
-		REQUIRE(str_writer.str() == "key = \"nan\"\r\n");
+		CHECK(str_writer.str() == "key = \"nan\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", std::numeric_limits<double>::infinity());
-		REQUIRE(str_writer.str() == "key = \"inf\"\r\n");
+		CHECK(str_writer.str() == "key = \"inf\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = std::numeric_limits<double>::infinity();
-		REQUIRE(str_writer.str() == "key = \"inf\"\r\n");
+		CHECK(str_writer.str() == "key = \"inf\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", -std::numeric_limits<double>::infinity());
-		REQUIRE(str_writer.str() == "key = \"-inf\"\r\n");
+		CHECK(str_writer.str() == "key = \"-inf\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = -std::numeric_limits<double>::infinity();
-		REQUIRE(str_writer.str() == "key = \"-inf\"\r\n");
+		CHECK(str_writer.str() == "key = \"-inf\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", 123.0F);
-		REQUIRE(str_writer.str() == "key = 123\r\n");
+		CHECK(str_writer.str() == "key = 123\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = 123.0F;
-		REQUIRE(str_writer.str() == "key = 123\r\n");
+		CHECK(str_writer.str() == "key = 123\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", 123.5F);
-		REQUIRE(str_writer.str() == "key = 123.5\r\n");
+		CHECK(str_writer.str() == "key = 123.5\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = 123.5F;
-		REQUIRE(str_writer.str() == "key = 123.5\r\n");
+		CHECK(str_writer.str() == "key = 123.5\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", std::nanf(""));
-		REQUIRE(str_writer.str() == "key = \"nan\"\r\n");
+		CHECK(str_writer.str() == "key = \"nan\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = std::nanf("");
-		REQUIRE(str_writer.str() == "key = \"nan\"\r\n");
+		CHECK(str_writer.str() == "key = \"nan\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", std::numeric_limits<float>::infinity());
-		REQUIRE(str_writer.str() == "key = \"inf\"\r\n");
+		CHECK(str_writer.str() == "key = \"inf\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = std::numeric_limits<float>::infinity();
-		REQUIRE(str_writer.str() == "key = \"inf\"\r\n");
+		CHECK(str_writer.str() == "key = \"inf\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer.insert("key", -std::numeric_limits<float>::infinity());
-		REQUIRE(str_writer.str() == "key = \"-inf\"\r\n");
+		CHECK(str_writer.str() == "key = \"-inf\"\r\n");
 	}
 
 	{
 		StringStreamWriter str_writer;
 		Writer writer(str_writer);
 		writer["key"] = -std::numeric_limits<float>::infinity();
-		REQUIRE(str_writer.str() == "key = \"-inf\"\r\n");
+		CHECK(str_writer.str() == "key = \"-inf\"\r\n");
 	}
 
 	{
@@ -286,7 +286,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		int8_t value = -123;
 		writer.insert("key", value);
-		REQUIRE(str_writer.str() == "key = -123\r\n");
+		CHECK(str_writer.str() == "key = -123\r\n");
 	}
 
 	{
@@ -294,7 +294,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		int8_t value = -123;
 		writer["key"] = value;
-		REQUIRE(str_writer.str() == "key = -123\r\n");
+		CHECK(str_writer.str() == "key = -123\r\n");
 	}
 
 	{
@@ -302,7 +302,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		uint8_t value = 123;
 		writer.insert("key", value);
-		REQUIRE(str_writer.str() == "key = 123\r\n");
+		CHECK(str_writer.str() == "key = 123\r\n");
 	}
 
 	{
@@ -310,7 +310,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		uint8_t value = 123;
 		writer["key"] = value;
-		REQUIRE(str_writer.str() == "key = 123\r\n");
+		CHECK(str_writer.str() == "key = 123\r\n");
 	}
 
 	{
@@ -318,7 +318,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		int16_t value = -1234;
 		writer.insert("key", value);
-		REQUIRE(str_writer.str() == "key = -1234\r\n");
+		CHECK(str_writer.str() == "key = -1234\r\n");
 	}
 
 	{
@@ -326,7 +326,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		int16_t value = -1234;
 		writer["key"] = value;
-		REQUIRE(str_writer.str() == "key = -1234\r\n");
+		CHECK(str_writer.str() == "key = -1234\r\n");
 	}
 
 	{
@@ -334,7 +334,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		uint16_t value = 1234;
 		writer.insert("key", value);
-		REQUIRE(str_writer.str() == "key = 1234\r\n");
+		CHECK(str_writer.str() == "key = 1234\r\n");
 	}
 
 	{
@@ -342,7 +342,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		uint16_t value = 1234;
 		writer["key"] = value;
-		REQUIRE(str_writer.str() == "key = 1234\r\n");
+		CHECK(str_writer.str() == "key = 1234\r\n");
 	}
 
 	{
@@ -350,7 +350,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		int32_t value = -123456;
 		writer.insert("key", value);
-		REQUIRE(str_writer.str() == "key = -123456\r\n");
+		CHECK(str_writer.str() == "key = -123456\r\n");
 	}
 
 	{
@@ -358,7 +358,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		int32_t value = -123456;
 		writer["key"] = value;
-		REQUIRE(str_writer.str() == "key = -123456\r\n");
+		CHECK(str_writer.str() == "key = -123456\r\n");
 	}
 
 	{
@@ -366,7 +366,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		uint32_t value = 123456;
 		writer.insert("key", value);
-		REQUIRE(str_writer.str() == "key = 123456\r\n");
+		CHECK(str_writer.str() == "key = 123456\r\n");
 	}
 
 	{
@@ -374,7 +374,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		uint32_t value = 123456;
 		writer["key"] = value;
-		REQUIRE(str_writer.str() == "key = 123456\r\n");
+		CHECK(str_writer.str() == "key = 123456\r\n");
 	}
 
 	{
@@ -382,7 +382,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		int64_t value = -1234567890123456LL;
 		writer.insert("key", value);
-		REQUIRE(str_writer.str() == "key = -1234567890123456\r\n");
+		CHECK(str_writer.str() == "key = -1234567890123456\r\n");
 	}
 
 	{
@@ -390,7 +390,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		int64_t value = -1234567890123456LL;
 		writer["key"] = value;
-		REQUIRE(str_writer.str() == "key = -1234567890123456\r\n");
+		CHECK(str_writer.str() == "key = -1234567890123456\r\n");
 	}
 
 	{
@@ -398,7 +398,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		uint64_t value = 1234567890123456ULL;
 		writer.insert("key", value);
-		REQUIRE(str_writer.str() == "key = 1234567890123456\r\n");
+		CHECK(str_writer.str() == "key = 1234567890123456\r\n");
 	}
 
 	{
@@ -406,7 +406,7 @@ TEST_CASE("Writer Object Number Writing", "[writer]")
 		Writer writer(str_writer);
 		uint64_t value = 1234567890123456ULL;
 		writer["key"] = value;
-		REQUIRE(str_writer.str() == "key = 1234567890123456\r\n");
+		CHECK(str_writer.str() == "key = 1234567890123456\r\n");
 	}
 }
 
@@ -418,7 +418,7 @@ TEST_CASE("Writer Object Array Writing", "[writer]")
 		writer.insert("key", [](ArrayWriter& /*array_writer*/)
 		{
 		});
-		REQUIRE(str_writer.str() == "key = [  ]\r\n");
+		CHECK(str_writer.str() == "key = [  ]\r\n");
 	}
 
 	{
@@ -429,7 +429,7 @@ TEST_CASE("Writer Object Array Writing", "[writer]")
 			array_writer.push(123.5);
 			array_writer.push(456.5);
 		});
-		REQUIRE(str_writer.str() == "key = [ 123.5, 456.5 ]\r\n");
+		CHECK(str_writer.str() == "key = [ 123.5, 456.5 ]\r\n");
 	}
 
 	{
@@ -440,7 +440,7 @@ TEST_CASE("Writer Object Array Writing", "[writer]")
 			array_writer.push(123.5);
 			array_writer.push(456.5);
 		};
-		REQUIRE(str_writer.str() == "key = [ 123.5, 456.5 ]\r\n");
+		CHECK(str_writer.str() == "key = [ 123.5, 456.5 ]\r\n");
 	}
 }
 
@@ -452,7 +452,7 @@ TEST_CASE("Writer Object Object Writing", "[writer]")
 		writer.insert("key", [](ObjectWriter& /*object_writer*/)
 		{
 		});
-		REQUIRE(str_writer.str() == "key = {\r\n}\r\n");
+		CHECK(str_writer.str() == "key = {\r\n}\r\n");
 	}
 
 	{
@@ -463,7 +463,7 @@ TEST_CASE("Writer Object Object Writing", "[writer]")
 			object_writer["key0"] = 123.5;
 			object_writer["key1"] = 456.5;
 		});
-		REQUIRE(str_writer.str() == "key = {\r\n\tkey0 = 123.5\r\n\tkey1 = 456.5\r\n}\r\n");
+		CHECK(str_writer.str() == "key = {\r\n\tkey0 = 123.5\r\n\tkey1 = 456.5\r\n}\r\n");
 	}
 
 	{
@@ -474,7 +474,7 @@ TEST_CASE("Writer Object Object Writing", "[writer]")
 			object_writer["key0"] = 123.5;
 			object_writer["key1"] = 456.5;
 		};
-		REQUIRE(str_writer.str() == "key = {\r\n\tkey0 = 123.5\r\n\tkey1 = 456.5\r\n}\r\n");
+		CHECK(str_writer.str() == "key = {\r\n\tkey0 = 123.5\r\n\tkey1 = 456.5\r\n}\r\n");
 	}
 }
 
@@ -487,7 +487,7 @@ TEST_CASE("Writer Array Bool Writing", "[writer]")
 		{
 			array_writer.push(true);
 		});
-		REQUIRE(str_writer.str() == "key = [ true ]\r\n");
+		CHECK(str_writer.str() == "key = [ true ]\r\n");
 	}
 
 	{
@@ -497,7 +497,7 @@ TEST_CASE("Writer Array Bool Writing", "[writer]")
 		{
 			array_writer.push(false);
 		});
-		REQUIRE(str_writer.str() == "key = [ false ]\r\n");
+		CHECK(str_writer.str() == "key = [ false ]\r\n");
 	}
 }
 
@@ -510,7 +510,7 @@ TEST_CASE("Writer Array String Writing", "[writer]")
 		{
 			array_writer.push("some string");
 		});
-		REQUIRE(str_writer.str() == "key = [ \"some string\" ]\r\n");
+		CHECK(str_writer.str() == "key = [ \"some string\" ]\r\n");
 	}
 
 	{
@@ -520,7 +520,7 @@ TEST_CASE("Writer Array String Writing", "[writer]")
 		{
 			array_writer.push("some\tstring");
 		});
-		REQUIRE(str_writer.str() == "key = [ \"some\tstring\" ]\r\n");
+		CHECK(str_writer.str() == "key = [ \"some\tstring\" ]\r\n");
 	}
 
 	{
@@ -530,7 +530,7 @@ TEST_CASE("Writer Array String Writing", "[writer]")
 		{
 			array_writer.push("some\nstring");
 		});
-		REQUIRE(str_writer.str() == "key = [ \"some\nstring\" ]\r\n");
+		CHECK(str_writer.str() == "key = [ \"some\nstring\" ]\r\n");
 	}
 
 	{
@@ -540,7 +540,7 @@ TEST_CASE("Writer Array String Writing", "[writer]")
 		{
 			array_writer.push("some\"string");
 		});
-		REQUIRE(str_writer.str() == "key = [ \"some\"string\" ]\r\n");
+		CHECK(str_writer.str() == "key = [ \"some\"string\" ]\r\n");
 	}
 }
 
@@ -553,7 +553,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 		{
 			array_writer.push(123.0);
 		});
-		REQUIRE(str_writer.str() == "key = [ 123 ]\r\n");
+		CHECK(str_writer.str() == "key = [ 123 ]\r\n");
 	}
 
 	{
@@ -563,7 +563,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 		{
 			array_writer.push(123.456);
 		});
-		REQUIRE(str_writer.str() == "key = [ 123.456 ]\r\n");
+		CHECK(str_writer.str() == "key = [ 123.456 ]\r\n");
 	}
 
 	{
@@ -575,7 +575,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 			array_writer.push(std::numeric_limits<double>::infinity());
 			array_writer.push(-std::numeric_limits<double>::infinity());
 		});
-		REQUIRE(str_writer.str() == "key = [ \"nan\", \"inf\", \"-inf\" ]\r\n");
+		CHECK(str_writer.str() == "key = [ \"nan\", \"inf\", \"-inf\" ]\r\n");
 	}
 
 	{
@@ -585,7 +585,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 		{
 			array_writer.push(123.0F);
 		});
-		REQUIRE(str_writer.str() == "key = [ 123 ]\r\n");
+		CHECK(str_writer.str() == "key = [ 123 ]\r\n");
 	}
 
 	{
@@ -595,7 +595,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 		{
 			array_writer.push(123.5F);
 		});
-		REQUIRE(str_writer.str() == "key = [ 123.5 ]\r\n");
+		CHECK(str_writer.str() == "key = [ 123.5 ]\r\n");
 	}
 
 	{
@@ -607,7 +607,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 			array_writer.push(std::numeric_limits<float>::infinity());
 			array_writer.push(-std::numeric_limits<float>::infinity());
 		});
-		REQUIRE(str_writer.str() == "key = [ \"nan\", \"inf\", \"-inf\" ]\r\n");
+		CHECK(str_writer.str() == "key = [ \"nan\", \"inf\", \"-inf\" ]\r\n");
 	}
 
 	{
@@ -618,7 +618,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 			int8_t value = -123;
 			array_writer.push(value);
 		});
-		REQUIRE(str_writer.str() == "key = [ -123 ]\r\n");
+		CHECK(str_writer.str() == "key = [ -123 ]\r\n");
 	}
 
 	{
@@ -629,7 +629,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 			uint8_t value = 123;
 			array_writer.push(value);
 		});
-		REQUIRE(str_writer.str() == "key = [ 123 ]\r\n");
+		CHECK(str_writer.str() == "key = [ 123 ]\r\n");
 	}
 
 	{
@@ -640,7 +640,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 			int16_t value = -1234;
 			array_writer.push(value);
 		});
-		REQUIRE(str_writer.str() == "key = [ -1234 ]\r\n");
+		CHECK(str_writer.str() == "key = [ -1234 ]\r\n");
 	}
 
 	{
@@ -651,7 +651,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 			uint16_t value = 1234;
 			array_writer.push(value);
 		});
-		REQUIRE(str_writer.str() == "key = [ 1234 ]\r\n");
+		CHECK(str_writer.str() == "key = [ 1234 ]\r\n");
 	}
 
 	{
@@ -662,7 +662,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 			int32_t value = -123456;
 			array_writer.push(value);
 		});
-		REQUIRE(str_writer.str() == "key = [ -123456 ]\r\n");
+		CHECK(str_writer.str() == "key = [ -123456 ]\r\n");
 	}
 
 	{
@@ -673,7 +673,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 			uint32_t value = 123456;
 			array_writer.push(value);
 		});
-		REQUIRE(str_writer.str() == "key = [ 123456 ]\r\n");
+		CHECK(str_writer.str() == "key = [ 123456 ]\r\n");
 	}
 
 	{
@@ -684,7 +684,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 			int64_t value = -1234567890123456LL;
 			array_writer.push(value);
 		});
-		REQUIRE(str_writer.str() == "key = [ -1234567890123456 ]\r\n");
+		CHECK(str_writer.str() == "key = [ -1234567890123456 ]\r\n");
 	}
 
 	{
@@ -695,7 +695,7 @@ TEST_CASE("Writer Array Number Writing", "[writer]")
 			uint64_t value = 1234567890123456ULL;
 			array_writer.push(value);
 		});
-		REQUIRE(str_writer.str() == "key = [ 1234567890123456 ]\r\n");
+		CHECK(str_writer.str() == "key = [ 1234567890123456 ]\r\n");
 	}
 }
 
@@ -710,7 +710,7 @@ TEST_CASE("Writer Array Array Writing", "[writer]")
 			{
 			});
 		});
-		REQUIRE(str_writer.str() == "key = [ [  ] ]\r\n");
+		CHECK(str_writer.str() == "key = [ [  ] ]\r\n");
 	}
 
 	{
@@ -724,7 +724,7 @@ TEST_CASE("Writer Array Array Writing", "[writer]")
 				array_writer1.push(456.5);
 			});
 		});
-		REQUIRE(str_writer.str() == "key = [ [ 123.5, 456.5 ] ]\r\n");
+		CHECK(str_writer.str() == "key = [ [ 123.5, 456.5 ] ]\r\n");
 	}
 }
 
@@ -739,7 +739,7 @@ TEST_CASE("Writer Array Object Writing", "[writer]")
 			{
 			});
 		});
-		REQUIRE(str_writer.str() == "key = [ \r\n\t{\r\n\t}\r\n]\r\n");
+		CHECK(str_writer.str() == "key = [ \r\n\t{\r\n\t}\r\n]\r\n");
 	}
 
 	{
@@ -753,6 +753,6 @@ TEST_CASE("Writer Array Object Writing", "[writer]")
 				object_writer1["key1"] = 456.5;
 			});
 		});
-		REQUIRE(str_writer.str() == "key = [ \r\n\t{\r\n\t\tkey0 = 123.5\r\n\t\tkey1 = 456.5\r\n\t}\r\n]\r\n");
+		CHECK(str_writer.str() == "key = [ \r\n\t{\r\n\t\tkey0 = 123.5\r\n\t\tkey1 = 456.5\r\n\t}\r\n]\r\n");
 	}
 }
