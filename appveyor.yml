@@ -37,10 +37,10 @@ build_script:
 
     IF "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2019" (SET COMPILER=vs2019-clang && SET CLANG_SUPPORTED=1)
 
-    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -compiler %COMPILER% -config Debug -cpu x86
+    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -unit_test -compiler %COMPILER% -config Debug -cpu x86
 
-    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -compiler %COMPILER% -config Release -cpu x86
+    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -unit_test -compiler %COMPILER% -config Release -cpu x86
 
-    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -compiler %COMPILER% -config Debug -cpu x64
+    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -unit_test -compiler %COMPILER% -config Debug -cpu x64
 
-    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -compiler %COMPILER% -config Release -cpu x64
+    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -unit_test -compiler %COMPILER% -config Release -cpu x64
