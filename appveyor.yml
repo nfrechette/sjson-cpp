@@ -34,3 +34,13 @@ build_script:
     IF DEFINED ARM64_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -compiler %COMPILER% -config Debug -cpu arm64
 
     IF DEFINED ARM64_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -compiler %COMPILER% -config Release -cpu arm64
+
+    IF "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2019" (SET COMPILER=vs2019-clang && SET CLANG_SUPPORTED=1)
+
+    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -compiler %COMPILER% -config Debug -cpu x86
+
+    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -compiler %COMPILER% -config Release -cpu x86
+
+    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -compiler %COMPILER% -config Debug -cpu x64
+
+    IF DEFINED CLANG_SUPPORTED %PYTHON%\\python.exe make.py -clean -build -compiler %COMPILER% -config Release -cpu x64
