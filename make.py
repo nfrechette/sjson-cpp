@@ -61,10 +61,6 @@ def parse_argv():
 		if not args.cpu:
 			args.cpu = 'x64'
 
-		if not args.cpu in ['x86', 'x64']:
-			print('{} cpu architecture not in supported list [x86, x64] for {}'.format(args.cpu, platform.system()))
-			sys.exit(1)
-
 	if args.cpu == 'arm64':
 		if not args.compiler in ['vs2017', 'vs2019', 'ios', 'android']:
 			print('arm64 is only supported with VS2017, VS2019, Android, and iOS')
