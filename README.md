@@ -41,7 +41,7 @@ Unicode formats other than UTF-8 aren't supported.
 *  Linux (gcc5, gcc6, gcc7, gcc8, gcc9) x86 and x64
 *  Linux (clang4, clang5, clang6, clang7, clang8, clang9) x86 and x64
 *  OS X (Xcode 8.3, 9.4, 10.3, 11.2*) x86 and x64
-*  Android (NVIDIA CodeWorks with clang5) ARMv7-A and ARM64
+*  Android (NDK 21) ARMv7-A and ARM64
 *  iOS (Xcode 8.3, 9.4, 10.3) ARM64
 
 The above supported platform list is only what is tested every release but if it compiles, it should run just fine.
@@ -73,7 +73,7 @@ For *Windows on ARM64*, the steps are identical to *x86 and x64* but you will ne
 
 ### Android
 
-For *Android*, the steps are identical to *Windows, Linux, and OS X* but you also need to install *NVIDIA CodeWorks 1R5* (or higher).
+For *Android*, the steps are identical to *Windows, Linux, and OS X* but you also need to install *Android NDK 21* (or higher). The build uses `gradle` and `-unit_test` will deploy and run on the device when executed.
 
 ### iOS
 
