@@ -280,7 +280,7 @@ def do_tests_android(build_dir, args):
 	# Restore working directory
 	os.chdir(build_dir)
 
-def do_tests_cmake(build_dir, ctest_exe, args):
+def do_tests_cmake(ctest_exe, args):
 	ctest_cmd = '"{}" --output-on-failure --parallel {}'.format(ctest_exe, args.num_threads)
 
 	if platform.system() == 'Windows' or platform.system() == 'Darwin':
