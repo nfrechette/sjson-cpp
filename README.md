@@ -73,7 +73,9 @@ For *Windows on ARM64*, the steps are identical to *x86 and x64* but you will ne
 
 ### Android
 
-For *Android*, the steps are identical to *Windows, Linux, and OS X* but you also need to install *Android NDK 21* (or higher). The build uses `gradle` and `-unit_test` will deploy and run on the device when executed.
+For *Android*, the steps are identical to *Windows, Linux, and OS X* but you also need to install *Android NDK 21* (or higher). The build uses `gradle` and `-unit_test` will deploy and run on the device when executed (make sure that the `adb` executable is in your `PATH` for this to work).
+
+*Android Studio v3.5* can be used to launch and debug. After running *CMake* to build and generate everything, the *Android Studio* projects can be found under the `./build` directory.
 
 ### iOS
 
