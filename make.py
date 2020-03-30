@@ -54,6 +54,10 @@ def parse_argv():
 			print('iOS is only supported on OS X')
 			sys.exit(1)
 
+		if args.unit_test:
+			print('Unit tests cannot run from the command line on iOS')
+			sys.exit(1)
+
 		if not args.cpu in ['arm64']:
 			print('{} cpu architecture not in supported list [arm64] for iOS'.format(args.cpu))
 			sys.exit(1)
@@ -182,6 +186,7 @@ def set_compiler_env(compiler, args):
 			os.environ['CXX'] = 'g++-9'
 		else:
 			print('Unknown compiler: {}'.format(compiler))
+			print('See help with: python make.py -help')
 			sys.exit(1)
 
 def do_generate_solution(cmake_exe, build_dir, cmake_script_dir, args):
@@ -195,7 +200,7 @@ def do_generate_solution(cmake_exe, build_dir, cmake_script_dir, args):
 	extra_switches = ['--no-warn-unused-cli']
 	extra_switches.append('-DCPU_INSTRUCTION_SET:STRING={}'.format(cpu))
 
-	if not platform.system() == 'Windows' and not platform.system() == 'Darwin':
+	if not platform.system() == 'Windows':
 		extra_switches.append('-DCMAKE_BUILD_TYPE={}'.format(config.upper()))
 
 	toolchain = get_toolchain(compiler, cmake_script_dir)
@@ -321,7 +326,7 @@ if __name__ == "__main__":
 
 	print('Using config: {}'.format(args.config))
 	print('Using cpu: {}'.format(args.cpu))
-	if not args.compiler == None:
+	if args.compiler:
 		print('Using compiler: {}'.format(args.compiler))
 	print('Using {} threads'.format(args.num_threads))
 
@@ -332,3 +337,5 @@ if __name__ == "__main__":
 
 	if args.unit_test:
 		do_tests(build_dir, ctest_exe, args)
+
+	sys.exit(0)
