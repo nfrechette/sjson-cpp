@@ -24,6 +24,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             debuggable = true
             signingConfig signingConfigs.debug
+            externalNativeBuild {
+                cmake {
+                    // Because we want to debug 'release' builds, the 'debuggable' property above
+                    // forces the build configuration to 'Debug' which disables optimizations.
+                    // Force a release configutation anyway.
+                    arguments '-DCMAKE_BUILD_TYPE=Release'
+                }
+            }
         }
     }
     externalNativeBuild {
