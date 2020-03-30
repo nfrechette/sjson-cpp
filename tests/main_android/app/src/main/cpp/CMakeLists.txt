@@ -20,7 +20,11 @@ file(GLOB_RECURSE ALL_MAIN_SOURCE_FILES LIST_DIRECTORIES false
 
 add_library(${PROJECT_NAME} SHARED ${ALL_TEST_SOURCE_FILES} ${ALL_MAIN_SOURCE_FILES})
 
+# Enable exceptions
 target_compile_options(${PROJECT_NAME} PRIVATE -fexceptions)
+
+# Enable debug symbols
+target_compile_options(${PROJECT_NAME} PRIVATE -g)
 
 # Throw on failure to allow us to catch them and recover
 add_definitions(-DSJSON_CPP_ON_ASSERT_THROW)
