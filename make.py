@@ -200,7 +200,7 @@ def do_generate_solution(cmake_exe, build_dir, cmake_script_dir, args):
 	extra_switches = ['--no-warn-unused-cli']
 	extra_switches.append('-DCPU_INSTRUCTION_SET:STRING={}'.format(cpu))
 
-	if not platform.system() == 'Windows':
+	if not platform.system() == 'Windows' and not platform.system() == 'Darwin':
 		extra_switches.append('-DCMAKE_BUILD_TYPE={}'.format(config.upper()))
 
 	toolchain = get_toolchain(compiler, cmake_script_dir)
@@ -303,6 +303,7 @@ def do_tests(build_dir, ctest_exe, args):
 
 if __name__ == "__main__":
 	args = parse_argv()
+
 	cmake_exe, ctest_exe = get_cmake_exes()
 
 	# Set the SJSON_CPP_CMAKE_HOME environment variable to point to CMake
