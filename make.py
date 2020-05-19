@@ -82,12 +82,6 @@ def parse_argv():
 
 	return args
 
-def get_cmake_exes():
-	if platform.system() == 'Windows':
-		return ('cmake.exe', 'ctest.exe')
-	else:
-		return ('cmake', 'ctest')
-
 def get_generator(compiler, cpu):
 	if compiler == None:
 		return None
@@ -189,7 +183,7 @@ def set_compiler_env(compiler, args):
 			print('See help with: python make.py -help')
 			sys.exit(1)
 
-def do_generate_solution(cmake_exe, build_dir, cmake_script_dir, args):
+def do_generate_solution(build_dir, cmake_script_dir, args):
 	compiler = args.compiler
 	cpu = args.cpu
 	config = args.config
@@ -214,7 +208,7 @@ def do_generate_solution(cmake_exe, build_dir, cmake_script_dir, args):
 
 	# Generate IDE solution
 	print('Generating build files ...')
-	cmake_cmd = '"{}" .. -DCMAKE_INSTALL_PREFIX="{}" {}'.format(cmake_exe, build_dir, ' '.join(extra_switches))
+	cmake_cmd = 'cmake .. -DCMAKE_INSTALL_PREFIX="{}" {}'.format(build_dir, ' '.join(extra_switches))
 	cmake_generator = get_generator(compiler, cpu)
 	if not cmake_generator:
 		print('Using default generator')
@@ -231,11 +225,11 @@ def do_generate_solution(cmake_exe, build_dir, cmake_script_dir, args):
 	if result != 0:
 		sys.exit(result)
 
-def do_build(cmake_exe, args):
+def do_build(args):
 	config = args.config
 
 	print('Building ...')
-	cmake_cmd = '"{}" --build .'.format(cmake_exe)
+	cmake_cmd = 'cmake --build .'
 	if platform.system() == 'Windows':
 		if args.compiler == 'android':
 			cmake_cmd += ' --config {}'.format(config)
@@ -281,8 +275,8 @@ def do_tests_android(build_dir, args):
 	# Restore working directory
 	os.chdir(build_dir)
 
-def do_tests_cmake(ctest_exe, args):
-	ctest_cmd = '"{}" --output-on-failure --parallel {}'.format(ctest_exe, args.num_threads)
+def do_tests_cmake(args):
+	ctest_cmd = 'ctest --output-on-failure --parallel {}'.format(args.num_threads)
 
 	if platform.system() == 'Windows' or platform.system() == 'Darwin':
 		ctest_cmd += ' -C {}'.format(args.config)
@@ -293,25 +287,16 @@ def do_tests_cmake(ctest_exe, args):
 	if result != 0:
 		sys.exit(result)
 
-def do_tests(build_dir, ctest_exe, args):
+def do_tests(build_dir, args):
 	print('Running unit tests ...')
 
 	if args.compiler == 'android':
 		do_tests_android(build_dir, args)
 	else:
-		do_tests_cmake(ctest_exe, args)
+		do_tests_cmake(args)
 
 if __name__ == "__main__":
 	args = parse_argv()
-
-	cmake_exe, ctest_exe = get_cmake_exes()
-
-	# Set the SJSON_CPP_CMAKE_HOME environment variable to point to CMake
-	# otherwise we assume it is already in the user PATH
-	if 'SJSON_CPP_CMAKE_HOME' in os.environ:
-		cmake_home = os.environ['SJSON_CPP_CMAKE_HOME']
-		cmake_exe = os.path.join(cmake_home, 'bin', cmake_exe)
-		ctest_exe = os.path.join(cmake_home, 'bin', ctest_exe)
 
 	build_dir = os.path.join(os.getcwd(), 'build')
 	cmake_script_dir = os.path.join(os.getcwd(), 'cmake')
@@ -331,12 +316,12 @@ if __name__ == "__main__":
 		print('Using compiler: {}'.format(args.compiler))
 	print('Using {} threads'.format(args.num_threads))
 
-	do_generate_solution(cmake_exe, build_dir, cmake_script_dir, args)
+	do_generate_solution(build_dir, cmake_script_dir, args)
 
 	if args.build:
-		do_build(cmake_exe, args)
+		do_build(args)
 
 	if args.unit_test:
-		do_tests(build_dir, ctest_exe, args)
+		do_tests(build_dir, args)
 
 	sys.exit(0)
