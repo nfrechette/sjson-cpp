@@ -15,9 +15,9 @@ def parse_argv():
 	actions.add_argument('-unit_test', action='store_true')
 
 	target = parser.add_argument_group(title='Target')
-	target.add_argument('-compiler', choices=['vs2015', 'vs2017', 'vs2019', 'vs2019-clang', 'android', 'clang4', 'clang5', 'clang6', 'clang7', 'clang8', 'clang9', 'gcc5', 'gcc6', 'gcc7', 'gcc8', 'gcc9', 'osx', 'ios'], help='Defaults to the host system\'s default compiler')
+	target.add_argument('-compiler', choices=['vs2015', 'vs2017', 'vs2019', 'vs2019-clang', 'android', 'clang4', 'clang5', 'clang6', 'clang7', 'clang8', 'clang9', 'gcc5', 'gcc6', 'gcc7', 'gcc8', 'gcc9', 'osx', 'ios', 'emscripten'], help='Defaults to the host system\'s default compiler')
 	target.add_argument('-config', choices=['Debug', 'Release'], type=str.capitalize)
-	target.add_argument('-cpu', choices=['x86', 'x64', 'armv7', 'arm64'], help='Defaults to the host system\'s architecture')
+	target.add_argument('-cpu', choices=['x86', 'x64', 'armv7', 'arm64', 'wasm'], help='Defaults to the host system\'s architecture')
 
 	misc = parser.add_argument_group(title='Miscellaneous')
 	misc.add_argument('-num_threads', help='No. to use while compiling')
@@ -61,6 +61,17 @@ def parse_argv():
 		if not args.cpu in ['arm64']:
 			print('{} cpu architecture not in supported list [arm64] for iOS'.format(args.cpu))
 			sys.exit(1)
+	elif args.compiler == 'emscripten':
+		if not args.cpu:
+			args.cpu = 'wasm'
+
+		if not platform.system() == 'Darwin' and not platform.system() == 'Linux':
+			print('Emscripten is only supported on OS X and Linux')
+			sys.exit(1)
+
+		if not args.cpu in ['wasm']:
+			print('{} cpu architecture not in supported list [wasm] for Emscripten'.format(args.cpu))
+			sys.exit(1)
 	else:
 		if not args.cpu:
 			args.cpu = 'x64'
@@ -72,6 +83,10 @@ def parse_argv():
 	elif args.cpu == 'armv7':
 		if not args.compiler == 'android':
 			print('armv7 is only supported with Android')
+			sys.exit(1)
+	elif args.cpu == 'wasm':
+		if not args.compiler == 'emscripten':
+			print('wasm is only supported with Emscripten')
 			sys.exit(1)
 
 	if platform.system() == 'Darwin' and args.cpu == 'x86':
@@ -109,7 +124,14 @@ def get_generator(compiler, cpu):
 	elif platform.system() == 'Darwin':
 		if compiler == 'osx' or compiler == 'ios':
 			return 'Xcode'
-	else:
+		elif compiler == 'emscripten':
+			# Emscripten uses the default generator
+			return None
+	elif platform.system() == 'Linux':
+		if compiler == 'emscripten':
+			# Emscripten uses the default generator
+			return None
+
 		return 'Unix Makefiles'
 
 	print('Unknown compiler: {}'.format(compiler))
@@ -178,6 +200,9 @@ def set_compiler_env(compiler, args):
 		elif compiler == 'gcc9':
 			os.environ['CC'] = 'gcc-9'
 			os.environ['CXX'] = 'g++-9'
+		elif compiler == 'emscripten':
+			# Nothing to do for Emscripten
+			return
 		else:
 			print('Unknown compiler: {}'.format(compiler))
 			print('See help with: python make.py -help')
@@ -194,32 +219,35 @@ def do_generate_solution(build_dir, cmake_script_dir, args):
 	extra_switches = ['--no-warn-unused-cli']
 	extra_switches.append('-DCPU_INSTRUCTION_SET:STRING={}'.format(cpu))
 
-	if not platform.system() == 'Windows' and not platform.system() == 'Darwin':
+	if not platform.system() == 'Windows':
 		extra_switches.append('-DCMAKE_BUILD_TYPE={}'.format(config.upper()))
 
 	toolchain = get_toolchain(compiler, cmake_script_dir)
 	if toolchain:
 		extra_switches.append('-DCMAKE_TOOLCHAIN_FILE={}'.format(toolchain))
 
-	generator_suffix = ''
-	if compiler == 'vs2019-clang':
-		extra_switches.append('-T ClangCL')
-		generator_suffix = 'Clang CL'
-
 	# Generate IDE solution
 	print('Generating build files ...')
-	cmake_cmd = 'cmake .. -DCMAKE_INSTALL_PREFIX="{}" {}'.format(build_dir, ' '.join(extra_switches))
-	cmake_generator = get_generator(compiler, cpu)
-	if not cmake_generator:
-		print('Using default generator')
+	if compiler == 'emscripten':
+		cmake_cmd = 'emcmake cmake .. -DCMAKE_INSTALL_PREFIX="{}" {}'.format(build_dir, ' '.join(extra_switches))
 	else:
-		print('Using generator: {} {}'.format(cmake_generator, generator_suffix))
-		cmake_cmd += ' -G "{}"'.format(cmake_generator)
+		cmake_cmd = 'cmake .. -DCMAKE_INSTALL_PREFIX="{}" {}'.format(build_dir, ' '.join(extra_switches))
+		cmake_generator = get_generator(compiler, cpu)
+		if not cmake_generator:
+			print('Using default generator')
+		else:
+			generator_suffix = ''
+			if compiler == 'vs2019-clang':
+				extra_switches.append('-T ClangCL')
+				generator_suffix = 'Clang CL'
 
-	cmake_arch = get_architecture(compiler, cpu)
-	if cmake_arch:
-		print('Using architecture: {}'.format(cmake_arch))
-		cmake_cmd += ' -A {}'.format(cmake_arch)
+			print('Using generator: {} {}'.format(cmake_generator, generator_suffix))
+			cmake_cmd += ' -G "{}"'.format(cmake_generator)
+
+		cmake_arch = get_architecture(compiler, cpu)
+		if cmake_arch:
+			print('Using architecture: {}'.format(cmake_arch))
+			cmake_cmd += ' -A {}'.format(cmake_arch)
 
 	result = subprocess.call(cmake_cmd, shell=True)
 	if result != 0:
