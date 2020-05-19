@@ -43,6 +43,7 @@ Unicode formats other than UTF-8 aren't supported.
 *  OS X (Xcode 8.3, 9.4, 10.3, 11.2*) x86 and x64
 *  Android (NDK 21) ARMv7-A and ARM64
 *  iOS (Xcode 8.3, 9.4, 10.3) ARM64
+*  Emscripten (1.39.11) WASM
 
 The above supported platform list is only what is tested every release but if it compiles, it should run just fine.
 
@@ -79,6 +80,10 @@ For *Android*, the steps are identical to *Windows, Linux, and OS X* but you als
 ### iOS
 
 For *iOS*, the steps are identical to the other platforms but due to code signing, you will need to perform the builds from *Xcode* manually. Note that this is only an issue if you attempt to use the tools or run the unit tests locally.
+
+### Emscripten
+
+Emscripten support currently only has been tested on OS X and Linux. To use it, make sure to install a recent version of Emscripten SDK 1.39.11+.
 
 ## Commit message format
 
