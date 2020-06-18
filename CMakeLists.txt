@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.2)
 project(sjson-cpp
 		VERSION 0.7.0
 		DESCRIPTION "A sjson-cpp library"
-		LANGUAGES CXX)
+		LANGUAGES NONE)
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/version.h.in"
