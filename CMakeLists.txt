@@ -1,5 +1,13 @@
 cmake_minimum_required (VERSION 3.2)
-project(sjson-cpp NONE)
+project(sjson-cpp
+		VERSION 0.7.0
+		DESCRIPTION "A sjson-cpp library"
+		LANGUAGES CXX)
+
+configure_file(
+  "${PROJECT_SOURCE_DIR}/version.h.in"
+  "${PROJECT_SOURCE_DIR}/includes/sjson/version.h"
+)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
