@@ -328,6 +328,8 @@ namespace sjson
 			return true;
 		}
 
+		bool read_comma()			{ return read_symbol(',', ParserError::CommaExpected); }
+
 		bool remainder_is_comments_and_whitespace()
 		{
 			if (!skip_comments_and_whitespace())
@@ -396,7 +398,6 @@ namespace sjson
 		bool read_closing_brace()	{ return read_symbol('}', ParserError::ClosingBraceExpected); }
 		bool read_opening_bracket()	{ return read_symbol('[', ParserError::OpeningBracketExpected); }
 		bool read_closing_bracket()	{ return read_symbol(']', ParserError::ClosingBracketExpected); }
-		bool read_comma()			{ return read_symbol(',', ParserError::CommaExpected); }
 
 		bool read_symbol(char expected, int32_t reason_if_other_found)
 		{
