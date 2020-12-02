@@ -5,17 +5,17 @@ COMPILER=$1
 
 # Convert our compiler into a list of packages it needs
 if [[ $COMPILER == gcc5 ]]; then
-    PACKAGES=g++-5 g++-5-multilib g++-multilib
+    PACKAGES="g++-5 g++-5-multilib g++-multilib"
 elif [[ $COMPILER == gcc6 ]]; then
-    PACKAGES=g++-6 g++-6-multilib g++-multilib
+    PACKAGES="g++-6 g++-6-multilib g++-multilib"
 elif [[ $COMPILER == gcc7 ]]; then
-    PACKAGES=g++-7 g++-7-multilib g++-multilib
+    PACKAGES="g++-7 g++-7-multilib g++-multilib"
 elif [[ $COMPILER == gcc8 ]]; then
-    PACKAGES=g++-8 g++-8-multilib g++-multilib
+    PACKAGES="g++-8 g++-8-multilib g++-multilib"
 elif [[ $COMPILER == gcc9 ]]; then
-    PACKAGES=g++-9 g++-9-multilib g++-multilib
+    PACKAGES="g++-9 g++-9-multilib g++-multilib"
 elif [[ $COMPILER == gcc10 ]]; then
-    PACKAGES=g++-10 g++-10-multilib g++-multilib
+    PACKAGES="g++-10 g++-10-multilib g++-multilib"
 fi
 
 # Install the packages we need
