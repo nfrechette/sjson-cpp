@@ -8,19 +8,35 @@ jobs:
     strategy:
       matrix:
         compiler: [gcc5, gcc6, gcc7, gcc8, gcc9, gcc10]
-        flavor: [Debug, Release]
-        arch: [x86, x64]
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - name: Setup compiler
+      - name: Setup ${{ matrix.compiler }} compiler
         run: ./tools/setup_linux_compiler.sh ${{ matrix.compiler }}
-      - name: Building ${{ matrix.flavor }}-${{ matrix.arch }} with ${{ matrix.compiler }}
-        run: python3 make.py -build -compiler ${{ matrix.compiler }} -config ${{ matrix.flavor }} -cpu ${{ matrix.arch }}
-      - name: Running unit tests
-        run: python3 make.py -unit_test -compiler ${{ matrix.compiler }} -config ${{ matrix.flavor }} -cpu ${{ matrix.arch }}
+      - name: Building (debug-x86)
+        run: python3 make.py -compiler ${{ matrix.compiler }} -config Debug -cpu x86 -build
+      - name: Running unit tests (debug-x86)
+        run: python3 make.py -compiler ${{ matrix.compiler }} -config Debug -cpu 86 -unit_test
+      - name: Clean
+        run: python3 make.py -clean
+      - name: Building (debug-x64)
+        run: python3 make.py -compiler ${{ matrix.compiler }} -config Debug -cpu x64 -build
+      - name: Running unit tests (debug-x64)
+        run: python3 make.py -compiler ${{ matrix.compiler }} -config Debug -cpu 64 -unit_test
+      - name: Clean
+        run: python3 make.py -clean
+      - name: Building (release-x86)
+        run: python3 make.py -compiler ${{ matrix.compiler }} -config Release -cpu x86 -build
+      - name: Running unit tests (release-x86)
+        run: python3 make.py -compiler ${{ matrix.compiler }} -config Release -cpu 86 -unit_test
+      - name: Clean
+        run: python3 make.py -clean
+      - name: Building (release-x64)
+        run: python3 make.py -compiler ${{ matrix.compiler }} -config Release -cpu x64 -build
+      - name: Running unit tests (release-x64)
+        run: python3 make.py -compiler ${{ matrix.compiler }} -config Release -cpu 64 -unit_test
   emscripten:
     runs-on: ubuntu-latest
     steps:
