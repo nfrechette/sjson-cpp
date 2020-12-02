@@ -16,7 +16,7 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Setup compiler
-        run: ./tools/setup_compiler.sh
+        run: ./tools/setup_linux_compiler.sh ${{ matrix.compiler }}
       - name: Building ${{ matrix.flavor }}-${{ matrix.arch }} with ${{ matrix.compiler }}
         run: python3 make.py -build -compiler ${{ matrix.compiler }} -config ${{ matrix.flavor }} -cpu ${{ matrix.arch }}
       - name: Running unit tests
