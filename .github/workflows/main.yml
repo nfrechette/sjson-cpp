@@ -47,6 +47,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: 'recursive'
+      - name: Setup ${{ matrix.compiler }} compiler
+        run: ./tools/setup_osx_compiler.sh ${{ matrix.compiler }}
       - name: Building (debug-x86)
         if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -compiler osx -config Debug -cpu x86 -build
@@ -57,13 +59,10 @@ jobs:
         if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -clean_only
       - name: Building (debug-x64)
-        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -compiler osx -config Debug -cpu x64 -build
       - name: Running unit tests (debug-x64)
-        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -compiler osx -config Debug -cpu x64 -unit_test
       - name: Clean
-        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -clean_only
       - name: Building (release-x86)
         if: ${{ matrix.compiler == 'xcode10' }}
