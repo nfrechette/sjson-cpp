@@ -48,31 +48,31 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Building (debug-x86)
-        if: ${{ matrix.compiler == xcode10 }}
+        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -compiler osx -config Debug -cpu x86 -build
       - name: Running unit tests (debug-x86)
-        if: ${{ matrix.compiler == xcode10 }}
+        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -compiler osx -config Debug -cpu x86 -unit_test
       - name: Clean
-        if: ${{ matrix.compiler == xcode10 }}
+        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -clean_only
       - name: Building (debug-x64)
-        if: ${{ matrix.compiler == xcode10 }}
+        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -compiler osx -config Debug -cpu x64 -build
       - name: Running unit tests (debug-x64)
-        if: ${{ matrix.compiler == xcode10 }}
+        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -compiler osx -config Debug -cpu x64 -unit_test
       - name: Clean
-        if: ${{ matrix.compiler == xcode10 }}
+        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -clean_only
       - name: Building (release-x86)
-        if: ${{ matrix.compiler == xcode10 }}
+        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -compiler osx -config Release -cpu x86 -build
       - name: Running unit tests (release-x86)
-        if: ${{ matrix.compiler == xcode10 }}
+        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -compiler osx -config Release -cpu x86 -unit_test
       - name: Clean
-        if: ${{ matrix.compiler == xcode10 }}
+        if: ${{ matrix.compiler == 'xcode10' }}
         run: python3 make.py -clean_only
       - name: Building (release-x64)
         run: python3 make.py -compiler osx -config Release -cpu x64 -build
