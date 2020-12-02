@@ -3,6 +3,24 @@ name: build
 on: [push, pull_request]
 
 jobs:
+  gcc:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        compiler: [gcc5, gcc6, gcc7, gcc8, gcc9, gcc10]
+        flavor: [Debug, Release]
+        arch: [x86, x64]
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Setup compiler
+        run: ./tools/setup_compiler.sh
+      - name: Building ${{ matrix.flavor }}-${{ matrix.arch }} with ${{ matrix.compiler }}
+        run: python3 make.py -build -compiler ${{ matrix.compiler }} -config ${{ matrix.flavor }} -cpu ${{ matrix.arch }}
+      - name: Running unit tests
+        run: python3 make.py -unit_test -compiler ${{ matrix.compiler }} -config ${{ matrix.flavor }} -cpu ${{ matrix.arch }}
   emscripten:
     runs-on: ubuntu-latest
     steps:
@@ -28,13 +46,13 @@ jobs:
         with:
           path: '~/.emscripten_cache'
           key: ${{ runner.os }}-emsdk-build-artifacts-1.39.11
-      - name: Build (debug)
+      - name: Building (debug)
         run: python3 make.py -compiler emscripten -config debug -build
-      - name: Unit tests (debug)
+      - name: Running unit tests (debug)
         run: python3 make.py -compiler emscripten -config debug -unit_test
       - name: Clean
         run: python3 make.py -clean
-      - name: Build (release)
+      - name: Building (release)
         run: python3 make.py -compiler emscripten -config release -build
-      - name: Unit tests (release)
+      - name: Running unit tests (release)
         run: python3 make.py -compiler emscripten -config release -unit_test
