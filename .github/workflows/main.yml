@@ -20,19 +20,19 @@ jobs:
       - name: Running unit tests (debug-x86)
         run: python3 make.py -compiler ${{ matrix.compiler }} -config Debug -cpu x86 -unit_test
       - name: Clean
-        run: python3 make.py -clean
+        run: python3 make.py -clean_only
       - name: Building (debug-x64)
         run: python3 make.py -compiler ${{ matrix.compiler }} -config Debug -cpu x64 -build
       - name: Running unit tests (debug-x64)
         run: python3 make.py -compiler ${{ matrix.compiler }} -config Debug -cpu x64 -unit_test
       - name: Clean
-        run: python3 make.py -clean
+        run: python3 make.py -clean_only
       - name: Building (release-x86)
         run: python3 make.py -compiler ${{ matrix.compiler }} -config Release -cpu x86 -build
       - name: Running unit tests (release-x86)
         run: python3 make.py -compiler ${{ matrix.compiler }} -config Release -cpu x86 -unit_test
       - name: Clean
-        run: python3 make.py -clean
+        run: python3 make.py -clean_only
       - name: Building (release-x64)
         run: python3 make.py -compiler ${{ matrix.compiler }} -config Release -cpu x64 -build
       - name: Running unit tests (release-x64)
@@ -67,7 +67,7 @@ jobs:
       - name: Running unit tests (debug)
         run: python3 make.py -compiler emscripten -config debug -unit_test
       - name: Clean
-        run: python3 make.py -clean
+        run: python3 make.py -clean_only
       - name: Building (release)
         run: python3 make.py -compiler emscripten -config release -build
       - name: Running unit tests (release)
