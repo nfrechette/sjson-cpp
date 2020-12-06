@@ -1,6 +1,5 @@
 [![CLA assistant](https://cla-assistant.io/readme/badge/nfrechette/sjson-cpp)](https://cla-assistant.io/nfrechette/sjson-cpp)
 [![Build status](https://ci.appveyor.com/api/projects/status/oynd3x3d9umjaruf/branch/develop?svg=true)](https://ci.appveyor.com/project/nfrechette/sjson-cpp)
-[![Build Status](https://travis-ci.org/nfrechette/sjson-cpp.svg?branch=develop)](https://travis-ci.org/nfrechette/sjson-cpp)
 [![Build status](https://github.com/nfrechette/sjson-cpp/workflows/build/badge.svg)](https://github.com/nfrechette/sjson-cpp/actions)
 [![Sonar Status](https://sonarcloud.io/api/project_badges/measure?project=nfrechette_sjson-cpp&metric=alert_status)](https://sonarcloud.io/dashboard?id=nfrechette_sjson-cpp)
 [![GitHub (pre-)release](https://img.shields.io/github/release/nfrechette/sjson-cpp/all.svg)](https://github.com/nfrechette/sjson-cpp/releases)
@@ -37,13 +36,13 @@ Unicode formats other than UTF-8 aren't supported.
 ## Supported platforms
 
 *  Windows VS2015 x86 and x64
-*  Windows (VS2017, VS2019) x86, x64, and ARM64*
+*  Windows (VS2017, VS2019) x86, x64, and ARM64
 *  Windows VS2019 with clang9 x86 and x64
 *  Linux (gcc5, gcc6, gcc7, gcc8, gcc9, gcc10) x86 and x64
 *  Linux (clang4, clang5, clang6, clang7, clang8, clang9, clang10) x86 and x64
-*  OS X (Xcode 8.3, 9.4, 10.3, 11.2*) x86 and x64
+*  OS X (Xcode 10.3, 11.7) x86 and x64
 *  Android (NDK 21) ARMv7-A and ARM64
-*  iOS (Xcode 8.3, 9.4, 10.3) ARM64
+*  iOS (Xcode 10.3) ARM64
 *  Emscripten (1.39.11) WASM
 
 The above supported platform list is only what is tested every release but if it compiles, it should run just fine.
