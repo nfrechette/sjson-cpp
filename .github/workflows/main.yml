@@ -16,11 +16,9 @@ jobs:
           unzip build-wrapper-linux-x86.zip
       - name: Setup compiler
         run: ./tools/setup_linux_compiler.sh clang5
-      - name: Building (release-x64)
-        run: python3 make.py -compiler clang5 -config Release -cpu x64 -build
-      - name: Run Sonarcloud
+      - name: Build with Sonarcloud
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw_output make -j2
+        run: ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw_output python3 make.py -compiler clang5 -config Release -cpu x64 -build
       
