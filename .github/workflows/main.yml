@@ -18,7 +18,6 @@ jobs:
         run: |
           wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
           unzip sonar-scanner-cli-4.2.0.1873-linux.zip
-          cp ./tools/solar-scanner.properties ./sonar-scanner-4.2.0.1873-linux/conf/sonar-scanner.properties
       - name: Setup compiler
         run: ./tools/setup_linux_compiler.sh clang5
       - name: Build with wrapper
@@ -27,4 +26,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
         run: ./sonar-scanner-4.2.0.1873-linux/bin/sonar-scanner
