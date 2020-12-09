@@ -16,8 +16,9 @@ jobs:
           unzip build-wrapper-linux-x86.zip
       - name: Setup Sonar Scanner
         run: |
-          wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.0.0.1744-linux.zip
-          unzip sonar-scanner-cli-4.0.0.1744-linux.zip
+          wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
+          unzip sonar-scanner-cli-4.2.0.1873-linux.zip
+          cp ./tools/solar-scanner.properties ./sonar-scanner-4.2.0.1873-linux/conf/sonar-scanner.properties
       - name: Setup compiler
         run: ./tools/setup_linux_compiler.sh clang5
       - name: Build with wrapper
@@ -26,4 +27,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./sonar-scanner-4.0.0.1744-linux/bin/sonar-scanner
+        run: ./sonar-scanner-4.2.0.1873-linux/bin/sonar-scanner
