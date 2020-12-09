@@ -26,4 +26,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./sonar-scanner-cli-4.0.0.1744-linux/bin/sonar-scanner
+        run: |
+          pwd
+          ./sonar-scanner-cli-4.0.0.1744-linux/bin/sonar-scanner -v
+          ./sonar-scanner-cli-4.0.0.1744-linux/bin/sonar-scanner
