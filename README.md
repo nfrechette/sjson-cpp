@@ -38,8 +38,8 @@ Unicode formats other than UTF-8 aren't supported.
 *  Windows VS2015 x86 and x64
 *  Windows (VS2017, VS2019) x86, x64, and ARM64
 *  Windows VS2019 with clang9 x86 and x64
-*  Linux (gcc5, gcc6, gcc7, gcc8, gcc9, gcc10) x86 and x64
-*  Linux (clang4, clang5, clang6, clang7, clang8, clang9, clang10) x86 and x64
+*  Linux (gcc 5 to 10) x86 and x64
+*  Linux (clang 4 to 11) x86 and x64
 *  OS X (Xcode 10.3, 11.7) x86 and x64
 *  Android (NDK 21) ARMv7-A and ARM64
 *  iOS (Xcode 10.3) ARM64
