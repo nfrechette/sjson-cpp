@@ -41,7 +41,7 @@
 // Throwing:
 //    In order to enable the throwing behavior, simply define the macro SJSON_CPP_ON_ASSERT_THROW:
 //    #define SJSON_CPP_ON_ASSERT_THROW
-//    Note that the type of the exception thrown is std::runtime_error.
+//    Note that the type of the exception thrown is sjson::runtime_assert.
 //
 // Custom function:
 //    In order to enable the custom function calling behavior, define the macro SJSON_CPP_ON_ASSERT_CUSTOM
