@@ -55,7 +55,7 @@ namespace sjson
 	class StreamWriter
 	{
 	public:
-		virtual ~StreamWriter() {}
+		virtual ~StreamWriter() = default;
 
 		virtual void write(const void* buffer, size_t buffer_size) = 0;
 
