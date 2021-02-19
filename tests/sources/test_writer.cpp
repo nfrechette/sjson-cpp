@@ -34,9 +34,7 @@ using namespace sjson;
 class StringStreamWriter final : public StreamWriter
 {
 public:
-	StringStreamWriter()
-		: m_buffer()
-	{}
+	StringStreamWriter() = default;
 
 	virtual void write(const void* buffer, size_t buffer_size) override
 	{
