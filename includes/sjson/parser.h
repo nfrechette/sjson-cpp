@@ -371,15 +371,15 @@ namespace sjson
 			}
 		}
 
-		void get_position(uint32_t& line, uint32_t& column)
+		void get_position(uint32_t& line, uint32_t& column) const
 		{
 			line = m_state.line;
 			column = m_state.column;
 		}
 
-		bool eof() { return m_state.offset >= m_input_length; }
+		bool eof() const { return m_state.offset >= m_input_length; }
 
-		ParserError get_error() { return m_state.error; }
+		ParserError get_error() const { return m_state.error; }
 		bool is_valid() const { return m_state.error.error == ParserError::None; }
 
 		ParserState save_state() const { return m_state; }
