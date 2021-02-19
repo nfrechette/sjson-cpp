@@ -115,6 +115,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/CodyDWJones"><img src="https://avatars.githubusercontent.com/u/28773740?v=4?s=100" width="100px;" alt=""/><br /><sub><b>CodyDWJones</b></sub></a><br /><a href="https://github.com/nfrechette/sjson-cpp/commits?author=CodyDWJones" title="Code">💻</a> <a href="#maintenance-CodyDWJones" title="Maintenance">🚧</a></td>
     <td align="center"><a href="https://github.com/janisozaur"><img src="https://avatars.githubusercontent.com/u/550290?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Michał Janiszewski</b></sub></a><br /><a href="https://github.com/nfrechette/sjson-cpp/commits?author=janisozaur" title="Code">💻</a> <a href="#maintenance-janisozaur" title="Maintenance">🚧</a></td>
     <td align="center"><a href="https://github.com/tirpidz"><img src="https://avatars.githubusercontent.com/u/9991876?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Martin Turcotte</b></sub></a><br /><a href="#maintenance-tirpidz" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/Meradrin"><img src="https://avatars.githubusercontent.com/u/7066278?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Meradrin</b></sub></a><br /><a href="https://github.com/nfrechette/sjson-cpp/issues?q=author%3AMeradrin" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
