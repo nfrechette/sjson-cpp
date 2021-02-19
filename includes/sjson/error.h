@@ -102,9 +102,7 @@
 	{
 		class runtime_assert final : public std::runtime_error
 		{
-		public:
-			explicit runtime_assert(const std::string& message) : std::runtime_error(message.c_str()) {}
-			explicit runtime_assert(const char* message) : std::runtime_error(message) {}
+			using std::runtime_error::runtime_error;	// Inherit constructors
 		};
 
 		namespace error_impl
