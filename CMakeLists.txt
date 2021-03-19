@@ -19,7 +19,9 @@ file(GLOB_RECURSE SJSON_CPP_INCLUDE_FILES LIST_DIRECTORIES false
 	${PROJECT_SOURCE_DIR}/includes/*.h
 	${PROJECT_SOURCE_DIR}/*.md
 	${PROJECT_SOURCE_DIR}/cmake/*.cmake
-	${PROJECT_SOURCE_DIR}/tools/vs_visualizers/*.natvis)
+	${PROJECT_SOURCE_DIR}/tools/release_scripts/*.py
+	${PROJECT_SOURCE_DIR}/tools/vs_visualizers/*.natvis
+	)
 
 create_source_groups("${SJSON_CPP_INCLUDE_FILES}" ${PROJECT_SOURCE_DIR})
 
