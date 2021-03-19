@@ -351,7 +351,7 @@ namespace sjson
 				if (eof())
 					return true;
 
-				if (std::isspace(m_state.symbol))
+				if (std::isspace(static_cast<unsigned char>(m_state.symbol)))
 				{
 					advance();
 					continue;
@@ -603,7 +603,7 @@ namespace sjson
 					break;
 				}
 
-				if (std::isspace(m_state.symbol))
+				if (std::isspace(static_cast<unsigned char>(m_state.symbol)))
 				{
 					end_offset = m_state.offset - 1;
 					advance();
