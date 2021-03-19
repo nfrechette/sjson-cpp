@@ -717,9 +717,9 @@ namespace sjson
 			{
 				advance();
 			}
-			else if (std::isdigit(m_state.symbol))
+			else if (std::isdigit(static_cast<unsigned char>(m_state.symbol)))
 			{
-				while (std::isdigit(m_state.symbol))
+				while (std::isdigit(static_cast<unsigned char>(m_state.symbol)))
 					advance();
 			}
 			else
@@ -732,7 +732,7 @@ namespace sjson
 			{
 				advance();
 
-				while (std::isdigit(m_state.symbol))
+				while (std::isdigit(static_cast<unsigned char>(m_state.symbol)))
 					advance();
 			}
 
@@ -744,13 +744,13 @@ namespace sjson
 				{
 					advance();
 				}
-				else if (!std::isdigit(m_state.symbol))
+				else if (!std::isdigit(static_cast<unsigned char>(m_state.symbol)))
 				{
 					set_error(ParserError::InvalidNumber);
 					return false;
 				}
 
-				while (std::isdigit(m_state.symbol))
+				while (std::isdigit(static_cast<unsigned char>(m_state.symbol)))
 					advance();
 			}
 
@@ -811,13 +811,13 @@ namespace sjson
 				{
 					base = 8;
 
-					while (std::isdigit(m_state.symbol))
+					while (std::isdigit(static_cast<unsigned char>(m_state.symbol)))
 						advance();
 				}
 			}
-			else if (std::isdigit(m_state.symbol))
+			else if (std::isdigit(static_cast<unsigned char>(m_state.symbol)))
 			{
-				while (std::isdigit(m_state.symbol))
+				while (std::isdigit(static_cast<unsigned char>(m_state.symbol)))
 					advance();
 			}
 			else
@@ -902,7 +902,7 @@ namespace sjson
 
 		static bool is_hex_digit(char value)
 		{
-			return std::isdigit(value)
+			return std::isdigit(static_cast<unsigned char>(value))
 				|| value == 'a' || value == 'A'
 				|| value == 'b' || value == 'B'
 				|| value == 'c' || value == 'C'
