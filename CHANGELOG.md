@@ -1,5 +1,9 @@
 # Significant changes per release
 
+## 0.8.1
+
+*  Minor static analysis fixes
+
 ## 0.8.0
 
 *  Added support for clang 8, 9, and 10
