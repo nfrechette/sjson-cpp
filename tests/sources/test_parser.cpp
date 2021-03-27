@@ -240,7 +240,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 	// Number reading
 	{
 		Parser parser = parser_from_c_str("key = 123.456789");
-		double value;
+		double value = 0.0;
 		CHECK(parser.read("key", value));
 		CHECK(value == 123.456789);
 		CHECK(parser.eof());
@@ -249,7 +249,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = \"nan\"");
-		double value;
+		double value = 0.0;
 		CHECK(parser.read("key", value));
 		CHECK(std::isnan(value));
 		CHECK(parser.eof());
@@ -258,7 +258,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = \"inf\"");
-		double value;
+		double value = 0.0;
 		CHECK(parser.read("key", value));
 		CHECK(std::isinf(value));
 		CHECK(value > 0.0);
@@ -268,7 +268,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = \"-inf\"");
-		double value;
+		double value = 0.0;
 		CHECK(parser.read("key", value));
 		CHECK(std::isinf(value));
 		CHECK(value < 0.0);
@@ -278,7 +278,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = 123.456789");
-		float value;
+		float value = 0.0F;
 		CHECK(parser.read("key", value));
 		CHECK(value == 123.456789F);
 		CHECK(parser.eof());
@@ -287,7 +287,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = \"nan\"");
-		float value;
+		float value = 0.0F;
 		CHECK(parser.read("key", value));
 		CHECK(std::isnan(value));
 		CHECK(parser.eof());
@@ -296,27 +296,27 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = \"inf\"");
-		float value;
+		float value = 0.0F;
 		CHECK(parser.read("key", value));
 		CHECK(std::isinf(value));
-		CHECK(value > 0.0f);
+		CHECK(value > 0.0F);
 		CHECK(parser.eof());
 		CHECK(parser.is_valid());
 	}
 
 	{
 		Parser parser = parser_from_c_str("key = \"-inf\"");
-		float value;
+		float value = 0.0F;
 		CHECK(parser.read("key", value));
 		CHECK(std::isinf(value));
-		CHECK(value < 0.0f);
+		CHECK(value < 0.0F);
 		CHECK(parser.eof());
 		CHECK(parser.is_valid());
 	}
 
 	{
 		Parser parser = parser_from_c_str("key = -123");
-		int8_t value;
+		int8_t value = 0;
 		CHECK(parser.read("key", value));
 		CHECK(value == -123);
 		CHECK(parser.eof());
@@ -325,7 +325,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = 123");
-		uint8_t value;
+		uint8_t value = 0;
 		CHECK(parser.read("key", value));
 		CHECK(value == 123);
 		CHECK(parser.eof());
@@ -334,7 +334,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = -1234");
-		int16_t value;
+		int16_t value = 0;
 		CHECK(parser.read("key", value));
 		CHECK(value == -1234);
 		CHECK(parser.eof());
@@ -343,7 +343,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = 1234");
-		uint16_t value;
+		uint16_t value = 0;
 		CHECK(parser.read("key", value));
 		CHECK(value == 1234);
 		CHECK(parser.eof());
@@ -352,7 +352,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = -123456");
-		int32_t value;
+		int32_t value = 0;
 		CHECK(parser.read("key", value));
 		CHECK(value == -123456);
 		CHECK(parser.eof());
@@ -361,7 +361,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = 123456");
-		uint32_t value;
+		uint32_t value = 0;
 		CHECK(parser.read("key", value));
 		CHECK(value == 123456);
 		CHECK(parser.eof());
@@ -370,7 +370,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = -1234567890123456");
-		int64_t value;
+		int64_t value = 0;
 		CHECK(parser.read("key", value));
 		CHECK(value == -1234567890123456LL);
 		CHECK(parser.eof());
@@ -379,7 +379,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = 1234567890123456");
-		uint64_t value;
+		uint64_t value = 0;
 		CHECK(parser.read("key", value));
 		CHECK(value == 1234567890123456ULL);
 		CHECK(parser.eof());
@@ -435,7 +435,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = -123");
-		int8_t value;
+		int8_t value = 0;
 		CHECK(parser.try_read("key", value, 1));
 		CHECK(value == -123);
 		CHECK(parser.eof());
@@ -453,7 +453,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = 123");
-		uint8_t value;
+		uint8_t value = 0;
 		CHECK(parser.try_read("key", value, 1));
 		CHECK(value == 123);
 		CHECK(parser.eof());
@@ -471,7 +471,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = -1234");
-		int16_t value;
+		int16_t value = 0;
 		CHECK(parser.try_read("key", value, 1));
 		CHECK(value == -1234);
 		CHECK(parser.eof());
@@ -489,7 +489,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = 1234");
-		uint16_t value;
+		uint16_t value = 0;
 		CHECK(parser.try_read("key", value, 1));
 		CHECK(value == 1234);
 		CHECK(parser.eof());
@@ -507,7 +507,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = -123456");
-		int32_t value;
+		int32_t value = 0;
 		CHECK(parser.try_read("key", value, 1));
 		CHECK(value == -123456);
 		CHECK(parser.eof());
@@ -525,7 +525,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = 123456");
-		uint32_t value;
+		uint32_t value = 0;
 		CHECK(parser.try_read("key", value, 1));
 		CHECK(value == 123456);
 		CHECK(parser.eof());
@@ -543,7 +543,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = -1234567890123456");
-		int64_t value;
+		int64_t value = 0;
 		CHECK(parser.try_read("key", value, 1));
 		CHECK(value == -1234567890123456LL);
 		CHECK(parser.eof());
@@ -561,7 +561,7 @@ TEST_CASE("Parser Number Reading", "[parser]")
 
 	{
 		Parser parser = parser_from_c_str("key = 1234567890123456");
-		uint64_t value;
+		uint64_t value = 0;
 		CHECK(parser.try_read("key", value, 1));
 		CHECK(value == 1234567890123456ULL);
 		CHECK(parser.eof());
