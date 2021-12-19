@@ -75,11 +75,20 @@ def parse_argv():
 			sys.exit(1)
 	else:
 		if not args.cpu:
-			args.cpu = 'x64'
+			if platform.system() == 'Darwin' and platform.processor() == 'arm':
+				args.cpu = 'arm64'
+			else:
+				args.cpu = 'x64'
 
 	if args.cpu == 'arm64':
-		if not args.compiler in ['vs2017', 'vs2019', 'ios', 'android']:
-			print('arm64 is only supported with VS2017, VS2019, Android, and iOS')
+		is_arm_supported = False
+		if args.compiler in ['vs2017', 'vs2019', 'ios', 'android']:
+			is_arm_supported = True
+		if platform.system() == 'Darwin' and platform.processor() == 'arm':
+			is_arm_supported = True
+
+		if not is_arm_supported:
+			print('arm64 is only supported with VS2017, VS2019, Android, OS X (M1 processors), and iOS')
 			sys.exit(1)
 	elif args.cpu == 'armv7':
 		if not args.compiler == 'android':
