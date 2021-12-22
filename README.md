@@ -41,7 +41,7 @@ Unicode formats other than UTF-8 aren't supported.
 *  Windows VS2019 with clang9 x86 and x64
 *  Linux (gcc 5 to 10) x86 and x64
 *  Linux (clang 4 to 11) x86 and x64
-*  OS X (Xcode 10.3, 11.7) x86 and x64
+*  OS X (Xcode 10.3, 11.7) x86, x64, and ARM64
 *  Android (NDK 21) ARMv7-A and ARM64
 *  iOS (Xcode 10.3) ARM64
 *  Emscripten (1.39.11) WASM
