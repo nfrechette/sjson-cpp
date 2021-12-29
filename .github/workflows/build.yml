@@ -175,15 +175,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         submodules: 'recursive'
-    - name: Setup build tools
+    - name: Build and run unit tests (release)
       uses: docker://multiarch/ubuntu-core:arm64-focal
       with:
-        args: 'bash -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential python3 cmake"'
-    - name: Building (release)
-      uses: docker://multiarch/ubuntu-core:arm64-focal
-      with:
-        args: 'bash -c "python3 make.py -ci -config release -build"'
-    - name: Running unit tests (release)
-      uses: docker://multiarch/ubuntu-core:arm64-focal
-      with:
-        args: 'bash -c "python3 make.py -ci -config release -unit_test"'
+        args: 'bash -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential python3 cmake && python3 make.py -ci -config release -build -unit_test"'
