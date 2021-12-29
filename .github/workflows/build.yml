@@ -178,7 +178,7 @@ jobs:
     - name: Setup build tools
       uses: docker://multiarch/ubuntu-core:arm64-focal
       with:
-        args: 'bash -c "apt-get update && apt-get install -y build-essential python3 cmake"'
+        args: 'bash -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential python3 cmake"'
     - name: Building (release)
       uses: docker://multiarch/ubuntu-core:arm64-focal
       with:
