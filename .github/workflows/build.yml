@@ -47,6 +47,7 @@ jobs:
         run: python3 make.py -ci -compiler ${{ matrix.compiler }} -config Release -cpu x64 -build
       - name: Running unit tests (release-x64)
         run: python3 make.py -ci -compiler ${{ matrix.compiler }} -config Release -cpu x64 -unit_test
+
   osx-10:
     runs-on: macos-10.15
     strategy:
@@ -95,6 +96,7 @@ jobs:
         run: python3 make.py -clean_only
       - name: Building for iOS (release-arm64)
         run: python3 make.py -ci -compiler ios -config Release -build
+
   osx-11:
     runs-on: macos-11
     strategy:
@@ -125,6 +127,7 @@ jobs:
         run: python3 make.py -clean_only
       - name: Building for iOS (release-arm64)
         run: python3 make.py -ci -compiler ios -config Release -build
+
   emscripten:
     runs-on: ubuntu-18.04
     steps:
@@ -160,3 +163,27 @@ jobs:
         run: python3 make.py -ci -compiler emscripten -config release -build
       - name: Running unit tests (release)
         run: python3 make.py -ci -compiler emscripten -config release -unit_test
+
+  linux-arm64:
+    runs-on: ubuntu-latest
+    steps:
+    - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    - uses: docker://multiarch/ubuntu-core:arm64-focal
+      with:
+        args: 'uname -a'
+    - name: Git checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: Setup build tools
+      uses: docker://multiarch/ubuntu-core:arm64-focal
+      with:
+        args: 'bash -c "apt-get update && apt-get install -y build-essential"'
+    - name: Building (release)
+      uses: docker://multiarch/ubuntu-core:arm64-focal
+      with:
+        args: 'bash -c "python3 make.py -ci -config release -build"'
+    - name: Running unit tests (release)
+      uses: docker://multiarch/ubuntu-core:arm64-focal
+      with:
+        args: 'bash -c "python3 make.py -ci -config release -unit_test"'
