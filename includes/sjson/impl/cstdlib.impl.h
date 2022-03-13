@@ -24,6 +24,8 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "sjson/version.h"
+
 //////////////////////////////////////////////////////////////////////////
 // The Android NDK r10 and possibly earlier used a STD lib that poorly supported C++11.
 // As such, it is necessary to polyfill a few missing things.
@@ -40,6 +42,8 @@
 
 namespace sjson
 {
+	SJSON_IMPL_VERSION_NAMESPACE_BEGIN
+
 	namespace sjson_impl
 	{
 #if defined(SJSON_CPP_IMPL_POLYFILL_STD)
@@ -54,4 +58,6 @@ namespace sjson
 		using std::strtof;
 #endif
 	}
+
+	SJSON_IMPL_VERSION_NAMESPACE_END
 }
