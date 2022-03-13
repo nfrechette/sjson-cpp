@@ -31,7 +31,7 @@
 
 #include "sjson/parser_error.h"
 #include "sjson/parser_state.h"
-#include "sjson/impl/compiler_utils.h"
+#include "sjson/impl/cstdlib.impl.h"
 #include "sjson/string_view.h"
 
 #include <algorithm>
