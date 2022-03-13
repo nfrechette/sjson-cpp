@@ -25,12 +25,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "sjson/error.h"
+#include "sjson/version.h"
 
 #include <cstring>
 #include <memory>
 
 namespace sjson
 {
+	SJSON_IMPL_VERSION_NAMESPACE_BEGIN
+
 	//////////////////////////////////////////////////////////////////////////
 	// A StringView is just a pointer to a string and an associated length.
 	// It does NOT own the memory and no allocation or deallocation ever takes place.
@@ -115,4 +118,6 @@ namespace sjson
 		const char* m_c_str;
 		size_t m_length;
 	};
+
+	SJSON_IMPL_VERSION_NAMESPACE_END
 }
