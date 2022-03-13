@@ -32,7 +32,7 @@
 
 namespace sjson
 {
-	SJSON_IMPL_VERSION_NAMESPACE_BEGIN
+	SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN
 
 	//////////////////////////////////////////////////////////////////////////
 	// A StringView is just a pointer to a string and an associated length.
@@ -119,5 +119,5 @@ namespace sjson
 		size_t m_length;
 	};
 
-	SJSON_IMPL_VERSION_NAMESPACE_END
+	SJSON_CPP_IMPL_VERSION_NAMESPACE_END
 }

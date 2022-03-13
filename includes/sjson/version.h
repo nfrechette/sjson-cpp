@@ -36,30 +36,30 @@
 // In order to allow multiple versions of this library to coexist side by side
 // within the same executable/library, the symbols have to be unique per version.
 // We achieve this by using a versioned namespace that we optionally inline.
-// To disable namespace inlining, define SJSON_NO_INLINE_NAMESPACE before including
+// To disable namespace inlining, define SJSON_CPP_NO_INLINE_NAMESPACE before including
 // any sjson-cpp header.
 ////////////////////////////////////////////////////////////////////////////////
 
 // Name of the namespace, e.g. v08
-#define SJSON_IMPL_VERSION_NAMESPACE_NAME v ## SJSON_CPP_VERSION_MAJOR ## SJSON_CPP_VERSION_MINOR
+#define SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME v ## SJSON_CPP_VERSION_MAJOR ## SJSON_CPP_VERSION_MINOR
 
-#if defined(SJSON_NO_INLINE_NAMESPACE)
+#if defined(SJSON_CPP_NO_INLINE_NAMESPACE)
     // Namespace won't be inlined, its usage will have to be qualified with the
     // full version everywhere
-    #define SJSON_IMPL_NAMESPACE sjson::SJSON_IMPL_VERSION_NAMESPACE_NAME
+    #define SJSON_CPP_IMPL_NAMESPACE sjson::SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME
 
-    #define SJSON_IMPL_VERSION_NAMESPACE_BEGIN \
-        namespace SJSON_IMPL_VERSION_NAMESPACE_NAME \
+    #define SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN \
+        namespace SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME \
         {
 #else
     // Namespace is inlined, its usage does not need to be qualified with the
     // full version everywhere
-    #define SJSON_IMPL_NAMESPACE sjson
+    #define SJSON_CPP_IMPL_NAMESPACE sjson
 
-    #define SJSON_IMPL_VERSION_NAMESPACE_BEGIN \
-        inline namespace SJSON_IMPL_VERSION_NAMESPACE_NAME \
+    #define SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN \
+        inline namespace SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME \
         {
 #endif
 
-#define SJSON_IMPL_VERSION_NAMESPACE_END \
+#define SJSON_CPP_IMPL_VERSION_NAMESPACE_END \
     }

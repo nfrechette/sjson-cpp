@@ -69,7 +69,7 @@
 
 	namespace sjson
 	{
-		SJSON_IMPL_VERSION_NAMESPACE_BEGIN
+		SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN
 
 		namespace error_impl
 		{
@@ -91,10 +91,10 @@
 			}
 		}
 
-		SJSON_IMPL_VERSION_NAMESPACE_END
+		SJSON_CPP_IMPL_VERSION_NAMESPACE_END
 	}
 
-	#define SJSON_CPP_ASSERT(expression, format, ...) do { if (!(expression)) SJSON_IMPL_NAMESPACE::error_impl::on_assert_abort(#expression, __LINE__, __FILE__, (format), ## __VA_ARGS__); } while (false)
+	#define SJSON_CPP_ASSERT(expression, format, ...) do { if (!(expression)) SJSON_CPP_IMPL_NAMESPACE::error_impl::on_assert_abort(#expression, __LINE__, __FILE__, (format), ## __VA_ARGS__); } while (false)
 	#define SJSON_CPP_HAS_ASSERT_CHECKS
 
 #elif defined(SJSON_CPP_ON_ASSERT_THROW)
@@ -108,7 +108,7 @@
 
 	namespace sjson
 	{
-		SJSON_IMPL_VERSION_NAMESPACE_BEGIN
+		SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN
 
 		class runtime_assert final : public std::runtime_error
 		{
@@ -140,10 +140,10 @@
 			}
 		}
 
-		SJSON_IMPL_VERSION_NAMESPACE_END
+		SJSON_CPP_IMPL_VERSION_NAMESPACE_END
 	}
 
-	#define SJSON_CPP_ASSERT(expression, format, ...) do { if (!(expression)) SJSON_IMPL_NAMESPACE::error_impl::on_assert_throw(#expression, __LINE__, __FILE__, (format), ## __VA_ARGS__); } while(false)
+	#define SJSON_CPP_ASSERT(expression, format, ...) do { if (!(expression)) SJSON_CPP_IMPL_NAMESPACE::error_impl::on_assert_throw(#expression, __LINE__, __FILE__, (format), ## __VA_ARGS__); } while(false)
 	#define SJSON_CPP_HAS_ASSERT_CHECKS
 
 #elif defined(SJSON_CPP_ON_ASSERT_CUSTOM)

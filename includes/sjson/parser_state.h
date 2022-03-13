@@ -32,7 +32,7 @@
 
 namespace sjson
 {
-	SJSON_IMPL_VERSION_NAMESPACE_BEGIN
+	SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN
 
 	struct ParserState
 	{
@@ -53,5 +53,5 @@ namespace sjson
 		ParserError error;
 	};
 
-	SJSON_IMPL_VERSION_NAMESPACE_END
+	SJSON_CPP_IMPL_VERSION_NAMESPACE_END
 }

@@ -43,7 +43,7 @@
 
 namespace sjson
 {
-	SJSON_IMPL_VERSION_NAMESPACE_BEGIN
+	SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN
 
 	// TODO: Cleanup the locking stuff, wrap it in #ifdef to strip when asserts are disabled
 
@@ -765,5 +765,5 @@ namespace sjson
 		: ObjectWriter(stream_writer, 0)
 	{}
 
-	SJSON_IMPL_VERSION_NAMESPACE_END
+	SJSON_CPP_IMPL_VERSION_NAMESPACE_END
 }
