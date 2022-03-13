@@ -42,7 +42,7 @@
 
 namespace sjson
 {
-	SJSON_IMPL_VERSION_NAMESPACE_BEGIN
+	SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN
 
 	namespace sjson_impl
 	{
@@ -59,5 +59,5 @@ namespace sjson
 #endif
 	}
 
-	SJSON_IMPL_VERSION_NAMESPACE_END
+	SJSON_CPP_IMPL_VERSION_NAMESPACE_END
 }
