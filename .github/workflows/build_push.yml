@@ -10,7 +10,7 @@ on:
 jobs:
   linux-bionic:
     runs-on: ubuntu-latest
-    container: ghcr.io/nfrechette/toolchain-arm64-bionic:v1
+    container: ghcr.io/nfrechette/toolchain-amd64-bionic:v1
     strategy:
       matrix:
         compiler: [gcc8, clang10]
