@@ -27,6 +27,7 @@ jobs:
         with:
           args: 'python3 make.py -ci -compiler ${{ matrix.compiler }} -config Debug -cpu x86 -unit_test'
       - name: Clean
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-bionic:v1
         with:
           args: 'python3 make.py -clean_only'
       - name: Building (debug-x64)
