@@ -1,4 +1,4 @@
-name: build_push
+name: build push
 
 on:
   push:
@@ -27,23 +27,40 @@ jobs:
         with:
           args: 'python3 make.py -ci -compiler ${{ matrix.compiler }} -config Debug -cpu x86 -unit_test'
       - name: Clean
-        run: python3 make.py -clean_only
+        with:
+          args: 'python3 make.py -clean_only'
       - name: Building (debug-x64)
-        run: python3 make.py -ci -compiler ${{ matrix.compiler }} -config Debug -cpu x64 -build
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-bionic:v1
+        with:
+          args: 'python3 make.py -ci -compiler ${{ matrix.compiler }} -config Debug -cpu x64 -build'
       - name: Running unit tests (debug-x64)
-        run: python3 make.py -ci -compiler ${{ matrix.compiler }} -config Debug -cpu x64 -unit_test
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-bionic:v1
+        with:
+          args: 'python3 make.py -ci -compiler ${{ matrix.compiler }} -config Debug -cpu x64 -unit_test'
       - name: Clean
-        run: python3 make.py -clean_only
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-bionic:v1
+        with:
+          args: 'python3 make.py -clean_only'
       - name: Building (release-x86)
-        run: python3 make.py -ci -compiler ${{ matrix.compiler }} -config Release -cpu x86 -build
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-bionic:v1
+        with:
+          args: 'python3 make.py -ci -compiler ${{ matrix.compiler }} -config Release -cpu x86 -build'
       - name: Running unit tests (release-x86)
-        run: python3 make.py -ci -compiler ${{ matrix.compiler }} -config Release -cpu x86 -unit_test
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-bionic:v1
+        with:
+          args: 'python3 make.py -ci -compiler ${{ matrix.compiler }} -config Release -cpu x86 -unit_test'
       - name: Clean
-        run: python3 make.py -clean_only
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-bionic:v1
+        with:
+          args: 'python3 make.py -clean_only'
       - name: Building (release-x64)
-        run: python3 make.py -ci -compiler ${{ matrix.compiler }} -config Release -cpu x64 -build
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-bionic:v1
+        with:
+          args: 'python3 make.py -ci -compiler ${{ matrix.compiler }} -config Release -cpu x64 -build'
       - name: Running unit tests (release-x64)
-        run: python3 make.py -ci -compiler ${{ matrix.compiler }} -config Release -cpu x64 -unit_test
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-bionic:v1
+        with:
+          args: 'python3 make.py -ci -compiler ${{ matrix.compiler }} -config Release -cpu x64 -unit_test'
 
   linux:
     runs-on: ubuntu-18.04
