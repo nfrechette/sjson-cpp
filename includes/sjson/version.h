@@ -37,29 +37,48 @@
 // within the same executable/library, the symbols have to be unique per version.
 // We achieve this by using a versioned namespace that we optionally inline.
 // To disable namespace inlining, define SJSON_CPP_NO_INLINE_NAMESPACE before including
-// any sjson-cpp header.
+// any sjson-cpp header. To disable the versioned namespace altogether,
+// define SJSON_CPP_NO_VERSION_NAMESPACE before including any sjson-cpp header.
 ////////////////////////////////////////////////////////////////////////////////
+
+#if !defined(SJSON_CPP_NO_VERSION_NAMESPACE)
+	#if defined(_MSC_VER) && !defined(__clang__) && _MSC_VER == 1900
+		// VS2015 struggles with type resolution when inline namespaces are used
+		// For that reason, we disable it explicitly
+		#define SJSON_CPP_NO_VERSION_NAMESPACE
+	#endif
+#endif
 
 // Name of the namespace, e.g. v08
 #define SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME v ## SJSON_CPP_VERSION_MAJOR ## SJSON_CPP_VERSION_MINOR
 
-#if defined(SJSON_CPP_NO_INLINE_NAMESPACE)
-    // Namespace won't be inlined, its usage will have to be qualified with the
-    // full version everywhere
-    #define SJSON_CPP_IMPL_NAMESPACE sjson::SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME
+#if defined(SJSON_CPP_NO_VERSION_NAMESPACE)
+	// Namespace is inlined, its usage does not need to be qualified with the
+	// full version everywhere
+	#define SJSON_CPP_IMPL_NAMESPACE sjson
 
-    #define SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN \
-        namespace SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME \
-        {
+	#define SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN
+	#define SJSON_CPP_IMPL_VERSION_NAMESPACE_END
+#elif defined(SJSON_CPP_NO_INLINE_NAMESPACE)
+	// Namespace won't be inlined, its usage will have to be qualified with the
+	// full version everywhere
+	#define SJSON_CPP_IMPL_NAMESPACE sjson::SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME
+
+	#define SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN \
+		namespace SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME \
+		{
+
+	#define SJSON_CPP_IMPL_VERSION_NAMESPACE_END \
+		}
 #else
-    // Namespace is inlined, its usage does not need to be qualified with the
-    // full version everywhere
-    #define SJSON_CPP_IMPL_NAMESPACE sjson
+	// Namespace is inlined, its usage does not need to be qualified with the
+	// full version everywhere
+	#define SJSON_CPP_IMPL_NAMESPACE sjson
 
-    #define SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN \
-        inline namespace SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME \
-        {
+	#define SJSON_CPP_IMPL_VERSION_NAMESPACE_BEGIN \
+		inline namespace SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME \
+		{
+
+	#define SJSON_CPP_IMPL_VERSION_NAMESPACE_END \
+		}
 #endif
-
-#define SJSON_CPP_IMPL_VERSION_NAMESPACE_END \
-    }
