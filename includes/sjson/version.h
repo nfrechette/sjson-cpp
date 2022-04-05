@@ -52,7 +52,11 @@
 // Name of the namespace, e.g. v08
 #define SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME v ## SJSON_CPP_VERSION_MAJOR ## SJSON_CPP_VERSION_MINOR
 
-#if defined(SJSON_CPP_NO_VERSION_NAMESPACE)
+// Because this is being introduced in a patch release, as caution, it is disabled
+// by default. It does break ABI if host runtimes forward declare types but that
+// is something they shouldn't do with a 3rd party library. Now, we offer forward
+// declaration headers to help prepare the migration in the next minor release.
+#if defined(SJSON_CPP_NO_VERSION_NAMESPACE) || !defined(SJSON_CPP_ENABLE_VERSION_NAMESPACE)
 	// Namespace is inlined, its usage does not need to be qualified with the
 	// full version everywhere
 	#define SJSON_CPP_IMPL_NAMESPACE sjson
