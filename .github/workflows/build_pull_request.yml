@@ -122,7 +122,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: [gcc9, gcc10, clang11]
+        compiler: [gcc9, gcc10, gcc11, clang11, clang12, clang13, clang14]
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
