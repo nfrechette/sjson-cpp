@@ -288,3 +288,31 @@ jobs:
         run: python3 make.py -ci -compiler emscripten -config release -build
       - name: Running unit tests (release)
         run: python3 make.py -ci -compiler emscripten -config release -unit_test
+
+  emscripten-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Building (debug)
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-linux-emscripten:v1
+        with:
+          args: 'python3 make.py -ci -compiler emscripten -config debug -build'
+      - name: Running unit tests (debug)
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-linux-emscripten:v1
+        with:
+          args: 'python3 make.py -ci -compiler emscripten -config debug -unit_test'
+      - name: Clean
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-linux-emscripten:v1
+        with:
+          args: 'python3 make.py -clean_only'
+      - name: Building (release)
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-linux-emscripten:v1
+        with:
+          args: 'python3 make.py -ci -compiler emscripten -config release -build'
+      - name: Running unit tests (release)
+        uses: docker://ghcr.io/nfrechette/toolchain-amd64-linux-emscripten:v1
+        with:
+          args: 'python3 make.py -ci -compiler emscripten -config release -unit_test'
