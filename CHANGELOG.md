@@ -1,5 +1,9 @@
 # Significant changes per release
 
+## 0.8.3
+
+*  Force macro expansion in version namespace identifier
+
 ## 0.8.2
 
 *  Add versioned namespace to allow multiple versions to coexist within a binary
