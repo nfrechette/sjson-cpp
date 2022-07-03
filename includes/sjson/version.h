@@ -49,8 +49,12 @@
 	#endif
 #endif
 
-// Name of the namespace, e.g. v08
-#define SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME v ## SJSON_CPP_VERSION_MAJOR ## SJSON_CPP_VERSION_MINOR
+// Force macro expansion to concatenate namespace identifier
+#define SJSON_CPP_IMPL_VERSION_CONCAT_IMPL(prefix, major, minor, patch) prefix ## major ## minor ## patch
+#define SJSON_CPP_IMPL_VERSION_CONCAT(prefix, major, minor, patch) SJSON_CPP_IMPL_VERSION_CONCAT_IMPL(prefix, major, minor, patch)
+
+// Name of the namespace, e.g. v082
+#define SJSON_CPP_IMPL_VERSION_NAMESPACE_NAME SJSON_CPP_IMPL_VERSION_CONCAT(v, SJSON_CPP_VERSION_MAJOR, SJSON_CPP_VERSION_MINOR, SJSON_CPP_VERSION_PATCH)
 
 // Because this is being introduced in a patch release, as caution, it is disabled
 // by default. It does break ABI if host runtimes forward declare types but that
