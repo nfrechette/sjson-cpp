@@ -147,6 +147,8 @@ jobs:
         run: python3 make.py -clean_only
       - name: Building (release-arm64)
         run: python3 make.py -ci -compiler vs2019 -config Release -cpu arm64 -build
+      - name: Clean
+        run: python3 make.py -clean_only
       - name: Building (debug-x64) with Clang
         run: python3 make.py -ci -compiler vs2019-clang -config Debug -cpu x64 -build
       - name: Running unit tests (debug-x64) with Clang
