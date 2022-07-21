@@ -122,44 +122,6 @@ jobs:
         with:
           args: 'python3 make.py -ci -compiler emscripten -config release -unit_test'
 
-  vs2019:
-    runs-on: windows-2019
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-      - name: Building (debug-x64)
-        run: python3 make.py -ci -compiler vs2019 -config Debug -cpu x64 -build
-      - name: Running unit tests (debug-x64)
-        run: python3 make.py -ci -compiler vs2019 -config Debug -cpu x64 -unit_test
-      - name: Clean
-        run: python3 make.py -clean_only
-      - name: Building (release-x64)
-        run: python3 make.py -ci -compiler vs2019 -config Release -cpu x64 -build
-      - name: Running unit tests (release-x64)
-        run: python3 make.py -ci -compiler vs2019 -config Release -cpu x64 -unit_test
-      - name: Clean
-        run: python3 make.py -clean_only
-      - name: Building (debug-arm64)
-        run: python3 make.py -ci -compiler vs2019 -config Debug -cpu arm64 -build
-      - name: Clean
-        run: python3 make.py -clean_only
-      - name: Building (release-arm64)
-        run: python3 make.py -ci -compiler vs2019 -config Release -cpu arm64 -build
-      - name: Clean
-        run: python3 make.py -clean_only
-      - name: Building (debug-x64) with Clang
-        run: python3 make.py -ci -compiler vs2019-clang -config Debug -cpu x64 -build
-      - name: Running unit tests (debug-x64) with Clang
-        run: python3 make.py -ci -compiler vs2019-clang -config Debug -cpu x64 -unit_test
-      - name: Clean
-        run: python3 make.py -clean_only
-      - name: Building (release-x64) with Clang
-        run: python3 make.py -ci -compiler vs2019-clang -config Release -cpu x64 -build
-      - name: Running unit tests (release-x64) with Clang
-        run: python3 make.py -ci -compiler vs2019-clang -config Release -cpu x64 -unit_test
-
   vs2022:
     runs-on: windows-2022
     steps:
