@@ -123,7 +123,7 @@
 				(void)line;
 				(void)file;
 
-				constexpr int buffer_size = 64 * 1024;
+				constexpr int buffer_size = 1 * 1024;
 				char buffer[buffer_size];
 
 				va_list args;
