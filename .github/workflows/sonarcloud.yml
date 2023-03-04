@@ -22,7 +22,7 @@ jobs:
         id: check-secrets
         run: |
           if [ ! -z "${{ secrets.SONAR_TOKEN }}" ]; then
-            echo "::set-output name=ok::true"
+            echo "ok=true" >> $GITHUB_OUTPUT
           fi
   sonarcloud:
     needs:
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Build with wrapper
