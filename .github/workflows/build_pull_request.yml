@@ -15,7 +15,7 @@ jobs:
         compiler: [clang4]
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Building (debug-x86)
@@ -70,7 +70,7 @@ jobs:
         compiler: [gcc5, gcc6, gcc7, gcc8, clang5, clang6, clang7, clang8, clang9, clang10]
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Building (debug-x86)
@@ -125,7 +125,7 @@ jobs:
         compiler: [gcc9, gcc10, gcc11, clang11, clang12, clang13, clang14]
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Building (debug-x86)
@@ -180,7 +180,7 @@ jobs:
         compiler: [xcode10, xcode11]
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Setup ${{ matrix.compiler }} compiler
@@ -229,7 +229,7 @@ jobs:
         compiler: [xcode12, xcode13]
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Setup ${{ matrix.compiler }} compiler
@@ -257,7 +257,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Building (debug)
@@ -285,7 +285,7 @@ jobs:
     runs-on: windows-2019
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Building (debug-x64)
@@ -323,7 +323,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Building (debug-x64)
