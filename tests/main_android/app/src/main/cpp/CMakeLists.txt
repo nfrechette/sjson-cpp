@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 project(sjson-cpp_unit_tests CXX)
 
-set(CMAKE_CXX_STANDARD 11)
-
 # Project root is <sjson-cpp-dir>\tests\main_android
 set(PROJECT_ROOT_DIR "${PROJECT_SOURCE_DIR}/../../../..")
 
