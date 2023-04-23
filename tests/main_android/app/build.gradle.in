@@ -11,6 +11,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
+                arguments '-DCMAKE_CXX_STANDARD=@CMAKE_CXX_STANDARD@'
             }
         }
         ndk {
