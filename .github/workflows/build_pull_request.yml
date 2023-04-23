@@ -307,6 +307,37 @@ jobs:
         run: python3 make.py -clean_only
       - name: Building for iOS (release-arm64)
         run: python3 make.py -ci -compiler ios -config Release -build
+        
+  osx-12:
+    runs-on: macos-12
+    strategy:
+      matrix:
+        compiler: [xcode14]
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Setup ${{ matrix.compiler }} compiler
+        run: ./tools/setup_osx_compiler.sh ${{ matrix.compiler }}
+      - name: Building (debug-x64)
+        run: python3 make.py -ci -compiler osx -config Debug -cpu x64 -build
+      - name: Running unit tests (debug-x64)
+        run: python3 make.py -ci -compiler osx -config Debug -cpu x64 -unit_test
+      - name: Clean
+        run: python3 make.py -clean_only
+      - name: Building (release-x64)
+        run: python3 make.py -ci -compiler osx -config Release -cpu x64 -build
+      - name: Running unit tests (release-x64)
+        run: python3 make.py -ci -compiler osx -config Release -cpu x64 -unit_test
+      - name: Clean
+        run: python3 make.py -clean_only
+      - name: Building for iOS (debug-arm64)
+        run: python3 make.py -ci -compiler ios -config Debug -build
+      - name: Clean
+        run: python3 make.py -clean_only
+      - name: Building for iOS (release-arm64)
+        run: python3 make.py -ci -compiler ios -config Release -build
 
   emscripten:
     runs-on: ubuntu-latest
