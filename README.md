@@ -45,6 +45,7 @@ Unicode formats other than UTF-8 aren't supported.
 *  Android (NDK 21) ARMv7-A and ARM64
 *  iOS (Xcode 10.3, 11.7, 12.5, 13.2, 14.2) ARM64
 *  Emscripten (1.39.11) WASM
+*  MSYS2 x64
 
 The above supported platform list is only what is tested every release but if it compiles, it should run just fine.
 
