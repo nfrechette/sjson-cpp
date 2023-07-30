@@ -286,7 +286,14 @@ def do_generate_solution(build_dir, cmake_script_dir, args):
 	extra_switches.append('-DCPU_INSTRUCTION_SET:STRING={}'.format(cpu))
 	extra_switches.append('-DCMAKE_CXX_STANDARD:STRING={}'.format(args.cpp_version))
 
-	if not platform.system() == 'Windows':
+	if platform.system() == 'Windows':
+		if os.path.sep == '\\':
+			# Native Windows
+			extra_switches
+		else:
+			# MSYS2 or Cygwin
+			extra_switches.append('-DCMAKE_BUILD_TYPE={}'.format(config.upper()))
+	else:
 		extra_switches.append('-DCMAKE_BUILD_TYPE={}'.format(config.upper()))
 
 	if platform.system() == 'Darwin' and compiler == 'ios' and args.ci:
