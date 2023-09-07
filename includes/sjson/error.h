@@ -67,11 +67,7 @@
 
 // See [Custom String Format Specifier] for details
 #if !defined(SJSON_STRING_FORMAT_SPECIFIER)
-	#if defined(_MSC_VER) && !defined(__clang__)
-		#define SJSON_STRING_FORMAT_SPECIFIER "%hs"
-	#else
-		#define SJSON_STRING_FORMAT_SPECIFIER "%s"
-	#endif
+	#define SJSON_STRING_FORMAT_SPECIFIER "%s"
 #endif
 
 #if defined(SJSON_CPP_ON_ASSERT_ABORT)
