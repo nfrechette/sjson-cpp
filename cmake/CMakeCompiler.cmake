@@ -14,6 +14,7 @@ macro(setup_default_compiler_flags _project_name)
 		target_compile_options(${_project_name} PRIVATE /wd4514)			# Unreferenced inline function removed
 		target_compile_options(${_project_name} PRIVATE /wd4820)			# Padding added after data member
 		target_compile_options(${_project_name} PRIVATE /wd4710)			# Function not inlined
+		target_compile_options(${_project_name} PRIVATE /wd4711)			# Function selected for automatic inlining
 		target_compile_options(${_project_name} PRIVATE /wd5045)			# Spectre mitigation for memory load
 
 		if(MSVC_VERSION GREATER 1900)
