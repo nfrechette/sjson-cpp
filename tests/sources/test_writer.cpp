@@ -40,7 +40,7 @@ public:
 
 	virtual void write(const void* buffer, size_t buffer_size) override
 	{
-		m_buffer.sputn(reinterpret_cast<const char*>(buffer), buffer_size);
+		m_buffer.sputn(reinterpret_cast<const char*>(buffer), static_cast<std::streamsize>(buffer_size));
 	}
 
 	std::string str() const { return m_buffer.str(); }
