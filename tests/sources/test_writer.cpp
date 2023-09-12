@@ -35,6 +35,8 @@ class StringStreamWriter final : public StreamWriter
 {
 public:
 	StringStreamWriter() = default;
+	StringStreamWriter(const StringStreamWriter&) = delete;
+	StringStreamWriter& operator=(const StringStreamWriter&) = delete;
 
 	virtual void write(const void* buffer, size_t buffer_size) override
 	{
