@@ -268,7 +268,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%s%s", value ? "true" : "false", k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %s]", key, value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [%s = %s]", key, value);
 		m_stream_writer.write(buffer, static_cast<size_t>(length));
 	}
 
@@ -301,7 +301,7 @@ namespace sjson
 		{
 			char buffer[256];
 			int length = snprintf(buffer, sizeof(buffer), "%.17g%s", value, k_line_terminator);
-			SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %.17g]", key, value);
+			SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [%s = %.17g]", key, value);
 			m_stream_writer.write(buffer, static_cast<size_t>(length));
 		}
 	}
@@ -318,7 +318,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%" PRId64 "%s", value, k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %lld]", key, value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [%s = %lld]", key, value);
 		m_stream_writer.write(buffer, static_cast<size_t>(length));
 	}
 
@@ -334,7 +334,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%" PRIu64 "%s", value, k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to insert SJSON value: [%s = %llu]", key, value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [%s = %llu]", key, value);
 		m_stream_writer.write(buffer, static_cast<size_t>(length));
 	}
 
@@ -463,7 +463,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%s%s", value ? "true" : "false", k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %s", value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to assign SJSON value: %s", value);
 		m_object_writer->m_stream_writer.write(buffer, static_cast<size_t>(length));
 		m_is_empty = false;
 	}
@@ -493,7 +493,7 @@ namespace sjson
 		{
 			char buffer[256];
 			int length = snprintf(buffer, sizeof(buffer), "%.17g%s", value, k_line_terminator);
-			SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %.17g", value);
+			SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to assign SJSON value: %.17g", value);
 			m_object_writer->m_stream_writer.write(buffer, static_cast<size_t>(length));
 		}
 
@@ -558,7 +558,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%" PRId64 "%s", value, k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %lld", value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to assign SJSON value: %lld", value);
 		m_object_writer->m_stream_writer.write(buffer, static_cast<size_t>(length));
 		m_is_empty = false;
 	}
@@ -571,7 +571,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%" PRIu64 "%s", value, k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to assign SJSON value: %llu", value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to assign SJSON value: %llu", value);
 		m_object_writer->m_stream_writer.write(buffer, static_cast<size_t>(length));
 		m_is_empty = false;
 	}
@@ -615,7 +615,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%s", value ? "true" : "false");
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %s", value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to push SJSON value: %s", value);
 		m_stream_writer.write(buffer, static_cast<size_t>(length));
 		m_is_empty = false;
 		m_is_newline = false;
@@ -648,7 +648,7 @@ namespace sjson
 		{
 			char buffer[256];
 			int length = snprintf(buffer, sizeof(buffer), "%.17g", value);
-			SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %.17g", value);
+			SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to push SJSON value: %.17g", value);
 			m_stream_writer.write(buffer, static_cast<size_t>(length));
 		}
 
@@ -668,7 +668,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%" PRId64, value);
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %lld", value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to push SJSON value: %lld", value);
 		m_stream_writer.write(buffer, static_cast<size_t>(length));
 		m_is_empty = false;
 		m_is_newline = false;
@@ -686,7 +686,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%" PRIu64, value);
-		SJSON_CPP_ASSERT(length > 0 && length < sizeof(buffer), "Failed to push SJSON value: %llu", value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to push SJSON value: %llu", value);
 		m_stream_writer.write(buffer, static_cast<size_t>(length));
 		m_is_empty = false;
 		m_is_newline = false;
