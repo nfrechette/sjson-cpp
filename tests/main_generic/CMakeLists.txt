@@ -32,6 +32,10 @@ if(MSVC)
 		# Exceptions are not enabled by default for ARM targets, enable them
 		target_compile_options(${PROJECT_NAME} PRIVATE /EHsc)
 	endif()
+
+	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		target_compile_options(${PROJECT_NAME} PRIVATE -Wno-float-equal)		# Float comparison
+	endif()
 endif()
 
 # Throw on failure to allow us to catch them and recover
