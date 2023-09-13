@@ -5,9 +5,14 @@ macro(setup_default_compiler_flags _project_name)
 		# Replace some default compiler switches and add new ones
 		STRING(REPLACE "/GR" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})			# Disable RTTI
 		if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-			STRING(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})		# Enable level 4 warnings
+			STRING(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})			# Enable level 4 warnings
 		else()
-			STRING(REPLACE "/W3" "/Wall" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})	# Enable all warnings
+			if(MSVC_VERSION GREATER 1920)
+				# VS2019 and above
+				STRING(REPLACE "/W3" "/Wall" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})	# Enable all warnings
+			else()
+				STRING(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})		# Enable level 4 warnings
+			endif()
 		endif()
 		target_compile_options(${_project_name} PRIVATE /Zi)				# Add debug info
 		target_compile_options(${_project_name} PRIVATE /Oi)				# Generate intrinsic functions
