@@ -48,7 +48,7 @@ namespace sjson
 		using std::bit_cast;
 	#else
 		template<class dest_type_t, class src_type_t>
-		inline constexpr dest_type_t bit_cast(src_type_t input) noexcept
+		constexpr dest_type_t bit_cast(src_type_t input) noexcept
 		{
 			return reinterpret_cast<dest_type_t>(input);
 		}
