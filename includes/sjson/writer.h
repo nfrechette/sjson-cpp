@@ -268,7 +268,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%s%s", value ? "true" : "false", k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [" SJSON_STRING_FORMAT_SPECIFIER " = " SJSON_STRING_FORMAT_SPECIFIER "]", key, value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [" SJSON_ASSERT_STRING_FORMAT_SPECIFIER " = " SJSON_ASSERT_STRING_FORMAT_SPECIFIER "]", key, value);
 		m_stream_writer.write(buffer, static_cast<size_t>(length));
 	}
 
@@ -301,7 +301,7 @@ namespace sjson
 		{
 			char buffer[256];
 			int length = snprintf(buffer, sizeof(buffer), "%.17g%s", value, k_line_terminator);
-			SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [" SJSON_STRING_FORMAT_SPECIFIER " = %.17g]", key, value);
+			SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [" SJSON_ASSERT_STRING_FORMAT_SPECIFIER " = %.17g]", key, value);
 			m_stream_writer.write(buffer, static_cast<size_t>(length));
 		}
 	}
@@ -318,7 +318,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%" PRId64 "%s", value, k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [" SJSON_STRING_FORMAT_SPECIFIER " = %lld]", key, value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [" SJSON_ASSERT_STRING_FORMAT_SPECIFIER " = %lld]", key, value);
 		m_stream_writer.write(buffer, static_cast<size_t>(length));
 	}
 
@@ -334,7 +334,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%" PRIu64 "%s", value, k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [" SJSON_STRING_FORMAT_SPECIFIER " = %llu]", key, value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to insert SJSON value: [" SJSON_ASSERT_STRING_FORMAT_SPECIFIER " = %llu]", key, value);
 		m_stream_writer.write(buffer, static_cast<size_t>(length));
 	}
 
@@ -463,7 +463,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%s%s", value ? "true" : "false", k_line_terminator);
-		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to assign SJSON value: " SJSON_STRING_FORMAT_SPECIFIER, value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to assign SJSON value: " SJSON_ASSERT_STRING_FORMAT_SPECIFIER, value);
 		m_object_writer->m_stream_writer.write(buffer, static_cast<size_t>(length));
 		m_is_empty = false;
 	}
@@ -615,7 +615,7 @@ namespace sjson
 
 		char buffer[256];
 		int length = snprintf(buffer, sizeof(buffer), "%s", value ? "true" : "false");
-		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to push SJSON value: " SJSON_STRING_FORMAT_SPECIFIER, value);
+		SJSON_CPP_ASSERT(length > 0 && length < static_cast<int>(sizeof(buffer)), "Failed to push SJSON value: " SJSON_ASSERT_STRING_FORMAT_SPECIFIER, value);
 		m_stream_writer.write(buffer, static_cast<size_t>(length));
 		m_is_empty = false;
 		m_is_newline = false;
