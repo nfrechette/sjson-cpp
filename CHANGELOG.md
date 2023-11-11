@@ -1,5 +1,17 @@
 # Significant changes per release
 
+## 0.9.0
+
+*  Added support for Clang 12, 13, 14, and 15
+*  Added support for GCC 11, 12, and 13
+*  Added support for XCode 14
+*  Added support for VS2022
+*  Added support for MSYS2
+*  Added support for C++14, C++17, and C++20
+*  CI now uses docker where possible
+*  Lots of static analysis fixes and improvements
+*  Misc minor improvements
+
 ## 0.8.3
 
 *  Force macro expansion in version namespace identifier
