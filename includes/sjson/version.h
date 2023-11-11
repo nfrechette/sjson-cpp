@@ -29,8 +29,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #define SJSON_CPP_VERSION_MAJOR 0
-#define SJSON_CPP_VERSION_MINOR 8
-#define SJSON_CPP_VERSION_PATCH 99
+#define SJSON_CPP_VERSION_MINOR 9
+#define SJSON_CPP_VERSION_PATCH 0
 
 ////////////////////////////////////////////////////////////////////////////////
 // In order to allow multiple versions of this library to coexist side by side
