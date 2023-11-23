@@ -36,3 +36,6 @@ add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${ALL_TEST_SOURCE_FILES} ${ALL_MAIN
 
 # Throw on failure to allow us to catch them and recover
 add_definitions(-DSJSON_CPP_ON_ASSERT_THROW)
+
+# Set XCode properties
+set_property(TARGET ${PROJECT_NAME} PROPERTY XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.sjson.cpp.unit-tests")
