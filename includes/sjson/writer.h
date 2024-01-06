@@ -78,7 +78,7 @@ namespace sjson
 		}
 
 	private:
-		std::FILE* m_file;
+		std::FILE* m_file = nullptr;
 	};
 
 	// A lambda that does not capture anything is equivalent to a static function
@@ -128,10 +128,13 @@ namespace sjson
 		void write_indentation();
 
 		StreamWriter& m_stream_writer;
-		uint32_t m_indent_level;
-		bool m_is_empty;
-		bool m_is_locked;
-		bool m_is_newline;
+		uint32_t m_indent_level = 0;
+		bool m_is_empty = true;
+		bool m_is_newline = false;
+
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
+		bool m_is_locked = false;
+#endif
 
 		friend ObjectWriter;
 	};
@@ -195,9 +198,12 @@ namespace sjson
 			void assign_signed_integer(int64_t value);
 			void assign_unsigned_integer(uint64_t value);
 
-			ObjectWriter* m_object_writer;
-			bool m_is_empty;
-			bool m_is_locked;
+			ObjectWriter* m_object_writer = nullptr;
+			bool m_is_empty = true;
+
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
+			bool m_is_locked = false;
+#endif
 
 			friend ObjectWriter;
 		};
@@ -216,9 +222,12 @@ namespace sjson
 
 	private:
 		StreamWriter& m_stream_writer;
-		uint32_t m_indent_level;
-		bool m_is_locked;
-		bool m_has_live_value_ref;
+		uint32_t m_indent_level = 0;
+		bool m_has_live_value_ref = false;
+
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
+		bool m_is_locked = false;
+#endif
 
 		friend ArrayWriter;
 	};
@@ -238,8 +247,6 @@ namespace sjson
 	inline ObjectWriter::ObjectWriter(StreamWriter& stream_writer, uint32_t indent_level)
 		: m_stream_writer(stream_writer)
 		, m_indent_level(indent_level)
-		, m_is_locked(false)
-		, m_has_live_value_ref(false)
 	{}
 
 	inline void ObjectWriter::insert(const char* key, const char* value)
@@ -349,12 +356,18 @@ namespace sjson
 		m_stream_writer.write(key);
 		m_stream_writer.write(" = {");
 		m_stream_writer.write(k_line_terminator);
+
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = true;
+#endif
 
 		ObjectWriter object_writer(m_stream_writer, m_indent_level + 1);
 		writer_fun(object_writer);
 
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = false;
+#endif
+
 		write_indentation();
 
 		m_stream_writer.write("}");
@@ -371,7 +384,10 @@ namespace sjson
 
 		m_stream_writer.write(key);
 		m_stream_writer.write(" = [ ");
+
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = true;
+#endif
 
 		ArrayWriter array_writer(m_stream_writer, m_indent_level + 1);
 		writer_fun(array_writer);
@@ -388,7 +404,9 @@ namespace sjson
 			m_stream_writer.write(k_line_terminator);
 		}
 
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = false;
+#endif
 	}
 
 	inline void ObjectWriter::write_indentation()
@@ -407,8 +425,6 @@ namespace sjson
 
 	inline ObjectWriter::ValueRef::ValueRef(ObjectWriter& object_writer, const char* key)
 		: m_object_writer(&object_writer)
-		, m_is_empty(true)
-		, m_is_locked(false)
 	{
 		SJSON_CPP_ASSERT(!object_writer.m_is_locked, "Cannot insert SJSON value in locked object");
 		SJSON_CPP_ASSERT(!object_writer.m_has_live_value_ref, "Cannot insert SJSON value in object when it has a live ValueRef");
@@ -417,13 +433,18 @@ namespace sjson
 		object_writer.m_stream_writer.write(key);
 		object_writer.m_stream_writer.write(" = ");
 		object_writer.m_has_live_value_ref = true;
+
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		object_writer.m_is_locked = true;
+#endif
 	}
 
 	inline ObjectWriter::ValueRef::ValueRef(ValueRef&& other) noexcept
 		: m_object_writer(other.m_object_writer)
 		, m_is_empty(other.m_is_empty)
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		, m_is_locked(other.m_is_locked)
+#endif
 	{
 		other.m_object_writer = nullptr;
 	}
@@ -438,7 +459,10 @@ namespace sjson
 			SJSON_CPP_ASSERT(m_object_writer->m_is_locked, "Expected object writer to be locked");
 
 			m_object_writer->m_has_live_value_ref = false;
+
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 			m_object_writer->m_is_locked = false;
+#endif
 		}
 	}
 
@@ -509,12 +533,18 @@ namespace sjson
 
 		m_object_writer->m_stream_writer.write("{");
 		m_object_writer->m_stream_writer.write(k_line_terminator);
+
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = true;
+#endif
 
 		ObjectWriter object_writer(m_object_writer->m_stream_writer, m_object_writer->m_indent_level + 1);
 		writer_fun(object_writer);
 
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = false;
+#endif
+
 		m_object_writer->write_indentation();
 		m_object_writer->m_stream_writer.write("}");
 		m_object_writer->m_stream_writer.write(k_line_terminator);
@@ -529,7 +559,10 @@ namespace sjson
 		SJSON_CPP_ASSERT(!m_is_locked, "Cannot assign a value when locked");
 
 		m_object_writer->m_stream_writer.write("[ ");
+
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = true;
+#endif
 
 		ArrayWriter array_writer(m_object_writer->m_stream_writer, m_object_writer->m_indent_level + 1);
 		writer_fun(array_writer);
@@ -546,7 +579,10 @@ namespace sjson
 			m_object_writer->m_stream_writer.write(k_line_terminator);
 		}
 
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = false;
+#endif
+
 		m_is_empty = false;
 	}
 
@@ -581,9 +617,6 @@ namespace sjson
 	inline ArrayWriter::ArrayWriter(StreamWriter& stream_writer, uint32_t indent_level)
 		: m_stream_writer(stream_writer)
 		, m_indent_level(indent_level)
-		, m_is_empty(true)
-		, m_is_locked(false)
-		, m_is_newline(false)
 	{}
 
 	inline void ArrayWriter::push(const char* value)
@@ -708,7 +741,10 @@ namespace sjson
 		write_indentation();
 		m_stream_writer.write("{");
 		m_stream_writer.write(k_line_terminator);
+
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = true;
+#endif
 
 		ObjectWriter object_writer(m_stream_writer, m_indent_level + 1);
 		writer_fun(object_writer);
@@ -717,7 +753,10 @@ namespace sjson
 		m_stream_writer.write("}");
 		m_stream_writer.write(k_line_terminator);
 
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = false;
+#endif
+
 		m_is_empty = false;
 		m_is_newline = true;
 	}
@@ -734,12 +773,18 @@ namespace sjson
 			write_indentation();
 
 		m_stream_writer.write("[ ");
+
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = true;
+#endif
 
 		ArrayWriter array_writer(m_stream_writer, m_indent_level);
 		writer_fun(array_writer);
 
+#if defined(SJSON_CPP_HAS_ASSERT_CHECKS)
 		m_is_locked = false;
+#endif
+
 		m_stream_writer.write(" ]");
 		m_is_empty = false;
 		m_is_newline = false;
