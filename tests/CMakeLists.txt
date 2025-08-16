@@ -1,4 +1,3 @@
-cmake_minimum_required (VERSION 3.2)
 project(sjson-cpp_unit_tests_root NONE)
 
 if(PLATFORM_ANDROID)
