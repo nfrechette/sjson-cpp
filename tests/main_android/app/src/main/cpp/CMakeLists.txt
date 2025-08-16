@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.2...3.25)
 project(sjson-cpp_unit_tests CXX)
 
 # Project root is <sjson-cpp-dir>\tests\main_android
