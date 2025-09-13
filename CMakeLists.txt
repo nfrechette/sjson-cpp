@@ -8,6 +8,7 @@ include(CMakeCompiler)
 include(CMakePlatforms)
 
 set(CPU_INSTRUCTION_SET false CACHE STRING "CPU instruction set")
+set(IS_CROSS_COMPILING false CACHE BOOL "Whether we are cross-compiling or not")
 
 if(CMAKE_CONFIGURATION_TYPES)
 	set(CMAKE_CONFIGURATION_TYPES Debug Release)
